@@ -1,2 +1,2 @@
-# Battlecode2017
+# Laby Ideas - Battlecode 2017
 Team Laby's Battlecode repository for the Jan 2017 competition
