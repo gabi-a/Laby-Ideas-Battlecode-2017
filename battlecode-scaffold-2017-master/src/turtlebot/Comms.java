@@ -50,42 +50,52 @@ public class Comms {
 
 	// Uses channels 7 to 26
 	// 10 high priority trees, 10 low priority trees
-	public static void pushHighPriorityTree(RobotController rc, MapLocation loc){
+	public static void pushHighPriorityTree(RobotController rc, TreeInfo tree) throws GameActionException {
 		for(int i = 7; i < 17; i++){
-			if(!rc.readBroadcast(i)){
-				rc.broadcast(i, compressLocation(loc));
+			int data = rc.readBroadcast(i);
+			if(data == 0){
+				rc.broadcast(i, compressLocation(tree.getLocation()) + tree.getID()*16384);
 				break;
 			}
 		}
 	}
 
-	public static MapLocation popHighPriorityTree(RobotController rc){
+	public static TreeInfo popHighPriorityTree(RobotController rc) throws GameActionException {
 		for(int i = 16; i > 6; i--){
-			if(rc.readBroadcast(i)){
+			int data = rc.readBroadcast(i);
+			if(data != 0){
+				int id = data/16384;
+				data -= id*16384;
 				MapLocation loc = unpackLocation(rc.readBroadcast(i));
 				rc.broadcast(i, 0);
-				return loc;
+				return new TreeInfo(id, Team.NEUTRAL, loc, 0, 0, 0, null);
 			}
 		}
+		return null;
 	}
 
-	public static void pushLowPriorityTree(RobotController rc, MapLocation loc){
+	public static void pushLowPriorityTree(RobotController rc, TreeInfo tree) throws GameActionException {
 		for(int i = 17; i < 27; i++){
-			if(!rc.readBroadcast(i)){
-				rc.broadcast(i, compressLocation(loc));
+			int data = rc.readBroadcast(i);
+			if(data == 0){
+				rc.broadcast(i, compressLocation(tree.getLocation()) + tree.getID()*16384);
 				break;
 			}
 		}
 	}
 
-	public static MapLocation popLowPriorityTree(RobotController rc){
+	public static TreeInfo popLowPriorityTree(RobotController rc) throws GameActionException {
 		for(int i = 26; i > 16; i--){
-			if(rc.readBroadcast(i)){
-				MapLocation loc = unpackLocation(rc.readBroadcast(i));
+			int data = rc.readBroadcast(i);
+			if(data != 0){
+				int id = data/16384;
+				data -= id*16384;
+				MapLocation loc = unpackLocation(data);
 				rc.broadcast(i, 0);
-				return loc;
+				return new TreeInfo(id, Team.NEUTRAL, loc, 0, 0, 0, null);
 			}
 		}
+		return null;
 	}
 	
 }
