@@ -49,6 +49,7 @@ public class Comms {
 		return archonLocations;
 	}
 
+	/*
 	// Uses channels 7 to 26
 	// 10 high priority trees, 10 low priority trees
 	public static void pushHighPriorityTree(RobotController rc, MapLocation loc){
@@ -88,5 +89,20 @@ public class Comms {
 			}
 		}
 	}
+	*/
 	
+	// Uses channels 27 to 28
+	public static void writeHomeLocation(RobotController rc, MapLocation homeLocation) throws GameActionException {
+		rc.broadcast(27, (int)homeLocation.x);
+		rc.broadcast(28, (int)homeLocation.y);
+	}
+	
+	public static MapLocation readHomeLocation(RobotController rc) throws GameActionException {
+		int x = rc.readBroadcast(27);
+		int y = rc.readBroadcast(28);
+		if(x == 0 && y == 0) {
+			return null;
+		}
+		return new MapLocation(x, y);
+	}
 }
