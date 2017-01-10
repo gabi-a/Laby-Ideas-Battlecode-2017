@@ -22,7 +22,7 @@ public class Comms {
 	}
 
 	// Uses channels 1 to 6
-	// There could be an issue if one coordinate is 0
+	// There could be an issue if both coordinates are 0
 	public static void writeArchonLocation(RobotController rc) throws GameActionException {
 		for(int channel = 8; (channel-=2) > 1;) {
 			int x = rc.readBroadcast(channel);
@@ -36,6 +36,7 @@ public class Comms {
 		}
 	}
 	
+	// Uses channels 1 to 6
 	public static MapLocation[] readArchonLocations(RobotController rc) throws GameActionException {
 		MapLocation[] archonLocations = new MapLocation[3];
 		for(int channel = 8; (channel-=2) > 1;) {
@@ -48,6 +49,7 @@ public class Comms {
 		return archonLocations;
 	}
 
+	/*
 	// Uses channels 7 to 26
 	// 10 high priority trees, 10 low priority trees
 	public static void pushHighPriorityTree(RobotController rc, TreeInfo tree) throws GameActionException {
@@ -97,5 +99,20 @@ public class Comms {
 		}
 		return null;
 	}
+	*/
 	
+	// Uses channels 27 to 28
+	public static void writeHomeLocation(RobotController rc, MapLocation homeLocation) throws GameActionException {
+		rc.broadcast(27, (int)homeLocation.x);
+		rc.broadcast(28, (int)homeLocation.y);
+	}
+	
+	public static MapLocation readHomeLocation(RobotController rc) throws GameActionException {
+		int x = rc.readBroadcast(27);
+		int y = rc.readBroadcast(28);
+		if(x == 0 && y == 0) {
+			return null;
+		}
+		return new MapLocation(x, y);
+	}
 }

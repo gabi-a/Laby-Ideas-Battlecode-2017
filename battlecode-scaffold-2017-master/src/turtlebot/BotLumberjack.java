@@ -8,6 +8,8 @@ public class BotLumberjack {
 
 	public static void turn(RobotController rc) throws GameActionException {
 		// TODO: Find trees, kill trees
+		BotLumberjack.rc = rc;
+
 		if(target == null){
 			BotLumberjack.rc = rc;
 			target = Comms.popHighPriorityTree(rc);

@@ -18,19 +18,23 @@ public class BotArchon {
 		}
 		
 		if(rc.getRoundNum() == 2) {
-			MapLocation[] archonLocations = Comms.readArchonLocations(rc);
-			int dx = 0;
-			int dy = 0;
-			int archonCount = 0;
-			for(int i = 3; i-- > 1;) {
-				if(archonLocations[i] != null) {
-					archonCount++;
-					dx += archonLocations[i].x;
-					dy += archonLocations[i].y;
+			
+			homeLocation = Comms.readHomeLocation(rc);
+			if(homeLocation == null) {
+				MapLocation[] archonLocations = Comms.readArchonLocations(rc);
+				int dx = 0;
+				int dy = 0;
+				int archonCount = 0;
+				for(int i = 3; i-- > 1;) {
+					if(archonLocations[i] != null) {
+						archonCount++;
+						dx += archonLocations[i].x;
+						dy += archonLocations[i].y;
+					}
 				}
+				homeLocation = new MapLocation(dx/archonCount, dy/archonCount);
+				Comms.writeHomeLocation(rc, homeLocation);
 			}
-			homeLocation = new MapLocation(dx/archonCount, dy/archonCount);
-			return;
 		}
 		
 		int gardenersCount = Comms.getNumGardeners(rc);

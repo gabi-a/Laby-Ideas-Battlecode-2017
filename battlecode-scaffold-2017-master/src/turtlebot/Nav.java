@@ -11,7 +11,7 @@ public class Nav {
      * @throws GameActionException
      */
     static boolean tryMove(RobotController rc, Direction dir) throws GameActionException {
-        return tryMove(rc, dir,20,3);
+        return tryMove(rc, dir,18,20);
     }
 
     /**
@@ -51,6 +51,7 @@ public class Nav {
         }
 
         // A move never happened, so return false.
+        System.out.println("I'm stuck! :( I have "+ Clock.getBytecodesLeft()+" bytecodes left");
         return false;
     }
 }
