@@ -37,6 +37,9 @@ public class BotGardener {
 			if(tree.getHealth() < 50) {
 				if(rc.canWater(tree.getLocation())) {
 					rc.water(tree.getLocation());
+					if(tree.getHealth() + 5 < 50) {
+						return;
+					}
 				} else if(tree.getHealth() < 30 && Nav.tryMove(rc, myLocation.directionTo(tree.getLocation()))) {
 					return;
 				}
