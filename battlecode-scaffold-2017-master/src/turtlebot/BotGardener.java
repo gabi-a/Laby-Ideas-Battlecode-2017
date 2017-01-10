@@ -47,6 +47,12 @@ public class BotGardener {
                 trappedCount = 0;
             } // Else, we're all good. So do we have spare bullets?
             else {
+                TreeInfo[] nearbyTreeList = rc.senseNearbyTrees();
+                for (TreeInfo tree : nearbyTreeList) {
+                    if (rc.canWater(tree.ID)) {
+                        rc.water(tree.ID);
+                    }
+                }
                 Direction plantDirection = new Direction(archonLoc, selfLoc);
                 if (rc.canPlantTree(plantDirection)) {
                     rc.plantTree(plantDirection);
