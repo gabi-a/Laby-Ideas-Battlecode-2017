@@ -3,6 +3,14 @@ import battlecode.common.*;
 
 public class Comms {
 
+	public static int compressLocation(MapLocation loc) {
+		return (int)loc.x + (int)loc.y*128;
+	}
+
+	public static MapLocation unpackLocation(int loc) {
+		return new MapLocation(loc%128, loc/128);
+	}
+
 	// Uses channel 0
 	public static int getNumGardeners(RobotController rc) throws GameActionException {
 		return rc.readBroadcast(0);
@@ -38,6 +46,46 @@ public class Comms {
 			}
 		}
 		return archonLocations;
+	}
+
+	// Uses channels 7 to 26
+	// 10 high priority trees, 10 low priority trees
+	public static void pushHighPriorityTree(RobotController rc, MapLocation loc){
+		for(int i = 7; i < 17; i++){
+			if(!rc.readBroadcast(i)){
+				rc.broadcast(i, compressLocation(loc));
+				break;
+			}
+		}
+	}
+
+	public static MapLocation popHighPriorityTree(RobotController rc){
+		for(int i = 16; i > 6; i--){
+			if(rc.readBroadcast(i)){
+				MapLocation loc = unpackLocation(rc.readBroadcast(i));
+				rc.broadcast(i, 0);
+				return loc;
+			}
+		}
+	}
+
+	public static void pushLowPriorityTree(RobotController rc, MapLocation loc){
+		for(int i = 17; i < 27; i++){
+			if(!rc.readBroadcast(i)){
+				rc.broadcast(i, compressLocation(loc));
+				break;
+			}
+		}
+	}
+
+	public static MapLocation popLowPriorityTree(RobotController rc){
+		for(int i = 26; i > 16; i--){
+			if(rc.readBroadcast(i)){
+				MapLocation loc = unpackLocation(rc.readBroadcast(i));
+				rc.broadcast(i, 0);
+				return loc;
+			}
+		}
 	}
 	
 }
