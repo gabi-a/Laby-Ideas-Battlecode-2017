@@ -62,7 +62,7 @@ public strictfp class RobotPlayer {
                 Clock.yield();
 
             } catch (Exception e) {
-                System.out.println("Archon Exception");
+                System.out.println("Archon Exception!");
                 e.printStackTrace();
             }
         }
