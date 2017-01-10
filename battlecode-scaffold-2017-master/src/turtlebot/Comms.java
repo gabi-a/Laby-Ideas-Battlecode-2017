@@ -14,7 +14,7 @@ public class Comms {
 	}
 
 	// Uses channels 1 to 6
-	// There could be an issue if one coordinate is 0
+	// There could be an issue if both coordinates are 0
 	public static void writeArchonLocation(RobotController rc) throws GameActionException {
 		for(int channel = 8; (channel-=2) > 1;) {
 			int x = rc.readBroadcast(channel);
@@ -28,6 +28,7 @@ public class Comms {
 		}
 	}
 	
+	// Uses channels 1 to 6
 	public static MapLocation[] readArchonLocations(RobotController rc) throws GameActionException {
 		MapLocation[] archonLocations = new MapLocation[3];
 		for(int channel = 8; (channel-=2) > 1;) {

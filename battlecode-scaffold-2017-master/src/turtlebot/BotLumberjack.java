@@ -15,7 +15,7 @@ public class BotLumberjack {
 		}
 		if(trees.length == 0){
         	Direction dir = new Direction((float)Math.random() * 2 * (float)Math.PI);
-			rc.move(dir);  
+			Nav.tryMove(rc, dir);  
 			return;
 		}
 		int tree_id = -1;
