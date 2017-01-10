@@ -7,6 +7,7 @@ public class BotGardener {
 	
 	static MapLocation homeLocation;
 	static final int DEFENSE_RADIUS = 10;
+	static final int TREE_PLANT_RADIUS = 5;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
@@ -33,6 +34,11 @@ public class BotGardener {
 			if(homeLocation.distanceTo(myLocation) < DEFENSE_RADIUS) {
 				Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).opposite());
 			} else {
+				if(myLocation.distanceTo(homeLocation) > TREE_PLANT_RADIUS) {
+					if(rc.canPlantTree(myLocation.directionTo(homeLocation).opposite())) {
+						rc.plantTree(myLocation.directionTo(homeLocation).opposite());
+					}
+				}
 				Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).rotateLeftDegrees(90));
 			}
 		}

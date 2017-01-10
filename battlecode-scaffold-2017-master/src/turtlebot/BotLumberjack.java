@@ -47,6 +47,7 @@ public class BotLumberjack {
 			while(!rc.canMove(dir))
 				dir = myLocation.directionTo(loc).rotateLeftDegrees(90+(float)Math.random()*180);
 			rc.move(dir);
+			return;
 		}
 
 		MapLocation loc = trees[tree_id].location;
