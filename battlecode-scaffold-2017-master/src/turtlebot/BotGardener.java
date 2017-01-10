@@ -8,6 +8,8 @@ public class BotGardener {
 	static MapLocation homeLocation;
 	static final int DEFENSE_RADIUS = 10;
 	static final int TREE_PLANT_RADIUS = 5;
+	static int rotation = 90;
+	static int turnsSinceChangedRotation = 30;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
@@ -28,18 +30,33 @@ public class BotGardener {
 		if(homeLocation == null) {
 			homeLocation = Comms.readHomeLocation(rc);
 		}
-		
+
+		turnsSinceChangedRotation++;
 		if(homeLocation != null) {
 			MapLocation myLocation = rc.getLocation();
 			if(homeLocation.distanceTo(myLocation) < DEFENSE_RADIUS) {
-				Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).opposite());
+				if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).opposite())) {
+					if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).rotateLeftDegrees(rotation))) {
+						System.out.println("Turns since changed rotation: "+turnsSinceChangedRotation);
+						if(turnsSinceChangedRotation > 15) {
+							turnsSinceChangedRotation = 0;
+							rotation = -rotation;
+						}
+					}
+				}
 			} else {
 				if(myLocation.distanceTo(homeLocation) > TREE_PLANT_RADIUS) {
 					if(rc.canPlantTree(myLocation.directionTo(homeLocation).opposite())) {
 						rc.plantTree(myLocation.directionTo(homeLocation).opposite());
 					}
 				}
-				Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).rotateLeftDegrees(90));
+				if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).rotateLeftDegrees(rotation))) {
+					System.out.println("Turns since changed rotation: "+turnsSinceChangedRotation);
+					if(turnsSinceChangedRotation > 15) {
+						turnsSinceChangedRotation = 0;
+						rotation = -rotation;
+					}
+				}
 			}
 		}
 		
