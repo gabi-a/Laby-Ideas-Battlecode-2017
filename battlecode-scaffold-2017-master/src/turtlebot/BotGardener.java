@@ -17,16 +17,6 @@ public class BotGardener {
 		TreeInfo[] nearbyTrees = rc.senseNearbyTrees();
 		MapLocation myLocation = rc.getLocation();
 		
-		// TODO: Decide intelligently whether to build lumberjacks
-		if(rc.isBuildReady() && rc.getTeamBullets() >= RobotType.LUMBERJACK.bulletCost) {
-			for(int direction = 360; (direction -= 15) > 0;) {
-				Direction directionToBuild = new Direction((float)Math.toRadians((double)direction));
-				if(rc.canBuildRobot(RobotType.LUMBERJACK, directionToBuild)) {
-					rc.buildRobot(RobotType.LUMBERJACK, directionToBuild);
-					break;
-				}
-			}
-		}
 		
 		if(homeLocation == null) {
 			homeLocation = Comms.readHomeLocation(rc);
@@ -70,6 +60,18 @@ public class BotGardener {
 						turnsSinceChangedRotation = 0;
 						rotation = -rotation;
 					}
+				}
+			}
+		}
+		
+
+		// TODO: Decide intelligently whether to build lumberjacks
+		if(rc.isBuildReady() && rc.getTeamBullets() >= RobotType.LUMBERJACK.bulletCost) {
+			for(int direction = 360; (direction -= 15) > 0;) {
+				Direction directionToBuild = new Direction((float)Math.toRadians((double)direction));
+				if(rc.canBuildRobot(RobotType.LUMBERJACK, directionToBuild)) {
+					rc.buildRobot(RobotType.LUMBERJACK, directionToBuild);
+					break;
 				}
 			}
 		}
