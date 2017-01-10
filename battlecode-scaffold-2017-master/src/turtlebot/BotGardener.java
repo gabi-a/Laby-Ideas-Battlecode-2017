@@ -6,7 +6,7 @@ public class BotGardener {
 	static RobotController rc;
 	
 	static MapLocation homeLocation;
-	static final int DEFENSE_RADIUS = 10;
+	static final int DEFENSE_RADIUS = 5;
 	static final int TREE_PLANT_RADIUS = 5;
 	static int rotation = 90;
 	static int turnsSinceChangedRotation = 30;
@@ -15,6 +15,7 @@ public class BotGardener {
 		BotGardener.rc = rc;
 		
 		TreeInfo[] nearbyTrees = rc.senseNearbyTrees();
+		MapLocation myLocation = rc.getLocation();
 		
 		// TODO: Decide intelligently whether to build lumberjacks
 		if(rc.isBuildReady() && rc.getTeamBullets() >= RobotType.LUMBERJACK.bulletCost) {
@@ -30,10 +31,20 @@ public class BotGardener {
 		if(homeLocation == null) {
 			homeLocation = Comms.readHomeLocation(rc);
 		}
+		
+		for(int i = nearbyTrees.length;i-- > 1;) {
+			TreeInfo tree= nearbyTrees[i];
+			if(tree.getHealth() < 50) {
+				if(rc.canWater(tree.getLocation())) {
+					rc.water(tree.getLocation());
+				} else if(tree.getHealth() < 30 && Nav.tryMove(rc, myLocation.directionTo(tree.getLocation()))) {
+					return;
+				}
+			}
+		}
 
 		turnsSinceChangedRotation++;
 		if(homeLocation != null) {
-			MapLocation myLocation = rc.getLocation();
 			if(homeLocation.distanceTo(myLocation) < DEFENSE_RADIUS) {
 				if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).opposite())) {
 					if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).rotateLeftDegrees(rotation))) {
