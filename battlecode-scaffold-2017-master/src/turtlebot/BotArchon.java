@@ -15,6 +15,8 @@ public class BotArchon {
 		}
 		
 		MapLocation selfLoc = rc.getLocation();
+		
+		Nav.avoidBullets(rc, selfLoc);
 
 		while (count <= 7) {
 			int didHire = BotArchon.tryHireGardener(rc) ? 1 : 0;
@@ -29,7 +31,7 @@ public class BotArchon {
     public static boolean tryHireGardener(RobotController rc) throws GameActionException {
         Direction hireDirection = new Direction(0);
         for (int i =0 ; i < 8; i++) {
-            if(rc.canHireGardener(hireDirection)) {
+            if(rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection), 5)) {
                 rc.hireGardener(hireDirection);
                 return true;
             }
