@@ -4,11 +4,8 @@ import battlecode.common.*;
 
 public class BotGardener {
 
-    public static MapLocation targetLoc = null; 
     public static boolean atTargetLoc = false;
-    public static int trappedCount = 0;
     
-    public static final float POSITION_FIDELITY = 1f;
     public static final float MULTIPLICITY = 0.333334f;
     public static final Direction[] TREE_DIRECTIONS = 
         { 
@@ -54,20 +51,6 @@ public class BotGardener {
         		atTargetLoc = true;
         		Comms.writeGarden(rc, myLocation);
         	}
-        	
-        	/*
-        	Direction moveDirection = new Direction(selfLoc, targetLoc);
-            if(rc.canMove(moveDirection)) {
-                rc.move(moveDirection);
-                trappedCount = 0;
-            }
-            else {
-                trappedCount++;
-            }
-            if(selfLoc.distanceTo(targetLoc) <= POSITION_FIDELITY) {
-                atTargetLoc = true;
-            }
-            */
         }
         else {
             for (Direction plantDirection : TREE_DIRECTIONS) {
@@ -98,12 +81,6 @@ public class BotGardener {
             }
         }
 
-    }
-    
-    public static void broadcastUnassigned(RobotController rc) throws GameActionException {
-        Comms.writeStack(rc, 121, 140, new MapLocation(0,0));
-        trappedCount = 0;
-        System.out.println("No, I'm trapped :|");
     }
 
 }
