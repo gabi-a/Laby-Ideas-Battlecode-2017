@@ -41,7 +41,11 @@ public class BotGardener {
             	MapLocation[] gardens = Comms.readGardenLocs(rc);
             	for(int i = gardens.length;i-->0;) {
             		MapLocation otherGardenLoc = gardens[i];
-            		if(otherGardenLoc != null && myLocation.distanceTo(otherGardenLoc) < 5) {
+            		System.out.format("\nlooking at garden %d", i);
+            		System.out.format("\ngarden exists %b", otherGardenLoc != null);
+            		
+            		
+            		if(otherGardenLoc != null && myLocation.distanceTo(otherGardenLoc) < 10) {
             			goodToSettle = false;
                 		System.out.format("\n Too close to another garden to settle");
             			break;
@@ -51,7 +55,7 @@ public class BotGardener {
         	
         	if(goodToSettle) {
         		atTargetLoc = true;
-        		System.out.format("Wrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
+        		System.out.format("\nWrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
         	}
         }
         else {

@@ -14,10 +14,9 @@ public class Comms {
     // Up to 20 gardeners
     public static boolean writeGarden(RobotController rc, MapLocation loc) throws GameActionException {
     	// Loop through channels until one is empty
-    	System.out.println("Writing garden");
+    	System.out.format("\nWriting garden");
     	for(int i = GARDENS_END; i-->GARDENS_START;) {
-    		MapLocation readLoc = Comms.unpackLocation(rc.readBroadcast(i));
-    		if(readLoc.x == 0 && readLoc.y == 0) {
+    		if(rc.readBroadcast(i) == 0) {
     			rc.broadcast(i, Comms.packLocation(loc));
     			return true;
     		}
@@ -29,7 +28,12 @@ public class Comms {
     	MapLocation[] gardenLocs = new MapLocation[GARDENS_END-GARDENS_START];
     	int j = 0;
     	for(int i = GARDENS_END; i-->GARDENS_START;) {
-    		gardenLocs[j] = Comms.unpackLocation(rc.readBroadcast(i));
+    		int data = rc.readBroadcast(i);
+    		if(data == 0) {
+    			gardenLocs[j] = null;
+    		} else {
+    			gardenLocs[j] = Comms.unpackLocation(data);
+    		}
     	}
     	return gardenLocs;
     }
@@ -53,7 +57,7 @@ public class Comms {
         
         // Debug only!
         if (mapZoneX < 0 || mapZoneY < 0 || mapZoneX >= 200 || mapZoneY >= 200) {
-            System.out.format("We shouldn't be here! Map zone X/Y < 0 or >= 200, is %d,%d\n", mapZoneX, mapZoneY);
+            System.out.format("\nWe shouldn't be here! Map zone X/Y < 0 or >= 200, is %d,%d\n", mapZoneX, mapZoneY);
         }
         
         int packedLocation = (mapZoneX << 8) | (mapZoneY);
