@@ -52,6 +52,7 @@ public class BotLumberjack {
 						while(!rc.canMove(dir))
 							dir = rc.getLocation().directionTo(loc).rotateLeftDegrees(90+(float)Math.random()*180);
 						rc.move(dir);
+						return;
 					}
 
 					target = trees[tree_id];

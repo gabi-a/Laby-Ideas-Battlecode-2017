@@ -1,13 +1,16 @@
 package turtlegardens;
 
 import battlecode.common.*;
-import turtlebot.Nav;
 
 public class BotGardener {
 	static RobotController rc;
 	
+	static final int ANGLES_TO_CHECK = 30;
+	static final int ANGLE_BETWEEN_TREES = 12;
+	
 	static MapLocation myHomeLocation = null;
-	static final int MIN_GARDEN_RADIUS = 12;
+	static final int MIN_GARDEN_RADIUS_FROM_BASE = 12;
+	static final int GARDEN_RADIUS = 4;
 	static int turnsSinceChangedRotation = 0;
 	static int rotation = Math.random() < 0.5 ? 60 : -60;
 	static boolean settled = false;
@@ -54,8 +57,8 @@ public class BotGardener {
 			// Otherwise attempt to plant trees around the garden
 			System.out.println("I want to plant a tree");
 			Direction plantingDirection = Direction.getNorth();
-			for(int i = 10; i-->0;) {
-				MapLocation plantingLocation = gardenLocation.add(plantingDirection, 5);
+			for(int i = ANGLES_TO_CHECK; i-->0;) {
+				MapLocation plantingLocation = gardenLocation.add(plantingDirection, GARDEN_RADIUS);
 				System.out.println("I can see the planting spot: "+(myLocation.distanceTo(plantingLocation) <= RobotType.GARDENER.sensorRadius));
 				if(myLocation.distanceTo(plantingLocation)+1 <= RobotType.GARDENER.sensorRadius && !rc.isCircleOccupied(plantingLocation, 1)) {
 					System.out.println("The spot where I want to plant it is clear");
@@ -71,13 +74,13 @@ public class BotGardener {
 						}
 					}
 				}
-				plantingDirection = plantingDirection.rotateLeftDegrees(36);
+				plantingDirection = plantingDirection.rotateLeftDegrees(ANGLE_BETWEEN_TREES);
 			}
 		} else {
 			if(myHomeLocation != null) {
 				// Move and settle
 				turnsSinceChangedRotation++;
-				if(myHomeLocation.distanceTo(myLocation) < MIN_GARDEN_RADIUS) {
+				if(myHomeLocation.distanceTo(myLocation) < MIN_GARDEN_RADIUS_FROM_BASE) {
 					if(!Nav.tryMove(rc, rc.getLocation().directionTo(myHomeLocation).opposite())) {
 						if(!Nav.tryMove(rc, rc.getLocation().directionTo(myHomeLocation).rotateLeftDegrees(rotation))) {
 							if(turnsSinceChangedRotation > 15) {
@@ -116,50 +119,7 @@ public class BotGardener {
 			}
 		}
 		
-		
-		/*
-		for(int i = nearbyTrees.length;i-- > 1;) {
-			TreeInfo tree= nearbyTrees[i];
-			if(tree.getHealth() < 50) {
-				if(rc.canWater(tree.getLocation())) {
-					rc.water(tree.getLocation());
-					if(tree.getHealth() + 5 < 50) {
-						return;
-					}
-				} else if(tree.getHealth() < 30 && Nav.tryMove(rc, myLocation.directionTo(tree.getLocation()))) {
-					return;
-				}
-			}
-		}
 
-		turnsSinceChangedRotation++;
-		if(homeLocation != null) {
-			if(homeLocation.distanceTo(myLocation) < DEFENSE_RADIUS) {
-				if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).opposite())) {
-					if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).rotateLeftDegrees(rotation))) {
-						System.out.println("Turns since changed rotation: "+turnsSinceChangedRotation);
-						if(turnsSinceChangedRotation > 15) {
-							turnsSinceChangedRotation = 0;
-							rotation = -rotation;
-						}
-					}
-				}
-			} else {
-				if(myLocation.distanceTo(homeLocation) > TREE_PLANT_RADIUS) {
-					if(rc.canPlantTree(myLocation.directionTo(homeLocation).opposite())) {
-						rc.plantTree(myLocation.directionTo(homeLocation).opposite());
-					}
-				}
-				if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).rotateLeftDegrees(rotation))) {
-					System.out.println("Turns since changed rotation: "+turnsSinceChangedRotation);
-					if(turnsSinceChangedRotation > 15) {
-						turnsSinceChangedRotation = 0;
-						rotation = -rotation;
-					}
-				}
-			}
-		}
-		
 		
 		// TODO: Decide intelligently whether to build lumberjacks
 		if(rc.getRoundNum() < 1000) {
@@ -181,6 +141,6 @@ public class BotGardener {
 					}
 				}
 			}
-		}*/
+		}
 	}
 }

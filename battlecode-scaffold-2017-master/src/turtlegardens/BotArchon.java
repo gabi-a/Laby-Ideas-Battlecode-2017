@@ -10,8 +10,8 @@ public class BotArchon {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		
-		if(rc.getTeamBullets() > 1000) {
-			rc.donate(500);
+		if(rc.getTeamBullets() > 10000) {
+			rc.donate(10000);
 		}
 		
 		if(rc.getRoundNum() == 1) {
