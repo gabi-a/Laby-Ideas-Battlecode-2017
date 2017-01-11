@@ -4,11 +4,35 @@ import battlecode.common.*;
 public class Comms {
 
 	
-	public static final int GARDNER_STACK_START = 100;
-	public static final int GARDNER_STACK_END = 120;
+	public static final int GARDENS_START = 100;
+	public static final int GARDENS_END = 120;
 	public static final int LUMBERJACKS_COUNTER = 500;
 	
     private static final int POINTER_OFFSET = 1;
+    
+    
+    // Up to 10 gardeners
+    public static boolean writeGarden(RobotController rc, MapLocation loc) throws GameActionException {
+    	// Loop through channels until one is empty
+    	for(int i = GARDENS_END; i-->GARDENS_END;) {
+    		MapLocation readLoc = Comms.unpackLocation(rc.readBroadcast(i));
+    		if(readLoc.x != 0 && readLoc.y != 0) {
+    			rc.broadcast(i, Comms.packLocation(loc));
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    public static MapLocation[] readGardenLocs(RobotController rc) throws GameActionException {
+    	MapLocation[] gardenLocs = new MapLocation[10];
+    	int j = 0;
+    	for(int i = GARDENS_END; i-->GARDENS_END;) {
+    		gardenLocs[j] = Comms.unpackLocation(rc.readBroadcast(i));
+    	}
+    	return gardenLocs;
+    }
+    
     
     public static void writeStack(RobotController rc, int stackStart, int stackEnd, MapLocation location) throws GameActionException {
         

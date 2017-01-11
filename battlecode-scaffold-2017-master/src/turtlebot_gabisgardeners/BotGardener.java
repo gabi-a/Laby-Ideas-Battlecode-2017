@@ -34,12 +34,22 @@ public class BotGardener {
         else if (!atTargetLoc) {
             //System.out.format("Hm. %d, (%f - %f)\n", trappedCount, targetLoc.x, targetLoc.y);
             
-
+        	boolean goodToSettle = true;
         	MapLocation myLocation = rc.getLocation();
-        	Comms.readStack(rc, Comms.GARDNER_STACK_START, Comms.GARDNER_STACK_END);
-        	Comms.writeStack(rc, Comms.GARDNER_STACK_START, Comms.GARDNER_STACK_END, myLocation);
+        	MapLocation[] gardens = Comms.readGardenLocs(rc);
+        	for(int i = gardens.length;i-->0;) {
+        		MapLocation otherGardenLoc = gardens[i];
+        		if(myLocation.distanceTo(otherGardenLoc) < 10) {
+        			goodToSettle = false;
+        			break;
+        		}
+        	}
         	
-        	Nav.explore(rc);
+        	if(goodToSettle) {
+        		atTargetLoc = true;
+        	} else {
+	        	Nav.explore(rc);
+        	}
         	
         	/*
         	Direction moveDirection = new Direction(selfLoc, targetLoc);
