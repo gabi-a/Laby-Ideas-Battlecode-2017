@@ -11,7 +11,7 @@ public class Nav {
      * @throws GameActionException
      */
     static boolean tryMove(RobotController rc, Direction dir) throws GameActionException {
-        return tryMove(rc, dir,5,10);
+        return (dir == null) || tryMove(rc, dir,5,10);
     }
 
     /**
