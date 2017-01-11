@@ -42,7 +42,7 @@ public class BotSoldier {
 			}
 		}
 
-		if (target != null) {
+		if (target != null && rc.canFireSingleShot()) {
 			rc.fireSingleShot(dir);
 		}
 	}
