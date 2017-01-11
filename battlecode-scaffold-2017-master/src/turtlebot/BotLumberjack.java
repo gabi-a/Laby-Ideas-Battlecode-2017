@@ -4,11 +4,19 @@ import battlecode.common.*;
 
 public class BotLumberjack {
 	static RobotController rc;
-	static TreeInfo target;
-
+	static TreeInfo target = null;
+	static MapLocation homeLocation;
+	static final int HOME_RADIUS= 20;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		// TODO: Find trees, kill trees
 		BotLumberjack.rc = rc;
+		
+		MapLocation myLocation = rc.getLocation();
+		
+		if(homeLocation == null) {
+			homeLocation = Comms.readHomeLocation(rc);
+		}
 
 		if(target == null){
 			BotLumberjack.rc = rc;
@@ -48,8 +56,10 @@ public class BotLumberjack {
 
 					target = trees[tree_id];
 					for(int i = 0; i < trees.length; i++){
-						Comms.pushLowPriorityTree(rc, trees[i], 3);
-						System.out.println("added tree to queue");
+						if(trees[i].getTeam() == Team.NEUTRAL && (trees[i].getContainedBullets() != 0 || trees[i].getContainedRobot() != null)){
+							Comms.pushLowPriorityTree(rc, trees[i], 3);
+							System.out.println("added tree to queue");
+						}
 					}
 				}
 			}

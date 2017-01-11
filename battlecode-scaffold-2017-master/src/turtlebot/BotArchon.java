@@ -12,6 +12,10 @@ public class BotArchon {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		
+		if(rc.getTeamBullets() > 1000) {
+			rc.donate(500);
+		}
+		
 		if(rc.getRoundNum() == 1) {
 			Comms.writeArchonLocation(rc);
 			return;
@@ -39,7 +43,7 @@ public class BotArchon {
 		
 		int gardenersCount = Comms.getNumGardeners(rc);
 		
-		if(gardenersCount <= 2) {
+		if(gardenersCount <= 5) {
 			if(rc.isBuildReady() && rc.getTeamBullets() >= RobotType.GARDENER.bulletCost) {
 				for(int direction = 360; (direction -= 15) > 0;) {
 					Direction directionToBuild = new Direction((float)Math.toRadians((double)direction));
