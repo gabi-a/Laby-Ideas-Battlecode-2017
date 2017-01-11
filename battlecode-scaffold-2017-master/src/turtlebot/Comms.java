@@ -2,13 +2,17 @@ package turtlebot;
 import battlecode.common.*;
 
 public class Comms {
+
+    private static final int POINTER_OFFSET = 1;
     
-    public static final int START_CHANNEL = 100;
-    public static final int POINTER_OFFSET = 1;
-    
-    public static void writeStack(RobotController rc, MapLocation location) throws GameActionException {
+    public static void writeStack(RobotController rc, int stackStart, int stackEnd, MapLocation location) throws GameActionException {
         
-        int stackPointer = rc.readBroadcast(START_CHANNEL);
+        int stackPointer = rc.readBroadcast(stackStart);
+        
+        if (stackStart + stackPointer + 1 > stackEnd) {
+            System.out.println("Oops! Exceeded stack limit.");
+            return;
+        }
         
         Team myTeam = rc.getTeam();
         MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
@@ -24,13 +28,13 @@ public class Comms {
         
         int packedLocation = (mapZoneX << 8) | (mapZoneY);
 
-        rc.broadcast(START_CHANNEL + POINTER_OFFSET + stackPointer, packedLocation);
-        rc.broadcast(START_CHANNEL, stackPointer + 1);
+        rc.broadcast(stackStart + POINTER_OFFSET + stackPointer, packedLocation);
+        rc.broadcast(stackStart, stackPointer + 1);
     }
     
-    public static MapLocation readStack(RobotController rc) throws GameActionException {
+    public static MapLocation readStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
         
-        int stackPointer = rc.readBroadcast(START_CHANNEL);
+        int stackPointer = rc.readBroadcast(stackStart);
         
         if (stackPointer == 0) {
             return null;
@@ -38,7 +42,7 @@ public class Comms {
         
         stackPointer--;
         
-        int packedLocation = rc.readBroadcast(START_CHANNEL + POINTER_OFFSET + stackPointer);
+        int packedLocation = rc.readBroadcast(stackStart + POINTER_OFFSET + stackPointer);
 
         int mapZoneX = (packedLocation & 0xFF00) >> 8;
         int mapZoneY = packedLocation & 0x00FF;
@@ -51,11 +55,11 @@ public class Comms {
         return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
     }
     
-    public static MapLocation popStack(RobotController rc) throws GameActionException {
+    public static MapLocation popStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
         
-        MapLocation returnValue = Comms.readStack(rc);
+        MapLocation returnValue = Comms.readStack(rc, stackStart, stackEnd);
         
-        int stackPointer = rc.readBroadcast(START_CHANNEL);
+        int stackPointer = rc.readBroadcast(stackStart);
         
         if (stackPointer == 0) {
             return null;
@@ -63,8 +67,8 @@ public class Comms {
         
         stackPointer--;
         
-        rc.broadcast(START_CHANNEL + POINTER_OFFSET + stackPointer, 0);
-        rc.broadcast(START_CHANNEL, stackPointer);
+        rc.broadcast(stackStart + POINTER_OFFSET + stackPointer, 0);
+        rc.broadcast(stackStart, stackPointer);
         
         return returnValue;
     }
