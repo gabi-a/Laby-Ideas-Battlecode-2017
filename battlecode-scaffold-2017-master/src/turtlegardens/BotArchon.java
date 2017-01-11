@@ -41,7 +41,7 @@ public class BotArchon {
 		
 		int gardenersCount = Comms.getNumGardeners(rc);
 		
-		if(gardenersCount <= 5) {
+		if(gardenersCount <= 7) {
 			if(rc.isBuildReady() && rc.getTeamBullets() >= RobotType.GARDENER.bulletCost) {
 				for(int direction = 360; (direction -= 15) > 0;) {
 					Direction directionToBuild = new Direction((float)Math.toRadians((double)direction));

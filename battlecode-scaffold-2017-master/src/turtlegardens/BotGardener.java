@@ -1,65 +1,80 @@
 package turtlegardens;
 
 import battlecode.common.*;
+import turtlebot.Nav;
 
 public class BotGardener {
 	static RobotController rc;
 	
 	static MapLocation myHomeLocation = null;
-	static MapLocation gardenLocation;
-	static final int MIN_GARDEN_RADIUS = 10;
+	static final int MIN_GARDEN_RADIUS = 12;
 	static int turnsSinceChangedRotation = 0;
-	static int rotation = 90;
+	static int rotation = Math.random() < 0.5 ? 60 : -60;
 	static boolean settled = false;
-	static int treesPlanted = 0;
-	static int lastState = 0; // 0 - thinking, 1 - watering, 2 - planting
+	static MapLocation gardenLocation;
+	
+	static MapLocation wateringTree = null;
+	static MapLocation plantingTree = null;
+	
+	static boolean toldTheArchonIamDead = false;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
 		
-		TreeInfo[] nearbyTrees = rc.senseNearbyTrees();
+		if(!toldTheArchonIamDead && rc.getHealth() < 10) {
+			int numGardeners = Comms.getNumGardeners(rc) - 1;
+			Comms.writeNumGardeners(rc, numGardeners);
+			toldTheArchonIamDead = true;
+		}
+		
 		MapLocation myLocation = rc.getLocation();
 		
 		if(myHomeLocation == null) {
 			myHomeLocation = Comms.readHomeLocation(rc);
 		}
-		
-		if(myHomeLocation != null) {
+		if(settled) {
 			
-			if(settled) {
-				if(treesPlanted < 10) {
-					
-					// Plant more trees if none urgently need watering
-					// if I was planting, go back to middle
-					if(lastState == 2) {
-						if(!rc.hasMoved() && myLocation.directionTo(gardenLocation) == null) {
-							lastState = 0;
-						} else {
-							Nav.tryMove(rc, myLocation.directionTo(gardenLocation));
+			TreeInfo[] nearbyTrees = rc.senseNearbyTrees();
+			
+			// Water trees that need watering
+			for(int i = nearbyTrees.length;i-- > 1;) {
+				TreeInfo tree= nearbyTrees[i];
+				if(tree.getHealth() < 50) {
+					if(rc.canWater(tree.getLocation())) {
+						rc.water(tree.getLocation());
+						if(tree.getHealth() + 5 < 50) {
+							return;
 						}
-					} else if(lastState == 0) {
-						for(float directionRads = 6.283f; (directionRads-=0.6283f) > 0;) {
-							Direction plantDirection = new Direction(directionRads);
-							if(!rc.hasMoved() && rc.isCircleOccupiedExceptByThisRobot(myLocation.add(plantDirection), 2)) {
-								if(Nav.tryMove(rc, plantDirection)) {
-									lastState = 2;
-									if(rc.canPlantTree(plantDirection)) {
-										rc.plantTree(plantDirection);
-									}
-								}
-							}
+					} else if(tree.getHealth() < 30 && Nav.tryMove(rc, myLocation.directionTo(tree.getLocation()))) {
+						return;
+					}
+				}
+			}
+			
+			// Otherwise attempt to plant trees around the garden
+			System.out.println("I want to plant a tree");
+			Direction plantingDirection = Direction.getNorth();
+			for(int i = 10; i-->0;) {
+				MapLocation plantingLocation = gardenLocation.add(plantingDirection, 5);
+				System.out.println("I can see the planting spot: "+(myLocation.distanceTo(plantingLocation) <= RobotType.GARDENER.sensorRadius));
+				if(myLocation.distanceTo(plantingLocation)+1 <= RobotType.GARDENER.sensorRadius && !rc.isCircleOccupied(plantingLocation, 1)) {
+					System.out.println("The spot where I want to plant it is clear");
+					System.out.println("I am this distance from the spot: "+myLocation.distanceTo(plantingLocation));
+					if(myLocation.distanceTo(plantingLocation) < 3) {
+						if(rc.canPlantTree(myLocation.directionTo(plantingLocation))) {
+							rc.plantTree(myLocation.directionTo(plantingLocation));
+							return;
+						}
+					} else {
+						if(Nav.tryMove(rc, myLocation.directionTo(plantingLocation))){
+							return;
 						}
 					}
-					
-					
-				} else {
-					
-					// Water trees, build other units
-					
 				}
-				
-			} else {
-				
+				plantingDirection = plantingDirection.rotateLeftDegrees(36);
+			}
+		} else {
+			if(myHomeLocation != null) {
 				// Move and settle
 				turnsSinceChangedRotation++;
 				if(myHomeLocation.distanceTo(myLocation) < MIN_GARDEN_RADIUS) {
@@ -75,7 +90,10 @@ public class BotGardener {
 					// If this is a good spot then settle it
 					boolean settleHere = true;
 					RobotInfo[] nearbyAllies = rc.senseNearbyRobots(RobotType.GARDENER.sensorRadius, rc.getTeam());
-					if(nearbyAllies.length > 0) {
+					RobotInfo[] nearbyTrees = rc.senseNearbyRobots(RobotType.GARDENER.sensorRadius, rc.getTeam());
+					if(nearbyTrees.length > 0) {
+						settleHere = false;
+					} else if(nearbyAllies.length > 0) {
 						for(int i = nearbyAllies.length; i-- > 0;) {
 							if(nearbyAllies[i].getType() == RobotType.GARDENER) {
 								settleHere = false;
@@ -95,9 +113,7 @@ public class BotGardener {
 						}
 					}
 				}
-				
 			}
-			
 		}
 		
 		
