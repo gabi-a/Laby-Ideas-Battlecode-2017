@@ -20,7 +20,7 @@ public class BotArchon {
             for (int r = 0; r < 3; r++ ) {
                 for (int t = 0; t < 8; t++) {
                     float distance = GARDEN_DISTANCE * (r+1);
-                    float radians = t * (float) Math.PI * 0.25f - 0.333f;
+                    float radians = t * (float) Math.PI * 0.25f - 0.222f * (r+1);
                     if (radians < 0f) {
                         radians += 2 * (float) Math.PI;
                     }
