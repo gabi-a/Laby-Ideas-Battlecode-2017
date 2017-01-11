@@ -21,12 +21,57 @@ public class BotSoldier {
                 rc.fireSingleShot(rc.getLocation().directionTo(robots[0].location));
             }
         }
+        
+        if(!avoidBullets(myLocation)) {
 
-        // Move randomly
-        Nav.tryMove(rc, randomDirection());
+            Nav.tryMove(rc, randomDirection());
+        }
+    }
 
-        // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
+	private static boolean avoidBullets(MapLocation myLocation) throws GameActionException {
+		
+		BulletInfo[] bullets = rc.senseNearbyBullets();
+		BulletInfo bullet;
+		MapLocation goalLoc = myLocation;
+		if(bullets.length == 0) {
+			return true;
+		}
+		for(int i = bullets.length;i-->0;) {
+			bullet = bullets[i];
+			if(willCollideWithMe(bullet, myLocation)) {
+				goalLoc = goalLoc.add(bullet.dir.rotateLeftDegrees(90));
+			}
+		}
+		if(goalLoc == myLocation) {
+			return true;
+		}
+		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
+		
+	}
+	
+	static boolean willCollideWithMe(BulletInfo bullet, MapLocation loc) {
 
+        // Get relevant bullet information
+        Direction propagationDirection = bullet.dir;
+        MapLocation bulletLocation = bullet.location;
+
+        // Calculate bullet relations to this robot
+        Direction directionToRobot = bulletLocation.directionTo(loc);
+        float distToRobot = bulletLocation.distanceTo(loc);
+        float theta = propagationDirection.radiansBetween(directionToRobot);
+
+        // If theta > 90 degrees, then the bullet is traveling away from us and we can break early
+        if (Math.abs(theta) > Math.PI/2) {
+            return false;
+        }
+
+        // distToRobot is our hypotenuse, theta is our angle, and we want to know this length of the opposite leg.
+        // This is the distance of a line that goes from myLocation and intersects perpendicularly with propagationDirection.
+        // This corresponds to the smallest radius circle centered at our location that would intersect with the
+        // line that is the path of the bullet.
+        float perpendicularDist = (float)Math.abs(distToRobot * Math.sin(theta)); // soh cah toa :)
+
+        return (perpendicularDist <= rc.getType().bodyRadius);
     }
 
 	static Direction randomDirection() {
