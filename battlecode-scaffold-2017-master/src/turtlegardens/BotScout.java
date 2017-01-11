@@ -1,11 +1,11 @@
-package basebot;
+package turtlegardens;
 
 import battlecode.common.*;
 
-public class BotTank {
+public class BotScout {
 	static RobotController rc;
 	
 	public static void turn(RobotController rc) {
-		BotTank.rc = rc;
+		BotScout.rc = rc;
 	}
 }

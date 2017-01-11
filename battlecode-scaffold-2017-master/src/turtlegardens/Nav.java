@@ -1,4 +1,4 @@
-package turtlebot;
+package turtlegardens;
 import battlecode.common.*;
 
 public class Nav {
@@ -10,12 +10,8 @@ public class Nav {
      * @return true if a move was performed
      * @throws GameActionException
      */
-    public static boolean tryMove(RobotController rc, Direction dir) throws GameActionException {
-        return tryMove(rc, dir,5,10);
-    }
-    
-    public static boolean tryPrecisionMove(RobotController rc, Direction dir, float stride) throws GameActionException {
-        return tryPrecisionMove(rc, dir,5,10, stride);
+    static boolean tryMove(RobotController rc, Direction dir) throws GameActionException {
+        return (dir == null) || tryMove(rc, dir,5,10);
     }
 
     /**
@@ -55,39 +51,7 @@ public class Nav {
         }
 
         // A move never happened, so return false.
-        //System.out.println("I'm stuck! :( I have "+ Clock.getBytecodesLeft()+" bytecodes left");
-        return false;
-    }
-    
-    static boolean tryPrecisionMove(RobotController rc, Direction dir, float degreeOffset, int checksPerSide, float stride) throws GameActionException {
-
-        // First, try intended direction
-        if (rc.canMove(dir,stride)) {
-            rc.move(dir,stride);
-            return true;
-        }
-
-        // Now try a bunch of similar angles
-        boolean moved = false;
-        int currentCheck = 1;
-
-        while(currentCheck<=checksPerSide) {
-            // Try the offset of the left side
-            if(rc.canMove(dir.rotateLeftDegrees(degreeOffset*currentCheck),stride)) {
-                rc.move(dir.rotateLeftDegrees(degreeOffset*currentCheck),stride);
-                return true;
-            }
-            // Try the offset on the right side
-            if(rc.canMove(dir.rotateRightDegrees(degreeOffset*currentCheck),stride)) {
-                rc.move(dir.rotateRightDegrees(degreeOffset*currentCheck),stride);
-                return true;
-            }
-            // No move performed, try slightly further
-            currentCheck++;
-        }
-
-        // A move never happened, so return false.
-        //System.out.println("I'm stuck! :( I have "+ Clock.getBytecodesLeft()+" bytecodes left");
+        System.out.println("I'm stuck! :( I have "+ Clock.getBytecodesLeft()+" bytecodes left");
         return false;
     }
 }

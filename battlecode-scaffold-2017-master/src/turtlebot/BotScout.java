@@ -3,7 +3,6 @@ package turtlebot;
 import battlecode.common.*;
 
 public class BotScout {
-
     static final float BULLET_SPREAD_FACTOR = 0.0f;
     static final float STRIDE_RADIUS = 2.5f;
     static boolean suspended = false;

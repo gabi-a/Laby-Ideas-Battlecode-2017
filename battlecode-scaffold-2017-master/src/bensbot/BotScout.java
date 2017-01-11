@@ -1,11 +1,9 @@
-package basebot;
+package bensbot;
 
 import battlecode.common.*;
 
 public class BotScout {
-	static RobotController rc;
-	
 	public static void turn(RobotController rc) {
-		BotScout.rc = rc;
+		
 	}
 }

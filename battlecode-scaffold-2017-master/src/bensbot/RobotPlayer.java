@@ -1,5 +1,4 @@
-package basebot;
-
+package bensbot;
 import battlecode.common.*;
 
 public strictfp class RobotPlayer {
@@ -35,4 +34,5 @@ public strictfp class RobotPlayer {
 			Clock.yield();
 		}
 	}
+		
 }
