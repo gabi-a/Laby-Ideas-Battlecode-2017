@@ -34,7 +34,13 @@ public class BotGardener {
         else if (!atTargetLoc) {
             //System.out.format("Hm. %d, (%f - %f)\n", trappedCount, targetLoc.x, targetLoc.y);
             
+
+        	MapLocation myLocation = rc.getLocation();
+        	Comms.readStack(rc, Comms.GARDNER_STACK_START, Comms.GARDNER_STACK_END);
+        	Comms.writeStack(rc, Comms.GARDNER_STACK_START, Comms.GARDNER_STACK_END, myLocation);
+        	
         	Nav.explore(rc);
+        	
         	/*
         	Direction moveDirection = new Direction(selfLoc, targetLoc);
             if(rc.canMove(moveDirection)) {
