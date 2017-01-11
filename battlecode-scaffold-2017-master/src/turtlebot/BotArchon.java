@@ -19,11 +19,7 @@ public class BotArchon {
 		Nav.avoidBullets(rc, selfLoc);
 
 		while (count <= 7) {
-			int didHire = BotArchon.tryHireGardener(rc) ? 1 : 0;
-			count += didHire;
-			if (didHire != 0) {
-				BotArchon.delegateGardener(rc);
-			}
+			count += BotArchon.tryHireGardener(rc) ? 1 : 0;
 		}
 		
 	}
@@ -36,20 +32,6 @@ public class BotArchon {
                 return true;
             }
             hireDirection = hireDirection.rotateLeftRads((float) Math.PI * 0.25f);
-        }
-        return false;
-    }
-    
-    public static void delegateGardener(RobotController rc) throws GameActionException {
-        Comms.writeStack(rc, 100, 120, gardenSpawns[gardenSpawnPointer]);
-        System.out.format("Delegrated (%f, %f)", gardenSpawns[gardenSpawnPointer].x, gardenSpawns[gardenSpawnPointer].y);
-        gardenSpawnPointer++;
-        gardenSpawnPointer %= 24;
-    }
-    
-    public static boolean checkUnnassingedGardener(RobotController rc) throws GameActionException {
-        if(Comms.popStack(rc, 121, 140) != null) {
-            return true;
         }
         return false;
     }
