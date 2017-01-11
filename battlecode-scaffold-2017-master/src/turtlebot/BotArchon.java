@@ -8,20 +8,23 @@ public class BotArchon {
     
     public static int count = 0;
     public static boolean startupFlag = true;
-    public static MapLocation[] gardenSpawns = new MapLocation[81];
+    public static MapLocation[] gardenSpawns = new MapLocation[24];
     public static int gardenSpawnPointer = 0;
-    public static final float GARDEN_DISTANCE = 5f;
+    public static final float GARDEN_DISTANCE = 10f;
     
     public static void turn(RobotController rc) throws GameActionException {
         
         MapLocation selfLoc = rc.getLocation();
         
         if (startupFlag) {
-            for (int i = -4; i <= 4; i++ ) {
-                for (int j = -4; i <= 4; i++) {
-                    gardenSpawns[i + 4 + 9 * (j + 4)] =
-                            selfLoc.add(0f, GARDEN_DISTANCE * i)
-                            .add((float) Math.PI * 0.5f, GARDEN_DISTANCE * j);
+            for (int r = 0; r < 3; r++ ) {
+                for (int t = 0; t < 8; t++) {
+                    float distance = GARDEN_DISTANCE * (r+1);
+                    float radians = t * (float) Math.PI * 0.25f - 0.333f;
+                    if (radians < 0f) {
+                        radians += 2 * (float) Math.PI;
+                    }
+                    gardenSpawns[8 * r + t] = selfLoc.add(new Direction(radians), distance);
                 }
             }
         }
@@ -55,7 +58,7 @@ public class BotArchon {
         Comms.writeStack(rc, 0, 20, gardenSpawns[gardenSpawnPointer]);
         System.out.format("Delegrated (%f, %f)", gardenSpawns[gardenSpawnPointer].x, gardenSpawns[gardenSpawnPointer].y);
         gardenSpawnPointer++;
-        gardenSpawnPointer %= 81;
+        gardenSpawnPointer %= 24;
     }
     
     public static boolean checkUnnassingedGardener(RobotController rc) throws GameActionException {

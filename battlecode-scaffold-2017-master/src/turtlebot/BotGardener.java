@@ -8,7 +8,7 @@ public class BotGardener {
     public static boolean atTargetLoc = false;
     public static int trappedCount = 0;
     
-    public static final float POSITION_FIDELITY = 0.6f;
+    public static final float POSITION_FIDELITY = 1f;
     public static final float MULTIPLICITY = 0.333334f;
     public static final Direction[] TREE_DIRECTIONS = 
         { 
