@@ -5,6 +5,11 @@ public class Comms {
 
     private static final int POINTER_OFFSET = 1;
     
+    /* STACK LAYOUT
+        0 - 20 = GARDENER SPAWNS
+        21 - 40 = GARDENER REQUESTS
+    */
+    
     public static void writeStack(RobotController rc, int stackStart, int stackEnd, MapLocation location) throws GameActionException {
         
         int stackPointer = rc.readBroadcast(stackStart);

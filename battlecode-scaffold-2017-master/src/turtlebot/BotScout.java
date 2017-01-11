@@ -79,13 +79,11 @@ public class BotScout {
         } else {
             suspended = false;
         }
-
-        Clock.yield();
     }
     
     public static MapLocation getLockLocation(RobotController rc, MapLocation selfLoc) throws GameActionException {
         
-        MapLocation location = Comms.popStack(rc);
+        MapLocation location = Comms.popStack(rc, 0, 50);
         Team myTeam = rc.getTeam();
         
         if (location != null) {
