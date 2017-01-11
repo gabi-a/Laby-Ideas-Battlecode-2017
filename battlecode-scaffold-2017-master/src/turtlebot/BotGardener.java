@@ -24,7 +24,7 @@ public class BotGardener {
         MapLocation selfLoc = rc.getLocation();
 
         if (targetLoc == null) {
-            targetLoc = Comms.popStack(rc, 0, 20);
+            targetLoc = Comms.popStack(rc, 100, 120);
         }
         else if (trappedCount > TRAPPED_THRESHOLD) {
             targetLoc = null;
@@ -66,7 +66,7 @@ public class BotGardener {
     }
     
     public static void broadcastUnassigned(RobotController rc) throws GameActionException {
-        Comms.writeStack(rc, 21, 40, new MapLocation(0,0));
+        Comms.writeStack(rc, 121, 140, new MapLocation(0,0));
         trappedCount = 0;
         System.out.println("No, I'm trapped :|");
     }

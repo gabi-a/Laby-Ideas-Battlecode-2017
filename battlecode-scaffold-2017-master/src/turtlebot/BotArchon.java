@@ -76,14 +76,14 @@ public class BotArchon {
     }
     
     public static void delegateGardener(RobotController rc) throws GameActionException {
-        Comms.writeStack(rc, 0, 20, gardenSpawns[gardenSpawnPointer]);
+        Comms.writeStack(rc, 100, 120, gardenSpawns[gardenSpawnPointer]);
         System.out.format("Delegrated (%f, %f)", gardenSpawns[gardenSpawnPointer].x, gardenSpawns[gardenSpawnPointer].y);
         gardenSpawnPointer++;
         gardenSpawnPointer %= 24;
     }
     
     public static boolean checkUnnassingedGardener(RobotController rc) throws GameActionException {
-        if(Comms.popStack(rc, 21, 40) != null) {
+        if(Comms.popStack(rc, 121, 140) != null) {
             return true;
         }
         return false;
