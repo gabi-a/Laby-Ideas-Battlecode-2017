@@ -100,14 +100,12 @@ public class Nav {
     public static void explore(RobotController rc) throws GameActionException {
     	MapLocation myLocation = rc.getLocation();
     	int moveAttemptCount = 0;
-    	
     	while(moveAttemptCount < 30) {
     		if(rc.onTheMap(myLocation.add(heading,RobotType.GARDENER.strideRadius),RobotType.GARDENER.bodyRadius+2)) {
     			if(Nav.tryMove(rc, heading)) {
     				break;
     			}
     		}
-    		System.out.format("Heading: %f degs", heading.getAngleDegrees());
     		heading = Nav.randomDirection();
     		moveAttemptCount++;
     	}

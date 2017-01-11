@@ -24,31 +24,35 @@ public class BotGardener {
         
         MapLocation selfLoc = rc.getLocation();
 
-        if (targetLoc == null) {
-            targetLoc = Comms.popStack(rc, 100, 120);
-        }
-        else if (trappedCount > TRAPPED_THRESHOLD) {
-            targetLoc = null;
-            BotGardener.broadcastUnassigned(rc);
-        }
-        else if (!atTargetLoc) {
+        if (!atTargetLoc) {
             //System.out.format("Hm. %d, (%f - %f)\n", trappedCount, targetLoc.x, targetLoc.y);
-            
+
+        	Nav.explore(rc);
+        	
         	boolean goodToSettle = true;
         	MapLocation myLocation = rc.getLocation();
-        	MapLocation[] gardens = Comms.readGardenLocs(rc);
-        	for(int i = gardens.length;i-->0;) {
-        		MapLocation otherGardenLoc = gardens[i];
-        		if(myLocation.distanceTo(otherGardenLoc) < 10) {
-        			goodToSettle = false;
-        			break;
-        		}
+        	
+        	RobotInfo[] nearbyBots = rc.senseNearbyRobots(5);
+        	if(nearbyBots.length > 0) {
+        		goodToSettle = false;
+        		System.out.format("\n Too many nearby bots to settle");
+        	}
+        	
+        	if(goodToSettle) {
+            	MapLocation[] gardens = Comms.readGardenLocs(rc);
+            	for(int i = gardens.length;i-->0;) {
+            		MapLocation otherGardenLoc = gardens[i];
+            		if(otherGardenLoc != null && myLocation.distanceTo(otherGardenLoc) < 10) {
+            			goodToSettle = false;
+                		System.out.format("\n Too close to another garden to settle");
+            			break;
+            		}
+            	}
         	}
         	
         	if(goodToSettle) {
         		atTargetLoc = true;
-        	} else {
-	        	Nav.explore(rc);
+        		Comms.writeGarden(rc, myLocation);
         	}
         	
         	/*
@@ -71,7 +75,7 @@ public class BotGardener {
                     rc.plantTree(plantDirection);
                 }
             }
-            for (TreeInfo treeInfo : rc.senseNearbyTrees(1.5f)) {
+            for (TreeInfo treeInfo : rc.senseNearbyTrees(1.5f, rc.getTeam())) {
                 if (treeInfo.health <= 0.9f * treeInfo.maxHealth && rc.canWater(treeInfo.ID)) {
                     rc.water(treeInfo.ID);
                 }
