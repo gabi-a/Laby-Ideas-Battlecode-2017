@@ -6,27 +6,53 @@ public class BotSoldier {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
-        Team enemy = rc.getTeam().opponent();
+		Team enemy = rc.getTeam().opponent();
 
-        MapLocation myLocation = rc.getLocation();
+		MapLocation myLocation = rc.getLocation();
+		RobotInfo[] robots = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		RobotInfo target = null;
+		float targetRating = 10000;
+		float curRating;
+		for (int i = 0; i < robots.length; i++) {
+			curRating = rateTarget(robots[i]);
+			if (curRating < targetRating) {
+				target = robots[i];
+				targetRating = curRating;
+			}
+		}
 
-        // See if there are any nearby enemy robots
-        RobotInfo[] robots = rc.senseNearbyRobots(-1, enemy);
+		float dist = 0;
+		Direction dir = new Direction(0);
+		if (target != null) {
+			dir = rc.getLocation().directionTo(target.location);
+			dist = target.location.distanceTo(rc.getLocation());
+		}
 
-        // If there are some...
-        if (robots.length > 0) {
-            // And we have enough bullets, and haven't attacked yet this turn...
-            if (rc.canFireSingleShot()) {
-                // ...Then fire a bullet in the direction of the enemy.
-                rc.fireSingleShot(rc.getLocation().directionTo(robots[0].location));
-            }
-        }
-        
-        if(!avoidBullets(myLocation)) {
+	        if(!avoidBullets(myLocation)) {
+			if (target != null) {
+				if (dist >= 6) {
+					Nav.tryMove(rc, dir);
+				}
+				else if (dist < 4 && rc.canMove(dir.opposite())) {
+					Nav.tryMove(rc, dir.opposite());
+				}
+			}
+			else {
+				Nav.tryMove(rc, randomDirection());
+			}
+		}
 
-            Nav.tryMove(rc, randomDirection());
-        }
-    }
+		if (target != null) {
+			rc.fireSingleShot(dir);
+		}
+	}
+
+        private static float rateTarget(RobotInfo target) {
+		float score;
+		score = target.location.distanceTo(rc.getLocation());
+		if (target.type == RobotType.ARCHON) score -= 2;
+		return score;
+	}
 
 	private static boolean avoidBullets(MapLocation myLocation) throws GameActionException {
 		
@@ -34,7 +60,7 @@ public class BotSoldier {
 		BulletInfo bullet;
 		MapLocation goalLoc = myLocation;
 		if(bullets.length == 0) {
-			return true;
+			return false;
 		}
 		for(int i = bullets.length;i-->0;) {
 			bullet = bullets[i];
@@ -43,7 +69,7 @@ public class BotSoldier {
 			}
 		}
 		if(goalLoc == myLocation) {
-			return true;
+			return false;
 		}
 		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
 		
