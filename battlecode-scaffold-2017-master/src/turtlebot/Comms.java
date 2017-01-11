@@ -26,7 +26,7 @@ public class Comms {
 	public static void writeArchonLocation(RobotController rc) throws GameActionException {
 		for(int channel = 8; (channel-=2) > 1;) {
 			int x = rc.readBroadcast(channel);
-			int y = rc.readBroadcast(channel+1);
+			int y = rc.readBroadcast(channel-1);
 			if(x == 0 && y == 0) {
 				rc.broadcast(channel, (int) rc.getLocation().x);
 				rc.broadcast(channel+1, (int) rc.getLocation().y);
@@ -41,7 +41,7 @@ public class Comms {
 		MapLocation[] archonLocations = new MapLocation[3];
 		for(int channel = 8; (channel-=2) > 1;) {
 			int x = rc.readBroadcast(channel);
-			int y = rc.readBroadcast(channel+1);
+			int y = rc.readBroadcast(channel-1);
 			if(x != 0 && y != 0) {
 				archonLocations[channel/2 - 1] = new MapLocation(x,y);
 			}
