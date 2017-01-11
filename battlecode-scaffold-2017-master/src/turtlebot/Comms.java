@@ -3,12 +3,12 @@ import battlecode.common.*;
 
 public class Comms {
 
-	public static int compressLocation(MapLocation loc) {
-		return (int)loc.x + (int)loc.y*128;
+	public static int packLocation(MapLocation loc) {
+		return (int)loc.x + (int)loc.y*(int)Math.pow(2,10);
 	}
 
 	public static MapLocation unpackLocation(int loc) {
-		return new MapLocation(loc%128, loc/128);
+		return new MapLocation(loc%(int)Math.pow(2,10), loc/(int)Math.pow(2,10));
 	}
 
 	// Uses channel 0
@@ -49,14 +49,25 @@ public class Comms {
 		return archonLocations;
 	}
 
-	/*
 	// Uses channels 7 to 26
 	// 10 high priority trees, 10 low priority trees
-	public static void pushHighPriorityTree(RobotController rc, TreeInfo tree) throws GameActionException {
+	public static int packTree(TreeInfo tree, int count){
+		return packLocation(tree.getLocation()) + count*(int)Math.pow(2,20)+ tree.getID()*(int)Math.pow(2,24);
+	}
+
+	public static TreeInfo unpackTree(int data){
+		int id = data/(int)Math.pow(2, 24);
+		int count = (data - (id*(int)Math.pow(2, 24)))/(int)Math.pow(2,20);
+		MapLocation loc = unpackLocation(data - id*(int)Math.pow(2,24) - count*(int)Math.pow(2,20));
+
+		return new TreeInfo(id, null, loc, 0, 0, count, null);
+	}
+
+	public static void pushHighPriorityTree(RobotController rc, TreeInfo tree, int count) throws GameActionException {
 		for(int i = 7; i < 17; i++){
 			int data = rc.readBroadcast(i);
 			if(data == 0){
-				rc.broadcast(i, compressLocation(tree.getLocation()) + tree.getID()*16384);
+				rc.broadcast(i, packTree(tree, count));
 				break;
 			}
 		}
@@ -66,21 +77,21 @@ public class Comms {
 		for(int i = 16; i > 6; i--){
 			int data = rc.readBroadcast(i);
 			if(data != 0){
-				int id = data/16384;
-				data -= id*16384;
-				MapLocation loc = unpackLocation(rc.readBroadcast(i));
-				rc.broadcast(i, 0);
-				return new TreeInfo(id, Team.NEUTRAL, loc, 0, 0, 0, null);
+				TreeInfo tree = unpackTree(data);
+				if(tree.getContainedBullets() > 1){
+					rc.broadcast(i, packTree(tree, tree.getContainedBullets()-1));
+				} else rc.broadcast(i, 0);
+				return tree;
 			}
 		}
 		return null;
 	}
 
-	public static void pushLowPriorityTree(RobotController rc, TreeInfo tree) throws GameActionException {
+	public static void pushLowPriorityTree(RobotController rc, TreeInfo tree, int count) throws GameActionException {
 		for(int i = 17; i < 27; i++){
 			int data = rc.readBroadcast(i);
 			if(data == 0){
-				rc.broadcast(i, compressLocation(tree.getLocation()) + tree.getID()*16384);
+				rc.broadcast(i, packTree(tree, count));
 				break;
 			}
 		}
@@ -90,16 +101,15 @@ public class Comms {
 		for(int i = 26; i > 16; i--){
 			int data = rc.readBroadcast(i);
 			if(data != 0){
-				int id = data/16384;
-				data -= id*16384;
-				MapLocation loc = unpackLocation(data);
-				rc.broadcast(i, 0);
-				return new TreeInfo(id, Team.NEUTRAL, loc, 0, 0, 0, null);
+				TreeInfo tree = unpackTree(data);
+				if(tree.getContainedBullets() > 1){
+					rc.broadcast(i, packTree(tree, tree.getContainedBullets()-1));
+				} else rc.broadcast(i, 0);
+				return tree;
 			}
 		}
 		return null;
 	}
-	*/
 	
 	// Uses channels 27 to 28
 	public static void writeHomeLocation(RobotController rc, MapLocation homeLocation) throws GameActionException {
