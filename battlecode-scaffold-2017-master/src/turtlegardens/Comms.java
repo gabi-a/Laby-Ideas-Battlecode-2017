@@ -1,4 +1,4 @@
-package turtlebot;
+package turtlegardens;
 import battlecode.common.*;
 
 public class Comms {

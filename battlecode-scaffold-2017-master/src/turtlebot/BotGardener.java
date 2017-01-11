@@ -41,7 +41,7 @@ public class BotGardener {
 			if(homeLocation.distanceTo(myLocation) < DEFENSE_RADIUS) {
 				if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).opposite())) {
 					if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).rotateLeftDegrees(rotation))) {
-						System.out.println("Turns since changed rotation: "+turnsSinceChangedRotation);
+						//System.out.println("Turns since changed rotation: "+turnsSinceChangedRotation);
 						if(turnsSinceChangedRotation > 15) {
 							turnsSinceChangedRotation = 0;
 							rotation = -rotation;
@@ -55,7 +55,7 @@ public class BotGardener {
 					}
 				}
 				if(!Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation).rotateLeftDegrees(rotation))) {
-					System.out.println("Turns since changed rotation: "+turnsSinceChangedRotation);
+					//System.out.println("Turns since changed rotation: "+turnsSinceChangedRotation);
 					if(turnsSinceChangedRotation > 15) {
 						turnsSinceChangedRotation = 0;
 						rotation = -rotation;
