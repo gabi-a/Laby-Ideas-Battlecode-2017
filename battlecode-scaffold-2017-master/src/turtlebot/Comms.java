@@ -28,7 +28,7 @@ public class Comms {
         rc.broadcast(START_CHANNEL, stackPointer + 1);
     }
     
-    public static MapLocation readStack(RobotController rc, MapLocation location) throws GameActionException {
+    public static MapLocation readStack(RobotController rc) throws GameActionException {
         
         int stackPointer = rc.readBroadcast(START_CHANNEL);
         
@@ -49,17 +49,21 @@ public class Comms {
         return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
     }
     
-    public static void popStack(RobotController rc, MapLocation location) throws GameActionException {
+    public static MapLocation popStack(RobotController rc) throws GameActionException {
+        
+        MapLocation returnValue = Comms.readStack(rc);
         
         int stackPointer = rc.readBroadcast(START_CHANNEL);
         
         if (stackPointer == 0) {
-            return;
+            return null;
         }
         
         stackPointer--;
         
         rc.broadcast(START_CHANNEL + POINTER_OFFSET + stackPointer, 0);
         rc.broadcast(START_CHANNEL, stackPointer);
+        
+        return returnValue;
     }
 }
