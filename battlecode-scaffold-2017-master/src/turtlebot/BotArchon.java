@@ -5,10 +5,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BotArchon {
+    
     static int count = 0;
+    static boolean pushFlag = false;
+    
     public static void turn(RobotController rc) throws GameActionException {
  
         float trialDirection = (float) Math.PI * 0.125f;
+        MapLocation myLoc = rc.getLocation();
 
         while (count < 2) {
             Direction trial = new Direction(trialDirection);
@@ -21,6 +25,14 @@ public class BotArchon {
                 trialDirection -= 2 * Math.PI;
             }
         }
+        
+        if (!pushFlag) {
+            for (int i = 0; i < 8; i++) {
+                Comms.writeStack(rc, myLoc.add((float)Math.PI * 0.25f * i, 20f));
+            }
+            pushFlag = true;
+        }
+        
         // Let the robots know where the Archons are
         MapLocation myLocation = rc.getLocation();
         rc.broadcast(0, (int) myLocation.x);

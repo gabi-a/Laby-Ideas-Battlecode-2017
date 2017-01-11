@@ -3,14 +3,13 @@ package turtlebot;
 import battlecode.common.*;
 
 public class BotGardener {
-	
+
     static final double PROTECTION_RADIUS = 10.0f;
     static final double PROTECTION_DELTA = 1.0f;
     static int trappedCount = 0;
-    static boolean clockwiseFlag = false; 
+    static boolean clockwiseFlag = false;
 
     public static void turn(RobotController rc) throws GameActionException {
- 
 
         MapLocation archonLoc = new MapLocation(rc.readBroadcast(0), rc.readBroadcast(1));
         MapLocation selfLoc = rc.getLocation();
@@ -19,7 +18,7 @@ public class BotGardener {
         double diffY = archonLoc.y - selfLoc.y;
 
         double protRingDistance = Math.abs(Math.sqrt(diffX * diffX + diffY * diffY)) - PROTECTION_RADIUS;
-    	
+
         // If we're below the protection radius, go away from our archon
         if (protRingDistance < -PROTECTION_DELTA || protRingDistance > PROTECTION_DELTA) {
             Direction moveDirection = new Direction(archonLoc, selfLoc);
@@ -66,6 +65,19 @@ public class BotGardener {
             }
         }
         
+        //Build scouts, sometimes
+        if (rc.getRoundNum() > 100 && rc.getRoundNum() % 50 == 0) {
+            int attempts = 0;
+            Direction placeDirection = new Direction(selfLoc, archonLoc);
+            while (attempts <= 3) {
+                if (rc.canBuildRobot(RobotType.SCOUT, placeDirection)) {
+                    rc.buildRobot(RobotType.SCOUT, placeDirection);
+                    break;
+                }
+                placeDirection = placeDirection.rotateLeftRads(0.4f);
+            }
+        }
+
     }
 
 }
