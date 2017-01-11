@@ -11,12 +11,13 @@ public class Comms {
     private static final int POINTER_OFFSET = 1;
     
     
-    // Up to 10 gardeners
+    // Up to 20 gardeners
     public static boolean writeGarden(RobotController rc, MapLocation loc) throws GameActionException {
     	// Loop through channels until one is empty
-    	for(int i = GARDENS_END; i-->GARDENS_END;) {
+    	System.out.println("Writing garden");
+    	for(int i = GARDENS_END; i-->GARDENS_START;) {
     		MapLocation readLoc = Comms.unpackLocation(rc.readBroadcast(i));
-    		if(readLoc.x != 0 && readLoc.y != 0) {
+    		if(readLoc.x == 0 && readLoc.y == 0) {
     			rc.broadcast(i, Comms.packLocation(loc));
     			return true;
     		}
@@ -25,9 +26,9 @@ public class Comms {
     }
     
     public static MapLocation[] readGardenLocs(RobotController rc) throws GameActionException {
-    	MapLocation[] gardenLocs = new MapLocation[10];
+    	MapLocation[] gardenLocs = new MapLocation[GARDENS_END-GARDENS_START];
     	int j = 0;
-    	for(int i = GARDENS_END; i-->GARDENS_END;) {
+    	for(int i = GARDENS_END; i-->GARDENS_START;) {
     		gardenLocs[j] = Comms.unpackLocation(rc.readBroadcast(i));
     	}
     	return gardenLocs;

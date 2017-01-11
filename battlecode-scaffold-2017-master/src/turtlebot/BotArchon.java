@@ -13,8 +13,13 @@ public class BotArchon {
 		if(rc.getTeamBullets() >= 10000) {
 			rc.donate(10000);
 		}
-		
+
 		MapLocation selfLoc = rc.getLocation();
+		
+		if(rc.getRoundNum() == 1) {
+			Comms.writeGarden(rc, selfLoc);
+		}
+		
 		
 		Nav.avoidBullets(rc, selfLoc);
 
