@@ -6,7 +6,7 @@ public class Comms {
     public static final int START_CHANNEL = 100;
     public static final int POINTER_OFFSET = 1;
     
-    public static void writeStack(RobotController rc, MapLocation location) {
+    public static void writeStack(RobotController rc, MapLocation location) throws GameActionException {
         
         int stackPointer = rc.readBroadcast(START_CHANNEL);
         
@@ -28,7 +28,7 @@ public class Comms {
         rc.broadcast(START_CHANNEL, stackPointer + 1);
     }
     
-    public static MapLocation readStack(RobotController rc, MapLocation location) {
+    public static MapLocation readStack(RobotController rc, MapLocation location) throws GameActionException {
         
         int stackPointer = rc.readBroadcast(START_CHANNEL);
         
@@ -49,7 +49,7 @@ public class Comms {
         return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
     }
     
-    public static void popStack(RobotController rc, MapLocation location) {
+    public static void popStack(RobotController rc, MapLocation location) throws GameActionException {
         
         int stackPointer = rc.readBroadcast(START_CHANNEL);
         
