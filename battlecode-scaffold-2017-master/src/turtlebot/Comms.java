@@ -12,17 +12,17 @@ public class Comms {
         
         Team myTeam = rc.getTeam();
         MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
-        MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, 100);
+        MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, -100);
         
         int mapZoneX = (int) (location.x - cornerPoint.x);
         int mapZoneY = (int) (location.y - cornerPoint.y);
         
         // Debug only!
         if (mapZoneX < 0 || mapZoneY < 0 || mapZoneX >= 200 || mapZoneY >= 200) {
-            System.out.printf("We shouldn't be here! Map zone X/Y < 0 or >= 200");
+            System.out.format("We shouldn't be here! Map zone X/Y < 0 or >= 200, is %d,%d\n", mapZoneX, mapZoneY);
         }
         
-        int packedLocation = (mapZoneX & 0xFF) << 8 + (mapZoneY & 0xFF);
+        int packedLocation = (mapZoneX << 8) | (mapZoneY);
 
         rc.broadcast(START_CHANNEL + POINTER_OFFSET + stackPointer, packedLocation);
         rc.broadcast(START_CHANNEL, stackPointer + 1);
@@ -39,12 +39,14 @@ public class Comms {
         stackPointer--;
         
         int packedLocation = rc.readBroadcast(START_CHANNEL + POINTER_OFFSET + stackPointer);
-        int mapZoneX = packedLocation & 0xFF00;
+
+        int mapZoneX = (packedLocation & 0xFF00) >> 8;
         int mapZoneY = packedLocation & 0x00FF;
         
         Team myTeam = rc.getTeam();
         MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
-        MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, 100);
+        MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, -100);
+        
         
         return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
     }
