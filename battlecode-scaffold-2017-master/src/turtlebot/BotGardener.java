@@ -4,77 +4,50 @@ import battlecode.common.*;
 
 public class BotGardener {
 
-    static final double PROTECTION_RADIUS = 10.0f;
-    static final double PROTECTION_DELTA = 1.0f;
-    static int trappedCount = 0;
-    static boolean clockwiseFlag = false;
-
+    public static MapLocation targetLoc = null; 
+    public static boolean atTargetLoc = false;
+    public static final float POSITION_FIDELITY = 0.1f;
+    public static final float MULTIPLICITY = 0.333334f;
+    public static final Direction[] TREE_DIRECTIONs = 
+        { 
+          new Direction(0) , new Direction((float) Math.PI * MULTIPLICITY),
+          new Direction((float) Math.PI * MULTIPLICITY * 2), new Direction((float) Math.PI * MULTIPLICITY * 3),
+          new Direction((float) Math.PI * MULTIPLICITY * 4)
+        };
+    public static final Direction SPAWN_DIRECTION = new Direction((float) Math.PI * MULTIPLICITY * 5);
+    
     public static void turn(RobotController rc) throws GameActionException {
-
-        MapLocation archonLoc = new MapLocation(rc.readBroadcast(0), rc.readBroadcast(1));
+        
         MapLocation selfLoc = rc.getLocation();
 
-        double diffX = archonLoc.x - selfLoc.x;
-        double diffY = archonLoc.y - selfLoc.y;
-
-        double protRingDistance = Math.abs(Math.sqrt(diffX * diffX + diffY * diffY)) - PROTECTION_RADIUS;
-
-        // If we're below the protection radius, go away from our archon
-        if (protRingDistance < -PROTECTION_DELTA || protRingDistance > PROTECTION_DELTA) {
-            Direction moveDirection = new Direction(archonLoc, selfLoc);
-            if (protRingDistance > PROTECTION_DELTA) {
-                moveDirection = moveDirection.opposite();
-            }
-            if (rc.canMove(moveDirection)) {
-                rc.move(moveDirection);
-            } else if (rc.canMove(moveDirection.rotateLeftRads((float) Math.PI * 0.25f))) {
-                rc.move(moveDirection.rotateLeftRads((float) Math.PI * 0.25f));
-            } else if (rc.canMove(moveDirection.rotateRightRads((float) Math.PI * 0.25f))) {
-                rc.move(moveDirection.rotateRightRads((float) Math.PI * 0.25f));
-            }
-        } // Else, are we trapped?
-        else if (trappedCount >= 4) {
-            Direction moveDirection = new Direction(selfLoc, archonLoc);
-            moveDirection = moveDirection.rotateLeftRads((float) (Math.random() - 0.5));
-            //Fall back
-            if (rc.canMove(moveDirection)) {
+        if (targetLoc == null) {
+            targetLoc = Comms.popStack(rc, 0, 50);
+        }
+        else if (!atTargetLoc) {
+            Direction moveDirection = new Direction(selfLoc, targetLoc);
+            if(rc.canMove(moveDirection)) {
                 rc.move(moveDirection);
             }
-            trappedCount = 0;
-        } // Else, we're all good. So do we have spare bullets?
-        else {
-            TreeInfo[] nearbyTreeList = rc.senseNearbyTrees();
-            for (TreeInfo tree : nearbyTreeList) {
-                if (rc.canWater(tree.ID)) {
-                    rc.water(tree.ID);
-                }
-            }
-            Direction plantDirection = new Direction(archonLoc, selfLoc);
-            if (rc.canPlantTree(plantDirection)) {
-                rc.plantTree(plantDirection);
-            }
-            Direction moveDirection
-                    = clockwiseFlag ? plantDirection.rotateLeftRads((float) Math.PI * 0.5f)
-                            : plantDirection.rotateRightRads((float) Math.PI * 0.5f);
-            if (rc.canMove(moveDirection)) {
-                rc.move(moveDirection);
-                trappedCount = 0;
-            } else {
-                clockwiseFlag = !clockwiseFlag;
-                trappedCount++;
+            if(selfLoc.distanceTo(targetLoc) <= POSITION_FIDELITY) {
+                atTargetLoc = true;
             }
         }
-        
-        //Build scouts, sometimes
-        if (rc.getRoundNum() > 100 && rc.getRoundNum() % 50 == 0) {
-            int attempts = 0;
-            Direction placeDirection = new Direction(selfLoc, archonLoc);
-            while (attempts <= 3) {
-                if (rc.canBuildRobot(RobotType.SCOUT, placeDirection)) {
-                    rc.buildRobot(RobotType.SCOUT, placeDirection);
-                    break;
+        else {
+            for (Direction plantDirection : TREE_DIRECTIONs) {
+                if (rc.canPlantTree(plantDirection)) {
+                    rc.plantTree(plantDirection);
                 }
-                placeDirection = placeDirection.rotateLeftRads(0.4f);
+            }
+            for (TreeInfo treeInfo : rc.senseNearbyTrees(1.5f)) {
+                if (treeInfo.health <= 0.9f * treeInfo.maxHealth && rc.canWater(treeInfo.ID)) {
+                    rc.water(treeInfo.ID);
+                }
+            }
+            if (rc.canBuildRobot(RobotType.SOLDIER, SPAWN_DIRECTION)) {
+                rc.buildRobot(RobotType.SOLDIER, SPAWN_DIRECTION);
+            }
+            else {
+                System.out.println(":(");
             }
         }
 

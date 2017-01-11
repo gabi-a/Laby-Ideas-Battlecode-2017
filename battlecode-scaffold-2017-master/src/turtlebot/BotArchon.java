@@ -7,35 +7,27 @@ import java.util.logging.Logger;
 public class BotArchon {
     
     static int count = 0;
-    static boolean pushFlag = false;
     
     public static void turn(RobotController rc) throws GameActionException {
  
-        float trialDirection = (float) Math.PI * 0.125f;
-        MapLocation myLoc = rc.getLocation();
-
-        while (count < 2) {
-            Direction trial = new Direction(trialDirection);
-            if (rc.canHireGardener(trial)) {
-                rc.hireGardener(trial);
-                count++;
-            }
-            trialDirection += Math.PI * 0.25f;
-            if (trialDirection >= 2 * Math.PI) {
-                trialDirection -= 2 * Math.PI;
+        while (count < 1) {
+            int didHire = BotArchon.tryHireGardener(rc) ? 1 : 0;
+            count += didHire;
+            if (didHire != 0) {
+                Comms.writeStack(rc, 0, 50, new MapLocation(5,15));
             }
         }
-        
-        if (!pushFlag) {
-            for (int i = 0; i < 8; i++) {
-                Comms.writeStack(rc, myLoc.add((float)Math.PI * 0.25f * i, 20f));
+    }
+    
+    public static boolean tryHireGardener(RobotController rc) throws GameActionException {
+        Direction hireDirection = new Direction(0);
+        for (int i =0 ; i < 8; i++) {
+            if(rc.canHireGardener(hireDirection)) {
+                rc.hireGardener(hireDirection);
+                return true;
             }
-            pushFlag = true;
+            hireDirection = hireDirection.rotateLeftRads((float) Math.PI * 0.25f);
         }
-        
-        // Let the robots know where the Archons are
-        MapLocation myLocation = rc.getLocation();
-        rc.broadcast(0, (int) myLocation.x);
-        rc.broadcast(1, (int) myLocation.y);
+        return false;
     }
 }
