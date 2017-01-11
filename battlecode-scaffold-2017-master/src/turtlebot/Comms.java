@@ -34,6 +34,7 @@ public class Comms {
     		} else {
     			gardenLocs[j] = Comms.unpackLocation(data);
     		}
+    		j++;
     	}
     	return gardenLocs;
     }

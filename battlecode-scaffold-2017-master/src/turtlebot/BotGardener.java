@@ -16,8 +16,7 @@ public class BotGardener {
     public static final Direction SPAWN_DIRECTION = new Direction((float) Math.PI * MULTIPLICITY * 5);
     public static final int TRAPPED_THRESHOLD = 10;
     
-    static int lumberjackCooldown = 51;
-    static final int LUMBERJAC_COOLDOWN_TIME = 50;
+    public static final int DISTANCE_BETWEEN_GARDENS = 7;
     
     public static void turn(RobotController rc) throws GameActionException {
         
@@ -41,11 +40,7 @@ public class BotGardener {
             	MapLocation[] gardens = Comms.readGardenLocs(rc);
             	for(int i = gardens.length;i-->0;) {
             		MapLocation otherGardenLoc = gardens[i];
-            		System.out.format("\nlooking at garden %d", i);
-            		System.out.format("\ngarden exists %b", otherGardenLoc != null);
-            		
-            		
-            		if(otherGardenLoc != null && myLocation.distanceTo(otherGardenLoc) < 10) {
+            		if(otherGardenLoc != null && myLocation.distanceTo(otherGardenLoc) < DISTANCE_BETWEEN_GARDENS) {
             			goodToSettle = false;
                 		System.out.format("\n Too close to another garden to settle");
             			break;
