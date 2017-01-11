@@ -19,6 +19,7 @@ public class BotGardener {
     public static final Direction SPAWN_DIRECTION = new Direction((float) Math.PI * MULTIPLICITY * 5);
     public static final int TRAPPED_THRESHOLD = 10;
     
+    
     public static void turn(RobotController rc) throws GameActionException {
         
         MapLocation selfLoc = rc.getLocation();
@@ -32,7 +33,26 @@ public class BotGardener {
         }
         else if (!atTargetLoc) {
             //System.out.format("Hm. %d, (%f - %f)\n", trappedCount, targetLoc.x, targetLoc.y);
-            Direction moveDirection = new Direction(selfLoc, targetLoc);
+            
+        	boolean goodToSettle = true;
+        	MapLocation myLocation = rc.getLocation();
+        	MapLocation[] gardens = Comms.readGardenLocs(rc);
+        	for(int i = gardens.length;i-->0;) {
+        		MapLocation otherGardenLoc = gardens[i];
+        		if(myLocation.distanceTo(otherGardenLoc) < 10) {
+        			goodToSettle = false;
+        			break;
+        		}
+        	}
+        	
+        	if(goodToSettle) {
+        		atTargetLoc = true;
+        	} else {
+	        	Nav.explore(rc);
+        	}
+        	
+        	/*
+        	Direction moveDirection = new Direction(selfLoc, targetLoc);
             if(rc.canMove(moveDirection)) {
                 rc.move(moveDirection);
                 trappedCount = 0;
@@ -43,6 +63,7 @@ public class BotGardener {
             if(selfLoc.distanceTo(targetLoc) <= POSITION_FIDELITY) {
                 atTargetLoc = true;
             }
+            */
         }
         else {
             for (Direction plantDirection : TREE_DIRECTIONS) {

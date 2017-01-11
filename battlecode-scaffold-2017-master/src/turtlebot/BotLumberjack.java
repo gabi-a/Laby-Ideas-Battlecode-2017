@@ -5,7 +5,6 @@ import battlecode.common.*;
 public class BotLumberjack {
 	static RobotController rc;
 	static TreeInfo target = null;
-	static MapLocation homeLocation;
 	static final int HOME_RADIUS= 20;
 	
 	static boolean toldArchonsImDead = false;
@@ -21,10 +20,6 @@ public class BotLumberjack {
 		}
 		
 		MapLocation myLocation = rc.getLocation();
-		
-		if(homeLocation == null) {
-			homeLocation = Comms.readHomeLocation(rc);
-		}
 
 		if(target == null){
 			BotLumberjack.rc = rc;

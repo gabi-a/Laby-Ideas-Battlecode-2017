@@ -15,56 +15,15 @@ public class BotArchon {
 		}
 		
 		MapLocation selfLoc = rc.getLocation();
-		MapLocation homeLocation;
-		
-		if(rc.getRoundNum() == 1) {
-			Comms.writeArchonLocation(rc);
-			for (int r = 0; r < 3; r++ ) {
-				for (int t = 0; t < 8; t++) {
-					float distance = GARDEN_DISTANCE * (r+1);
-					float radians = t * (float) Math.PI * 0.25f - 0.222f * (r+1);
-					if (radians < 0f) {
-						radians += 2 * (float) Math.PI;
-					}
-					gardenSpawns[8 * r + t] = selfLoc.add(new Direction(radians), distance);
-				}
-			}
-			return;
-		}
-		
-		if(rc.getRoundNum() == 2) {
-			homeLocation = Comms.readHomeLocation(rc);
-			if(homeLocation == null) {
-				MapLocation[] archonLocations = Comms.readArchonLocations(rc);
-				int dx = 0;
-				int dy = 0;
-				int archonCount = 0;
-				for(int i = 3; i-- > 1;) {
-					if(archonLocations[i] != null) {
-						archonCount++;
-						dx += archonLocations[i].x;
-						dy += archonLocations[i].y;
-					}
-				}
-				homeLocation = new MapLocation(dx/archonCount, dy/archonCount);
-				Comms.writeHomeLocation(rc, homeLocation);
-			}
-		}
 
-		while (count < 2) {
+		while (count <= 7) {
 			int didHire = BotArchon.tryHireGardener(rc) ? 1 : 0;
 			count += didHire;
 			if (didHire != 0) {
 				BotArchon.delegateGardener(rc);
 			}
 		}
-
-		while(BotArchon.checkUnnassingedGardener(rc)) {
-			BotArchon.delegateGardener(rc);
-		}
 		
-		homeLocation = Comms.readHomeLocation(rc); //LC: homeLocation needs to be inited properly
-		Nav.tryMove(rc, rc.getLocation().directionTo(homeLocation));
 	}
     
     public static boolean tryHireGardener(RobotController rc) throws GameActionException {
