@@ -3,12 +3,36 @@ import battlecode.common.*;
 
 public class Comms {
 
+	
+	public static final int GARDENS_START = 100;
+	public static final int GARDENS_END = 120;
+	public static final int LUMBERJACKS_COUNTER = 500;
+	
     private static final int POINTER_OFFSET = 1;
     
-    /* STACK LAYOUT
-        0 - 20 = GARDENER SPAWNS
-        21 - 40 = GARDENER REQUESTS
-    */
+    
+    // Up to 10 gardeners
+    public static boolean writeGarden(RobotController rc, MapLocation loc) throws GameActionException {
+    	// Loop through channels until one is empty
+    	for(int i = GARDENS_END; i-->GARDENS_END;) {
+    		MapLocation readLoc = Comms.unpackLocation(rc.readBroadcast(i));
+    		if(readLoc.x != 0 && readLoc.y != 0) {
+    			rc.broadcast(i, Comms.packLocation(loc));
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    public static MapLocation[] readGardenLocs(RobotController rc) throws GameActionException {
+    	MapLocation[] gardenLocs = new MapLocation[10];
+    	int j = 0;
+    	for(int i = GARDENS_END; i-->GARDENS_END;) {
+    		gardenLocs[j] = Comms.unpackLocation(rc.readBroadcast(i));
+    	}
+    	return gardenLocs;
+    }
+    
     
     public static void writeStack(RobotController rc, int stackStart, int stackEnd, MapLocation location) throws GameActionException {
         
@@ -86,44 +110,6 @@ public class Comms {
 		return new MapLocation(loc%(int)Math.pow(2,10), loc/(int)Math.pow(2,10));
 	}
 
-	// Uses channel 0
-	public static int getNumGardeners(RobotController rc) throws GameActionException {
-		return rc.readBroadcast(0);
-	}
-	
-	// Uses channel 0
-	public static void writeNumGardeners(RobotController rc, int num) throws GameActionException {
-		rc.broadcast(0, num);
-	}
-
-	// Uses channels 1 to 6
-	// There could be an issue if both coordinates are 0
-	public static void writeArchonLocation(RobotController rc) throws GameActionException {
-		for(int channel = 8; (channel-=2) > 1;) {
-			int x = rc.readBroadcast(channel);
-			int y = rc.readBroadcast(channel-1);
-			if(x == 0 && y == 0) {
-				rc.broadcast(channel, (int) rc.getLocation().x);
-				rc.broadcast(channel-1, (int) rc.getLocation().y);
-				System.out.println(channel);
-				break;
-			}
-		}
-	}
-	
-	// Uses channels 1 to 6
-	public static MapLocation[] readArchonLocations(RobotController rc) throws GameActionException {
-		MapLocation[] archonLocations = new MapLocation[3];
-		for(int channel = 8; (channel-=2) > 1;) {
-			int x = rc.readBroadcast(channel);
-			int y = rc.readBroadcast(channel-1);
-			if(x != 0 && y != 0) {
-				archonLocations[channel/2 - 1] = new MapLocation(x,y);
-			}
-		}
-		return archonLocations;
-	}
-
 	// Uses channels 7 to 26
 	// 10 high priority trees, 10 low priority trees
 	public static int packTree(TreeInfo tree, int count){
@@ -186,26 +172,11 @@ public class Comms {
 		return null;
 	}
 	
-	// Uses channels 27 to 28
-	public static void writeHomeLocation(RobotController rc, MapLocation homeLocation) throws GameActionException {
-		rc.broadcast(27, (int)homeLocation.x);
-		rc.broadcast(28, (int)homeLocation.y);
-	}
-	
-	public static MapLocation readHomeLocation(RobotController rc) throws GameActionException {
-		int x = rc.readBroadcast(27);
-		int y = rc.readBroadcast(28);
-		if(x == 0 && y == 0) {
-			return null;
-		}
-		return new MapLocation(x, y);
-	}
-	
 	// uses channel 500 for the lols
 	public static void writeNumLumberjacks(RobotController rc, int data) throws GameActionException {
-		rc.broadcast(500, data);
+		rc.broadcast(LUMBERJACKS_COUNTER, data);
 	}
 	public static int readNumLumberjacks(RobotController rc) throws GameActionException {
-		return rc.readBroadcast(500);
+		return rc.readBroadcast(LUMBERJACKS_COUNTER);
 	}
 }
