@@ -34,13 +34,29 @@ public class RobotPlayer {
  		}
     }
 
-	private static void runLumberjack() {
+	private static void runLumberjack() throws GameActionException {
 		// TODO Auto-generated method stub
+		MapLocation myLocation = rc.getLocation();
+		RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(RobotType.LUMBERJACK.sensorRadius, rc.getTeam().opponent());
+		
+		if(nearbyEnemies.length == 0) {	
+			if(rc.canMove(Direction.getSouth())) {
+				rc.move(Direction.getSouth());
+			}
+		}
+		else {
+			RobotInfo enemySoldier = nearbyEnemies[0];
+			System.out.print(nearbyEnemies.length);
+		}
 		
 	}
 
-	private static void runSoldier() {
+	private static void runSoldier() throws GameActionException {
 		// TODO Auto-generated method stub
+		
+		if(rc.canMove(Direction.getNorth())) {
+			rc.move(Direction.getNorth());
+		}
 		
 	}
 
