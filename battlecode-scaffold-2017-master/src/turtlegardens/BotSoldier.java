@@ -3,36 +3,40 @@ import battlecode.common.*;
 
 public class BotSoldier {
 	static RobotController rc;
-	
+
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
-        Team enemy = rc.getTeam().opponent();
+		RobotInfo[] robots = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		RobotInfo target = null;
+		float targetRating = 10000;
+		float curRating;
+		for (int i = 0; i < robots.length; i++) {
+			curRating = rateTarget(robots[i]);
+			if (curRating < targetRating) {
+				target = robots[i];
+				targetRating = curRating;
+			}
+		}
 
-        MapLocation myLocation = rc.getLocation();
-
-        // See if there are any nearby enemy robots
-        RobotInfo[] robots = rc.senseNearbyRobots(-1, enemy);
-
-        // If there are some...
-        if (robots.length > 0) {
-            // And we have enough bullets, and haven't attacked yet this turn...
-            if (rc.canFireSingleShot()) {
-                // ...Then fire a bullet in the direction of the enemy.
-                rc.fireSingleShot(rc.getLocation().directionTo(robots[0].location));
-            }
+		float dist;
+		Direction dir;
+		if (target != null) {
+			dir = rc.getLocation().directionTo(target.location);
+			dist = target.location.distanceTo(rc.getLocation());
+			rc.fireSingleShot(dir);
+			if (dist >= 6 && rc.canMove(dir)) {
+				rc.move(dir);
+			}
+			else if (dist < 4 && rc.canMove(dir.opposite())) {
+				rc.move(dir.opposite());
+			}
+		}
         }
 
-        // Move randomly
-        Nav.tryMove(rc, randomDirection());
-
-        // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
-
-    }
-
-	static Direction randomDirection() {
-        return new Direction((float)Math.random() * 2 * (float)Math.PI);
-    }
-		
-	
-	
+        private static float rateTarget(RobotInfo target) {
+		float score;
+		score = target.location.distanceTo(rc.getLocation());
+		if (target.type == RobotType.ARCHON) score -= 2;
+		return score;
+	}
 }
