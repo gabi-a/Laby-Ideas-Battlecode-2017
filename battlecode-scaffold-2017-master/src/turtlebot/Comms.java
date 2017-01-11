@@ -200,4 +200,12 @@ public class Comms {
 		}
 		return new MapLocation(x, y);
 	}
+	
+	// uses channel 500 for the lols
+	public static void writeNumLumberjacks(RobotController rc, int data) throws GameActionException {
+		rc.broadcast(500, data);
+	}
+	public static int readNumLumberjacks(RobotController rc) throws GameActionException {
+		return rc.readBroadcast(500);
+	}
 }

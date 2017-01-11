@@ -55,8 +55,18 @@ public class BotGardener {
                     rc.water(treeInfo.ID);
                 }
             }
-            if (rc.canBuildRobot(RobotType.SOLDIER, SPAWN_DIRECTION)) {
-                rc.buildRobot(RobotType.SOLDIER, SPAWN_DIRECTION);
+            RobotType typeToBuild;
+            int lumberjacks = Comms.readNumLumberjacks(rc);
+            if(rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL).length > 0 && lumberjacks < 10) {
+            	typeToBuild = RobotType.LUMBERJACK;
+            } else {
+            	typeToBuild = RobotType.SOLDIER;
+            }
+            if (rc.canBuildRobot(typeToBuild, SPAWN_DIRECTION)) {
+                rc.buildRobot(typeToBuild, SPAWN_DIRECTION);
+                if(typeToBuild == RobotType.LUMBERJACK) {
+                	Comms.writeNumLumberjacks(rc, lumberjacks+1);
+                }
             }
             else {
                 //System.out.println(":(");

@@ -10,6 +10,10 @@ public class BotArchon {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		
+		if(rc.getTeamBullets() >= 10000) {
+			rc.donate(10000);
+		}
+		
 		MapLocation selfLoc = rc.getLocation();
 		MapLocation homeLocation;
 		

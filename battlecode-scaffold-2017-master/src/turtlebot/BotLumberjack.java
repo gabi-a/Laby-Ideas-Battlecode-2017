@@ -8,9 +8,17 @@ public class BotLumberjack {
 	static MapLocation homeLocation;
 	static final int HOME_RADIUS= 20;
 	
+	static boolean toldArchonsImDead = false;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		// TODO: Find trees, kill trees
 		BotLumberjack.rc = rc;
+		
+		if(!toldArchonsImDead && rc.getHealth() < 10) {
+			int lumberjacks = Comms.readNumLumberjacks(rc) - 1;
+			Comms.writeNumLumberjacks(rc, lumberjacks);
+			toldArchonsImDead = true;
+		}
 		
 		MapLocation myLocation = rc.getLocation();
 		
