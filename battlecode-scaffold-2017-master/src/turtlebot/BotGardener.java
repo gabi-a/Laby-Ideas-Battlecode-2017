@@ -4,15 +4,13 @@ import battlecode.common.*;
 
 public class BotGardener {
 	
-    static int trappedCount = 0;
     static final double PROTECTION_RADIUS = 10.0f;
     static final double PROTECTION_DELTA = 1.0f;
+    static int trappedCount = 0;
+    static boolean clockwiseFlag = false; 
 
     public static void turn(RobotController rc) throws GameActionException {
-
-        boolean clockwiseFlag = false;
-
-        System.out.println("I'm an gardener!");
+ 
 
         MapLocation archonLoc = new MapLocation(rc.readBroadcast(0), rc.readBroadcast(1));
         MapLocation selfLoc = rc.getLocation();
@@ -21,8 +19,6 @@ public class BotGardener {
         double diffY = archonLoc.y - selfLoc.y;
 
         double protRingDistance = Math.abs(Math.sqrt(diffX * diffX + diffY * diffY)) - PROTECTION_RADIUS;
-
-    	System.out.println("Trapped Count: "+trappedCount);
     	
         // If we're below the protection radius, go away from our archon
         if (protRingDistance < -PROTECTION_DELTA || protRingDistance > PROTECTION_DELTA) {
@@ -38,13 +34,14 @@ public class BotGardener {
                 rc.move(moveDirection.rotateRightRads((float) Math.PI * 0.25f));
             }
         } // Else, are we trapped?
-        else if (trappedCount >= 5) {
+        else if (trappedCount >= 4) {
             Direction moveDirection = new Direction(selfLoc, archonLoc);
             moveDirection = moveDirection.rotateLeftRads((float) (Math.random() - 0.5));
             //Fall back
             if (rc.canMove(moveDirection)) {
                 rc.move(moveDirection);
             }
+            trappedCount = 0;
         } // Else, we're all good. So do we have spare bullets?
         else {
             TreeInfo[] nearbyTreeList = rc.senseNearbyTrees();
