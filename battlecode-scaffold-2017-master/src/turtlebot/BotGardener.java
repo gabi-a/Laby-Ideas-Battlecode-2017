@@ -20,7 +20,7 @@ public class BotGardener {
     	BotGardener.rc = rc;
     	
         MapLocation selfLoc = rc.getLocation();
-        scoutThreshold = rc.getRoundNum() / 100;
+        scoutThreshold = rc.getRoundNum() / 200;
 
         if (!atTargetLoc) {
             //System.out.format("Hm. %d, (%f - %f)\n", trappedCount, targetLoc.x, targetLoc.y);
@@ -74,8 +74,13 @@ public class BotGardener {
                     spawnDirection = new Direction(0);
                 }
             }
+			if(rc.canBuildRobot(RobotType.SCOUT, spawnDirection) && rc.getRoundNum() < 50) {
+				rc.buildRobot(RobotType.SCOUT, spawnDirection);
+				broadcastUnassignedScout();
+				numScouts++;
+			}
             for (Direction plantDirection : treeDirections) {
-                if (plantDirection != null && rc.canPlantTree(plantDirection)) {
+                if (plantDirection != null && rc.canPlantTree(plantDirection) && (rc.getRoundNum() > 50 || rc.getTeamBullets() > 100)) {
                     rc.plantTree(plantDirection);
                 }
             }
@@ -107,7 +112,7 @@ public class BotGardener {
 	                	Comms.writeNumLumberjacks(rc, lumberjacks+1);
 	                } else if(typeToBuild == RobotType.SCOUT) {
 	                	broadcastUnassignedScout();
-                                numScouts++;
+                        numScouts++;
 	                }
 	            }
 	            else {
