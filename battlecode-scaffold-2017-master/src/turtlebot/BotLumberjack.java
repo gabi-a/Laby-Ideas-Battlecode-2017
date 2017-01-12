@@ -54,7 +54,7 @@ public class BotLumberjack {
 			for(int i = nearbyTrees.length;i-->0;) {
 				if(rc.canChop(nearbyTrees[i].ID)) {
 					if(target != null && nearbyTrees[i].ID == target.ID) {
-						if(nearbyTrees[i].getHealth() - GameConstants.LUMBERJACK_CHOP_DAMAGE <= 0) {
+						if(rc.getLocation().distanceTo(target.getLocation()) < 7 && !rc.canSenseTree(target.getID())){
 							target = null;
 						}
 					}
@@ -63,6 +63,7 @@ public class BotLumberjack {
 				}
 			}
 		}
+
 		
 		/*
 		if(!toldArchonsImDead && rc.getHealth() < 10) {
