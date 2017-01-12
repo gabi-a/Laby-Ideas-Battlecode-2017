@@ -25,7 +25,7 @@ public class BotArchon {
                         Direction exploreDir = new Direction(0);
                         for (int i=0; i < EXPLORE_SPOKES; i++) {
                             exploreDirections[i] = exploreDir;
-                            exploreDir = exploreDir.rotateLeftRads(2 * (float) Math.PI / EXPLORE_SPOKES);
+                            exploreDir = exploreDir.rotateLeftRads(7 * (float) Math.PI / EXPLORE_SPOKES);
                         }
                         startupFlag = false;
 		}
