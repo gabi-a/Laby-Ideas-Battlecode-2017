@@ -1,4 +1,4 @@
-package turtlebot;
+package onevonetests;
 import battlecode.common.*;
 
 public class Util {
@@ -17,22 +17,6 @@ public class Util {
 			}
 		}
 		return closestBot;
-	}
-	
-	public static TreeInfo getClosestTree(RobotController rc, TreeInfo[] trees) {
-		TreeInfo closestTree = null;
-		TreeInfo tree;
-		float closestDist = 100;
-		MapLocation myLocation = rc.getLocation();
-		for(int i = trees.length;i-->0;) {
-			tree = trees[i];
-			float dist = myLocation.distanceTo(tree.getLocation());
-			if(dist < closestDist) {
-				closestDist = dist;
-				closestTree = tree;
-			}
-		}
-		return closestTree;
 	}
 
 }
