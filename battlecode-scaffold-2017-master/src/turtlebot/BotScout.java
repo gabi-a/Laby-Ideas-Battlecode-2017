@@ -18,7 +18,7 @@ public class BotScout {
                 enemyTarget = null;
 
 		for(int i = 0; i < enemies.length; i++){
-			if(enemies[i].getType() == RobotType.GARDENER || rc.getRoundNum() > 50){
+			if(enemies[i].getType() == RobotType.GARDENER || rc.getRoundNum() > 500){
 				//Comms.writeStack(rc, Comms.ENEMY_ARCHON_START, Comms.ENEMY_ARCHON_END, enemies[i].getLocation());
 				enemyTarget = enemies[i];
 			} else {
@@ -43,7 +43,7 @@ public class BotScout {
                     }
                 }
                 
-		if(true) {
+		if(enemyTarget == null) {
                         if (moveTarget == null && returning == false) {
                             //Nav.explore(rc);
                         }
