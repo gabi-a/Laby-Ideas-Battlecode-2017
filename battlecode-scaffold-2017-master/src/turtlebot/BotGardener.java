@@ -5,15 +5,10 @@ import battlecode.common.*;
 public class BotGardener {
 
     public static boolean atTargetLoc = false;
+    public static Direction[] treeDirections = new Direction[5];
+    public static Direction spawnDirection = null;
     
     public static final float MULTIPLICITY = 0.333334f;
-    public static final Direction[] TREE_DIRECTIONS = 
-        { 
-          new Direction(0) , new Direction((float) Math.PI * MULTIPLICITY),
-          new Direction((float) Math.PI * MULTIPLICITY * 2), new Direction((float) Math.PI * MULTIPLICITY * 3),
-          new Direction((float) Math.PI * MULTIPLICITY * 4)
-        };
-    public static final Direction SPAWN_DIRECTION = new Direction((float) Math.PI * MULTIPLICITY * 5);
     public static final int TRAPPED_THRESHOLD = 10;
     
     public static final int DISTANCE_BETWEEN_GARDENS = 7;
@@ -42,7 +37,7 @@ public class BotGardener {
             		MapLocation otherGardenLoc = gardens[i];
             		if(otherGardenLoc != null && myLocation.distanceTo(otherGardenLoc) < DISTANCE_BETWEEN_GARDENS) {
             			goodToSettle = false;
-                		System.out.format("\n Too close to another garden to settle");
+                		//System.out.format("\n Too close to another garden to settle");
             			break;
             		}
             	}
@@ -50,12 +45,33 @@ public class BotGardener {
         	
         	if(goodToSettle) {
         		atTargetLoc = true;
+                        spawnDirection = null;
         		System.out.format("\nWrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
         	}
         }
         else {
-            for (Direction plantDirection : TREE_DIRECTIONS) {
-                if (rc.canPlantTree(plantDirection)) {
+            if(spawnDirection == null) {
+                int validPlantCount = 0;
+                Direction direction = new Direction(0f);
+                for(int i=0; i<6; i++) {
+                    if(rc.canPlantTree(direction)) {
+                        if(spawnDirection == null) {
+                            spawnDirection = direction;
+                        }
+                        else {
+                            treeDirections[validPlantCount] = direction;
+                            validPlantCount++;
+                        }
+                    }
+                    direction = direction.rotateLeftRads((float) Math.PI * MULTIPLICITY);
+                }
+                if(spawnDirection == null) {
+                    atTargetLoc = false;
+                    spawnDirection = new Direction(0);
+                }
+            }
+            for (Direction plantDirection : treeDirections) {
+                if (plantDirection != null && rc.canPlantTree(plantDirection)) {
                     rc.plantTree(plantDirection);
                 }
             }
@@ -77,8 +93,8 @@ public class BotGardener {
             } else {
             	typeToBuild = RobotType.SOLDIER;
             }
-            if (rc.canBuildRobot(typeToBuild, SPAWN_DIRECTION)) {
-                rc.buildRobot(typeToBuild, SPAWN_DIRECTION);
+            if (rc.canBuildRobot(typeToBuild, spawnDirection)) {
+                rc.buildRobot(typeToBuild, spawnDirection);
                 if(typeToBuild == RobotType.LUMBERJACK) {
                 	Comms.writeNumLumberjacks(rc, lumberjacks+1);
                 }
