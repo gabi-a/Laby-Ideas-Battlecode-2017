@@ -33,6 +33,8 @@ public class BotArchon {
 		if (count <= 7) {
 			count += BotArchon.tryHireGardener(rc) ? 1 : 0;
 		}
+		
+		while(checkUnassignedScout(rc)) {}
 
 	}
 
@@ -47,4 +49,21 @@ public class BotArchon {
 		}
 		return false;
 	}
+	
+	public static void delegateScout(RobotController rc) throws GameActionException {
+        MapLocation exploreLocation = rc.getInitialArchonLocations(rc.getTeam())[0].add(exploreDirections[exploreDirectionsPointer], 100f);
+        Comms.writeStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END, exploreLocation);
+        exploreDirectionsPointer++;
+        exploreDirectionsPointer %= 24;
+    }
+    
+    public static boolean checkUnassignedScout(RobotController rc) throws GameActionException {
+         MapLocation unassignedCheck = Comms.popStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END);
+         if(unassignedCheck != null) {
+            delegateScout(rc);
+            System.out.println("DELEGATED");
+            return true;
+        }
+        return false;
+    }
 }
