@@ -38,7 +38,20 @@ public class BotSoldier {
 				}
 			}
 			else {
-				Nav.tryMove(rc, Nav.randomDirection());
+				RobotInfo[] allyRobots = rc.senseNearbyRobots(-1, rc.getTeam());
+				RobotInfo allyBot;
+				boolean moved = false;
+				for(int i = allyRobots.length;i-->0;) {
+					allyBot = allyRobots[i];
+					if(allyBot.getType() == RobotType.GARDENER) {
+						float distance = myLocation.distanceTo(allyBot.getLocation());
+						if (distance > 6) {
+							moved = Nav.tryMove(rc, myLocation.directionTo(allyBot.getLocation()));
+						}
+					}
+				}
+				if(!moved)
+					Nav.tryMove(rc, Nav.randomDirection());
 			}
 		}
 

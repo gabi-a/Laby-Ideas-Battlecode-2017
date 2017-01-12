@@ -92,7 +92,10 @@ public class BotGardener {
                     spawnDirection = new Direction(0);
                 }
             }
-			if(rc.canBuildRobot(RobotType.SCOUT, spawnDirection) && rc.getRoundNum() < 50) {
+			if(rc.canBuildRobot(RobotType.SOLDIER, spawnDirection) && rc.getRoundNum() < 50) {
+				rc.buildRobot(RobotType.SOLDIER, spawnDirection);
+			}
+			else if(rc.canBuildRobot(RobotType.SCOUT, spawnDirection) && rc.getRoundNum() < 50) {
 				rc.buildRobot(RobotType.SCOUT, spawnDirection);
 				broadcastUnassignedScout();
 				numScouts++;
@@ -115,7 +118,7 @@ public class BotGardener {
                         typeToBuild = RobotType.SCOUT;
                     }
                     else if(nearbyTrees.length > 0) {
-	            	if(lumberjacks < 5) {
+	            	if(lumberjacks < 3) {
 	            		typeToBuild = RobotType.LUMBERJACK;
 	            	} else {
 	            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
