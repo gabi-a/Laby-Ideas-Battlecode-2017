@@ -133,6 +133,42 @@ public class Nav {
 		
 	}
 	
+	public static boolean avoidLumberjacks(RobotController rc, MapLocation myLocation) throws GameActionException {
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		if(enemies.length == 0) {
+			return false;
+		}
+		Float[] enemyAngles = new Float[enemies.length];
+		float s = 0;
+		float c = 0;
+		int eaPointer = 0;
+		for (RobotInfo enemy : enemies) {
+			if(enemy.type == RobotType.LUMBERJACK) {
+				enemyAngles[eaPointer] = new Direction(myLocation, enemy.location).radians;
+				eaPointer++;
+			}
+		}
+		if (enemyAngles[0] == null) {
+			return false;
+		}
+		// Find best escape route
+		for (float angle : enemyAngles) {
+			s += Math.sin(angle);
+			c += Math.cos(angle);
+		}
+		s /= eaPointer;
+		c /= eaPointer;
+		if (c < 0) {
+			tryMove(rc, new Direction((float) Math.atan2(s, c)));
+			return true;
+		}
+		else {
+			tryMove(rc, (new Direction((float) Math.atan2(s, c)).opposite()));
+			return true;
+		}
+		
+	}
+	
 	static boolean willCollideWithMe(RobotController rc, BulletInfo bullet, MapLocation loc) {
 
         // Get relevant bullet information
