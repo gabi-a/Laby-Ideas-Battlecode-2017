@@ -92,9 +92,9 @@ public class BotGardener {
                     spawnDirection = new Direction(0);
                 }
             }
-			if(rc.canBuildRobot(RobotType.SOLDIER, spawnDirection) && rc.getRoundNum() < 50) {
+			/*if(rc.canBuildRobot(RobotType.SOLDIER, spawnDirection) && rc.getRoundNum() < 50) {
 				rc.buildRobot(RobotType.SOLDIER, spawnDirection);
-			}
+			}*/
 			if(rc.canBuildRobot(RobotType.SCOUT, spawnDirection) && rc.getRoundNum() < 50) {
 				rc.buildRobot(RobotType.SCOUT, spawnDirection);
 				broadcastUnassignedScout();
