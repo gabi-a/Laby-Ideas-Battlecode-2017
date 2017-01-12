@@ -17,6 +17,10 @@ public class Comms {
 	public static final int ENEMY_END = 699;
 	public static final int ENEMY_ARCHON_START = 700;
 	public static final int ENEMY_ARCHON_END = 702;
+	public static final int HIGH_PRIORITY_TREE_START = 7;
+	public static final int HIGH_PRIORITY_TREE_END = 16;
+	public static final int LOW_PRIORITY_TREE_START = 17;
+	public static final int LOW_PRIORITY_TREE_END = 26;
 	
     private static final int POINTER_OFFSET = 1;
     
@@ -136,56 +140,25 @@ public class Comms {
 		int id = data/(int)Math.pow(2, 24);
 		int count = (data - (id*(int)Math.pow(2, 24)))/(int)Math.pow(2,20);
 		MapLocation loc = unpackLocation(rc, data - id*(int)Math.pow(2,24) - count*(int)Math.pow(2,20));
+		if(loc == null) return null;
 
 		return new TreeInfo(id, null, loc, 0, 0, count, null);
 	}
 
 	public static void pushHighPriorityTree(RobotController rc, TreeInfo tree, int count) throws GameActionException {
-		for(int i = 7; i < 17; i++){
-			int data = rc.readBroadcast(i);
-			if(data == 0){
-				rc.broadcast(i, packTree(rc, tree, count));
-				break;
-			}
-		}
+		writeStack(rc, HIGH_PRIORITY_TREE_START, HIGH_PRIORITY_TREE_END, packTree(rc, tree, count));
 	}
 
 	public static TreeInfo popHighPriorityTree(RobotController rc) throws GameActionException {
-		for(int i = 16; i > 6; i--){
-			int data = rc.readBroadcast(i);
-			if(data != 0){
-				TreeInfo tree = unpackTree(rc, data);
-				if(tree.getContainedBullets() > 1){
-					rc.broadcast(i, packTree(rc, tree, tree.getContainedBullets()-1));
-				} else rc.broadcast(i, 0);
-				return tree;
-			}
-		}
-		return null;
+		return unpackTree(rc, popStack(rc, HIGH_PRIORITY_TREE_START, HIGH_PRIORITY_TREE_END));
 	}
 
 	public static void pushLowPriorityTree(RobotController rc, TreeInfo tree, int count) throws GameActionException {
-		for(int i = 17; i < 27; i++){
-			int data = rc.readBroadcast(i);
-			if(data == 0){
-				rc.broadcast(i, packTree(rc, tree, count));
-				break;
-			}
-		}
+		writeStack(rc, LOW_PRIORITY_TREE_START, LOW_PRIORITY_TREE_END, packTree(rc, tree, count));
 	}
 
 	public static TreeInfo popLowPriorityTree(RobotController rc) throws GameActionException {
-		for(int i = 26; i > 16; i--){
-			int data = rc.readBroadcast(i);
-			if(data != 0){
-				TreeInfo tree = unpackTree(rc, data);
-				if(tree.getContainedBullets() > 1){
-					rc.broadcast(i, packTree(rc, tree, tree.getContainedBullets()-1));
-				} else rc.broadcast(i, 0);
-				return tree;
-			}
-		}
-		return null;
+		return unpackTree(rc, popStack(rc, LOW_PRIORITY_TREE_START, LOW_PRIORITY_TREE_END));
 	}
 	
 	// uses channel 500 for the lols
