@@ -64,13 +64,13 @@ public class BotArchon {
 		int numEnemyArchons = enemyArchons.length;
 		MapLocation delegationLocation = (exploreLocationsPointer < numEnemyArchons) 
 				? enemyArchons[exploreLocationsPointer] : exploreLocations[exploreLocationsPointer - numEnemyArchons];
-        Comms.writeStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END, delegationLocation);
+        Comms.writeStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END, Comms.packLocation(rc, delegationLocation));
         exploreLocationsPointer++;
         exploreLocationsPointer %= (exploreLocations.length + numEnemyArchons);
     }
     
     public static boolean checkUnassignedScout(RobotController rc) throws GameActionException {
-         MapLocation unassignedCheck = Comms.popStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END);
+         MapLocation unassignedCheck = Comms.unpackLocation(rc, Comms.popStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END));
          if(unassignedCheck != null) {
             delegateScout(rc);
             System.out.println("DELEGATED");

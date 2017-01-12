@@ -38,7 +38,7 @@ public class BotScout {
 		}
 
 		if (moveTarget == null) {
-			moveTarget = Comms.popStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END);
+			moveTarget = Comms.unpackLocation(rc, Comms.popStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END));
 		}
 		if( rc.getRoundNum() <= Comms.readGardenerUniversalHoldRound(rc) 
 					&& Comms.readGardenerUniversalHoldLocation(rc).distanceTo(myLocation) >= 10f ) {
@@ -85,7 +85,7 @@ public class BotScout {
 	}
 
 	public static void broadcastUnassigned(RobotController rc) throws GameActionException {
-		Comms.writeStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END, rc.getLocation());
+		Comms.writeStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END, Comms.packLocation(rc, rc.getLocation()));
 	}
 
 }

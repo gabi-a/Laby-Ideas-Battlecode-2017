@@ -50,7 +50,7 @@ public class Comms {
     }
     
     
-    public static void writeStack(RobotController rc, int stackStart, int stackEnd, MapLocation location) throws GameActionException {
+    public static void writeStack(RobotController rc, int stackStart, int stackEnd, int data) throws GameActionException {
         
         int stackPointer = rc.readBroadcast(stackStart);
         
@@ -59,35 +59,33 @@ public class Comms {
             return;
         }
 
-		int packedLocation = packLocation(rc, location);
-
-        rc.broadcast(stackStart + POINTER_OFFSET + stackPointer, packedLocation);
+        rc.broadcast(stackStart + POINTER_OFFSET + stackPointer, data);
         rc.broadcast(stackStart, stackPointer + 1);
     }
     
-    public static MapLocation readStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
+    public static int readStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
         
         int stackPointer = rc.readBroadcast(stackStart);
         
         if (stackPointer == 0) {
-            return null;
+            return -1;
         }
         
         stackPointer--;
         
-        int packedLocation = rc.readBroadcast(stackStart + POINTER_OFFSET + stackPointer);
+        int data = rc.readBroadcast(stackStart + POINTER_OFFSET + stackPointer);
 
-		return unpackLocation(rc, packedLocation);
+		return data;
     }
     
-    public static MapLocation popStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
+    public static int popStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
         
-        MapLocation returnValue = Comms.readStack(rc, stackStart, stackEnd);
+        int returnValue = Comms.readStack(rc, stackStart, stackEnd);
         
         int stackPointer = rc.readBroadcast(stackStart);
         
         if (stackPointer == 0) {
-            return null;
+            return -1;
         }
         
         stackPointer--;
@@ -115,6 +113,8 @@ public class Comms {
 	}
 
 	public static MapLocation unpackLocation(RobotController rc, int loc) {
+		if(loc == -1) return null;
+
         int mapZoneX = (loc & 0xFF00) >> 8;
         int mapZoneY = loc & 0x00FF;
         

@@ -150,7 +150,7 @@ public class BotGardener {
     }
     
     public static void broadcastUnassignedScout() throws GameActionException {
-        Comms.writeStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END, rc.getLocation());
+        Comms.writeStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END, Comms.packLocation(rc, rc.getLocation()));
     }
 
 }
