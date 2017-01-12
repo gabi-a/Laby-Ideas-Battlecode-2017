@@ -10,6 +10,7 @@ public class BotGardener {
     public static Direction spawnDirection = null;
     public static int numScouts = 0;
     public static int scoutThreshold = 0;
+	public static boolean hasBuiltStartingLumberjack = false;
     
     public static final float MULTIPLICITY = 0.333334f;
     public static final int TRAPPED_THRESHOLD = 10;
@@ -31,12 +32,13 @@ public class BotGardener {
 				break;
 			}
 		}	
-		if (notJustScoutFlag && spawnDirection != null && !(Comms.readGardenerUniversalHoldRound(rc) <= rc.getRoundNum())) {
+		if (notJustScoutFlag && spawnDirection != null && !(Comms.readGardenerUniversalHoldRound(rc) > rc.getRoundNum())) {
+			rc.setIndicatorDot(selfLoc, 0, 255, 255);
 			Comms.writeGardenerUniversalHold(rc, selfLoc, rc.getRoundNum() + 1);
 			Direction direction = new Direction(0f);
 			for(int i=0; i<6; i++) {
-				if (rc.canBuildRobot(RobotType.LUMBERJACK, spawnDirection)) {
-					rc.buildRobot(RobotType.LUMBERJACK, spawnDirection);
+				if (rc.canBuildRobot(RobotType.LUMBERJACK, direction)) {
+					rc.buildRobot(RobotType.LUMBERJACK, direction);
 					break;
 				}
 				direction = direction.rotateLeftRads((float) Math.PI * MULTIPLICITY);
@@ -97,10 +99,23 @@ public class BotGardener {
 			/*if(rc.canBuildRobot(RobotType.SOLDIER, spawnDirection) && rc.getRoundNum() < 50) {
 				rc.buildRobot(RobotType.SOLDIER, spawnDirection);
 			}*/
-			if(rc.canBuildRobot(RobotType.SCOUT, spawnDirection) && rc.getRoundNum() < 50) {
-				rc.buildRobot(RobotType.SCOUT, spawnDirection);
-				broadcastUnassignedScout();
-				numScouts++;
+			if(rc.getRoundNum() < 50) {
+				Direction direction = new Direction(0f);
+				if(rc.canBuildRobot(RobotType.SCOUT, spawnDirection) && numScouts == 0) {
+					rc.buildRobot(RobotType.SCOUT, spawnDirection);
+					broadcastUnassignedScout();
+					numScouts++;
+				}
+				if(!hasBuiltStartingLumberjack) {
+					for(int i=0; i<6; i++) {
+						if (rc.canBuildRobot(RobotType.LUMBERJACK, direction)) {
+							rc.buildRobot(RobotType.LUMBERJACK, direction);
+							break;
+						}
+						direction = direction.rotateLeftRads((float) Math.PI * MULTIPLICITY);
+						System.out.format("%f\n", direction.radians);
+					}	
+				}
 			}
 			if(!(Comms.readGardenerUniversalHoldRound(rc) <= rc.getRoundNum()
 					&& Comms.readGardenerUniversalHoldLocation(rc).distanceTo(selfLoc) <= 20f)) {

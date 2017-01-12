@@ -10,6 +10,7 @@ public class BotScout {
 	public static boolean returning = false;
 	public static RobotInfo enemyTarget = null;
 	public static int trappedCount = 0;
+	public static boolean defensiveScout = false;
 
 	public static final float HOME_DISTANCE_DEFENSE_THRESHOLD = 7.5f;
 	
@@ -18,30 +19,35 @@ public class BotScout {
 
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		enemyTarget = null;
-		float closestDistance = 10f;
+		float lowestHealth = 10000f;
 
 		for (int i = 0; i < enemies.length; i++) {
 			if (enemies[i].getType() == RobotType.GARDENER 
 				|| enemies[i].getType() == RobotType.LUMBERJACK 
+				|| enemies[i].getType() == RobotType.SCOUT
 				|| rc.getRoundNum() > 500
-				|| enemies[i].location.distanceTo(myLocation) < HOME_DISTANCE_DEFENSE_THRESHOLD) {
-				if(enemies[i].location.distanceTo(myLocation) < closestDistance) {
+				|| enemies[i].location.distanceTo(homeMemoryLocation != null ? homeMemoryLocation : new MapLocation(-100,-100)) < HOME_DISTANCE_DEFENSE_THRESHOLD) {
+				if(enemies[i].health < lowestHealth) {
 					enemyTarget = enemies[i];
-					closestDistance = enemies[i].location.distanceTo(myLocation);
+					lowestHealth = enemies[i].health;
 				}
 			} 
 		}
 
 		if (startupFlag) {
 			homeMemoryLocation = myLocation;
+			if(rc.getRoundNum() < 100 || Math.random() < 0.5) {
+				defensiveScout = true;
+			}
 			startupFlag = false;
 		}
 
 		if (moveTarget == null) {
 			moveTarget = Comms.unpackLocation(rc, Comms.popStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END));
 		}
-		if( rc.getRoundNum() <= Comms.readGardenerUniversalHoldRound(rc) 
+		if( defensiveScout && rc.getRoundNum() <= Comms.readGardenerUniversalHoldRound(rc) 
 					&& Comms.readGardenerUniversalHoldLocation(rc).distanceTo(myLocation) >= 10f ) {
+			rc.setIndicatorDot(myLocation, 0, 0, 255);
 			moveTarget = Comms.readGardenerUniversalHoldLocation(rc);
 			enemyTarget = null;
 			returning = false;
@@ -75,7 +81,7 @@ public class BotScout {
 			float dist = enemyTarget.location.distanceTo(rc.getLocation());
 			if (/*!Nav.avoidBullets(rc, myLocation) &&*/ !Nav.avoidLumberjacks(rc, myLocation)) {
 				if ((dist >= 0f && enemyTarget.type != RobotType.LUMBERJACK) || dist >= 2f) {
-					Nav.tryPrecisionMove(rc, dir, dist / 2);
+					Nav.tryPrecisionMove(rc, dir, 1.49f);
 				}
 			}
 			if (rc.canFireSingleShot()) {
