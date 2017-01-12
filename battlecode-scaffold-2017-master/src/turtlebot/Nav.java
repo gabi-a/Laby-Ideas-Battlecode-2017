@@ -141,9 +141,14 @@ public class Nav {
 		float s = 0;
 		float c = 0;
 		int eaPointer = 0;
+		float closestDistance = 2.5f;
 		for (RobotInfo enemy : enemies) {
-			if(enemy.type == RobotType.LUMBERJACK) {
+			if(enemy.type == RobotType.LUMBERJACK && enemy.location.distanceTo(myLocation) <= 2.5f) {
 				enemyAngles[eaPointer] = new Direction(myLocation, enemy.location).radians;
+				float distanceToEnemy = enemy.location.distanceTo(myLocation);
+				if(distanceToEnemy < closestDistance) {
+					closestDistance = distanceToEnemy;
+				}
 				eaPointer++;
 			}
 		}
@@ -151,18 +156,20 @@ public class Nav {
 			return false;
 		}
 		// Find best escape route
-		for (float angle : enemyAngles) {
-			s += Math.sin(angle);
-			c += Math.cos(angle);
+		for (Float angle : enemyAngles) {
+			if( angle != null ) {
+				s += Math.sin(angle);
+				c += Math.cos(angle);
+			}
 		}
 		s /= eaPointer;
 		c /= eaPointer;
 		if (c < 0) {
-			tryMove(rc, new Direction((float) Math.atan2(s, c)));
+			tryPrecisionMove(rc, new Direction((float) Math.atan2(s, c)), 2f, 5, 2.5f - closestDistance);
 			return true;
 		}
 		else {
-			tryMove(rc, (new Direction((float) Math.atan2(s, c)).opposite()));
+			tryPrecisionMove(rc, (new Direction((float) Math.atan2(s, c)).opposite()), 2f, 5, 2.5f - closestDistance);
 			return true;
 		}
 		
