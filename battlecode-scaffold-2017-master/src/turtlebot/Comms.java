@@ -65,8 +65,8 @@ public class Comms {
         int mapZoneY = (int) (location.y - cornerPoint.y);
         
         // Debug only!
-        if (mapZoneX < 0 || mapZoneY < 0 || mapZoneX >= 200 || mapZoneY >= 200) {
-            System.out.format("\nWe shouldn't be here! Map zone X/Y < 0 or >= 200, is %d,%d\n", mapZoneX, mapZoneY);
+        if (mapZoneX < 0 || mapZoneY < 0 || mapZoneX > 200 || mapZoneY > 200) {
+            System.out.format("\nWe shouldn't be here! Map zone X/Y < 0 or > 200, is %d,%d\n", mapZoneX, mapZoneY);
         }
         
         int packedLocation = (mapZoneX << 8) | (mapZoneY);
