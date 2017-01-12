@@ -9,13 +9,13 @@ public class BotArchon {
 
 	public static int count = 0;
 	public static boolean startupFlag = true;
-	public static Direction[] exploreDirections = new Direction[EXPLORE_SPOKES];
-	public static int exploreDirectionsPointer = 0;
+	public static MapLocation[] exploreLocations = new MapLocation[EXPLORE_SPOKES];
+	public static int exploreLocationsPointer = 0;
 
 	public static void turn(RobotController rc) throws GameActionException {
 
 		if (!Nav.explore(rc)) {
-			System.out.format("\nCouldn't move");
+			//System.out.format("\nCouldn't move");
 		}
 		
 		// Donate all of our bullets if we can  win or the game's about to end
@@ -29,7 +29,7 @@ public class BotArchon {
 			Comms.writeGarden(rc, selfLoc);
 			Direction exploreDir = new Direction(0);
 			for (int i=0; i < EXPLORE_SPOKES; i++) {
-				exploreDirections[i] = exploreDir;
+				exploreLocations[i] = selfLoc.add(exploreDir,100f);
 				exploreDir = exploreDir.rotateLeftRads(7 * (float) Math.PI / EXPLORE_SPOKES);
 			}
 		}
@@ -58,10 +58,13 @@ public class BotArchon {
 	}
 	
 	public static void delegateScout(RobotController rc) throws GameActionException {
-        MapLocation exploreLocation = rc.getInitialArchonLocations(rc.getTeam())[0].add(exploreDirections[exploreDirectionsPointer], 100f);
-        Comms.writeStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END, exploreLocation);
-        exploreDirectionsPointer++;
-        exploreDirectionsPointer %= EXPLORE_SPOKES;
+		MapLocation[] enemyArchons = rc.getInitialArchonLocations(rc.getTeam().opponent());
+		int numEnemyArchons = enemyArchons.length;
+		MapLocation delegationLocation = (exploreLocationsPointer < numEnemyArchons) 
+				? enemyArchons[exploreLocationsPointer] : exploreLocations[exploreLocationsPointer - numEnemyArchons];
+        Comms.writeStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END, delegationLocation);
+        exploreLocationsPointer++;
+        exploreLocationsPointer %= (exploreLocations.length + numEnemyArchons);
     }
     
     public static boolean checkUnassignedScout(RobotController rc) throws GameActionException {
