@@ -101,10 +101,9 @@ public class Nav {
     	MapLocation myLocation = rc.getLocation();
     	int moveAttemptCount = 0;
     	while(moveAttemptCount < 30) {
-    		if(rc.onTheMap(myLocation.add(heading,rc.getType().strideRadius),rc.getType().bodyRadius+2)) {
-    			if(Nav.tryMove(rc, heading)) {
+    		if(rc.onTheMap(myLocation.add(heading,rc.getType().strideRadius + rc.getType().bodyRadius ),rc.getType().bodyRadius+2f) 
+					&& Nav.tryMove(rc, heading)) {
     				return true;
-    			}
     		}
     		heading = Nav.randomDirection();
     		moveAttemptCount++;
