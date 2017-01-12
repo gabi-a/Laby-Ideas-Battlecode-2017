@@ -17,9 +17,10 @@ public class BotArchon {
 		if (!Nav.explore(rc)) {
 			System.out.format("\nCouldn't move");
 		}
-
-		if (rc.getTeamBullets() >= 10000) {
-			rc.donate(10000);
+		
+		// Donate all of our bullets if we can  win or the game's about to end
+		if (rc.getTeamBullets() >= 10000 || rc.getRoundNum() == rc.getRoundLimit() - 1) {
+			rc.donate(rc.getTeamBullets());
 		}
 
 		MapLocation selfLoc = rc.getLocation();
