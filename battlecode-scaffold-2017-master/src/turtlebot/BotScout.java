@@ -18,7 +18,7 @@ public class BotScout {
                 enemyTarget = null;
 
 		for(int i = 0; i < enemies.length; i++){
-			if(enemies[i].getType() == RobotType.GARDENER || rc.getRoundNum() > 750){
+			if(enemies[i].getType() == RobotType.GARDENER || rc.getRoundNum() > 50){
 				//Comms.writeStack(rc, Comms.ENEMY_ARCHON_START, Comms.ENEMY_ARCHON_END, enemies[i].getLocation());
 				enemyTarget = enemies[i];
 			} else {
