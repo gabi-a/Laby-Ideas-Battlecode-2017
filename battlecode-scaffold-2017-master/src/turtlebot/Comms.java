@@ -7,6 +7,10 @@ public class Comms {
 	public static final int GARDENS_START = 100;
 	public static final int GARDENS_END = 120;
 	public static final int LUMBERJACKS_COUNTER = 500;
+	public static final int ENEMY_START = 600;
+	public static final int ENEMY_END = 699;
+	public static final int ENEMY_ARCHON_START = 700;
+	public static final int ENEMY_ARCHON_END = 702;
 	
     private static final int POINTER_OFFSET = 1;
     
