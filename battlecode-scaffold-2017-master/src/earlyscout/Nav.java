@@ -192,4 +192,5 @@ public class Nav {
 
         return (perpendicularDist <= rc.getType().bodyRadius);
     }
+	
 }

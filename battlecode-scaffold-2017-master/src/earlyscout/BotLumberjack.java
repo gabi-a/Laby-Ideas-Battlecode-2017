@@ -20,6 +20,13 @@ public class BotLumberjack {
 			toldArchonsImDead = true;
 		}
 		
+		
+		RobotInfo[] robots = rc.senseNearbyRobots(RobotType.LUMBERJACK.bodyRadius+GameConstants.LUMBERJACK_STRIKE_RADIUS, rc.getTeam().opponent());
+        if(robots.length > 0 && !rc.hasAttacked()) {
+            // Use strike() to hit all nearby robots!
+            rc.strike();
+        }
+		
 		MapLocation myLocation = rc.getLocation();
 
 		if(target == null){
@@ -44,7 +51,7 @@ public class BotLumberjack {
 		if(target != null){
 			cutTree();
 			return;
-		}
+        }
 	}
 
 	public static TreeInfo nearestTree() throws GameActionException {
@@ -70,7 +77,7 @@ public class BotLumberjack {
 		if(target != null && rc.canChop(target.getID())){
 			rc.chop(target.getID());
 		}
-		if(!Nav.tryMove(rc, rc.getLocation().directionTo(target.getLocation()))){
+		if(target != null && !Nav.tryMove(rc, rc.getLocation().directionTo(target.getLocation()))){
 			if(oldTarget == null) oldTarget = target;
 			target = nearestTree();
 			cutTree();

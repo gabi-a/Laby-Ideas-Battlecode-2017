@@ -14,7 +14,9 @@ public class BotArchon {
 
 	public static void turn(RobotController rc) throws GameActionException {
 
-		if (!Nav.explore(rc)) {
+		MapLocation selfLoc = rc.getLocation();
+		
+		if (!Nav.avoidBullets(rc, selfLoc) && !Nav.explore(rc)) {
 			//System.out.format("\nCouldn't move");
 		}
 		
@@ -23,7 +25,6 @@ public class BotArchon {
 			rc.donate(rc.getTeamBullets());
 		}
 
-		MapLocation selfLoc = rc.getLocation();
 
 		if (rc.getRoundNum() == 1) {
 			Comms.writeGarden(rc, selfLoc);
@@ -33,8 +34,6 @@ public class BotArchon {
 				exploreDir = exploreDir.rotateLeftRads(7 * (float) Math.PI / EXPLORE_SPOKES);
 			}
 		}
-
-		// Nav.avoidBullets(rc, selfLoc);
 
 		if (count <= 7) {
 			//if(rc.onTheMap(selfLoc, RobotType.ARCHON.sensorRadius-3))

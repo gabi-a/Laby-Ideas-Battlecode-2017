@@ -14,9 +14,6 @@ public class BotArchon {
 
 	public static void turn(RobotController rc) throws GameActionException {
 
-		if (!Nav.explore(rc)) {
-			System.out.format("\nCouldn't move");
-		}
 		
 		// Donate all of our bullets if we can  win or the game's about to end
 		if (rc.getTeamBullets() >= 10000 || rc.getRoundNum() == rc.getRoundLimit() - 1) {
@@ -25,6 +22,10 @@ public class BotArchon {
 
 		MapLocation selfLoc = rc.getLocation();
 
+		if (!Nav.avoidBullets(rc, selfLoc) && !Nav.explore(rc)) {
+			System.out.format("\nCouldn't move");
+		}
+		
 		if (rc.getRoundNum() == 1) {
 			Comms.writeGarden(rc, selfLoc);
 			Direction exploreDir = new Direction(0);
