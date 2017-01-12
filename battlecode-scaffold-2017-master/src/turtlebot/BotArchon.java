@@ -30,7 +30,7 @@ public class BotArchon {
 
 		// Nav.avoidBullets(rc, selfLoc);
 
-		while (count <= 7) {
+		if (count <= 7) {
 			count += BotArchon.tryHireGardener(rc) ? 1 : 0;
 		}
 
