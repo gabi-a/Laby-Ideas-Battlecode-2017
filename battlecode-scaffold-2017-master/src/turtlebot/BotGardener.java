@@ -46,8 +46,7 @@ public class BotGardener {
         	
         	if(goodToSettle) {
         		atTargetLoc = true;
-                        spawnDirection = null;
-        		//System.out.format("\nWrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
+        		System.out.format("\nWrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
         	}
         }
         else {
@@ -81,6 +80,58 @@ public class BotGardener {
                     rc.water(treeInfo.ID);
                 }
             }
+            if(rc.getRoundNum() > 300) {
+	            RobotType typeToBuild;
+	            int lumberjacks = Comms.readNumLumberjacks(rc);
+	            TreeInfo[] nearbyTrees = rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL);
+	            if(nearbyTrees.length > 0) {
+	            	if(lumberjacks < 5) {
+	            		typeToBuild = RobotType.LUMBERJACK;
+	            	} else {
+	            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
+	            		typeToBuild = RobotType.SOLDIER;
+	            	}
+	            } else {
+	            	typeToBuild = RobotType.SOLDIER;
+	            }
+	            if (rc.canBuildRobot(typeToBuild, SPAWN_DIRECTION)) {
+	                rc.buildRobot(typeToBuild, SPAWN_DIRECTION);
+	                if(typeToBuild == RobotType.LUMBERJACK) {
+	                	Comms.writeNumLumberjacks(rc, lumberjacks+1);
+	                }
+	            }
+	            else {
+	                //System.out.println(":(");
+	            }
+            RobotType typeToBuild;
+            int lumberjacks = Comms.readNumLumberjacks(rc);
+            TreeInfo[] nearbyTrees = rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL);
+            if(numScouts == 0) {
+                typeToBuild = RobotType.SCOUT;
+            }
+            else if(nearbyTrees.length > 0) {
+            	if(lumberjacks < 5) {
+            		typeToBuild = RobotType.LUMBERJACK;
+            	} else {
+            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
+            		typeToBuild = RobotType.SOLDIER;
+            	}
+            } 
+            else {
+            	typeToBuild = RobotType.SOLDIER;
+            }
+            if (rc.canBuildRobot(typeToBuild, spawnDirection)) {
+                rc.buildRobot(typeToBuild, spawnDirection);
+                if(typeToBuild == RobotType.LUMBERJACK) {
+                	Comms.writeNumLumberjacks(rc, lumberjacks+1);
+                }
+                else if(typeToBuild == RobotType.SCOUT) {
+                    broadcastUnassignedScout(rc);
+                    numScouts++;
+                }
+            }
+            else {
+                //System.out.println(":(");
             RobotType typeToBuild;
             int lumberjacks = Comms.readNumLumberjacks(rc);
             TreeInfo[] nearbyTrees = rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL);

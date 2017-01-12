@@ -37,6 +37,7 @@ public class BotArchon {
 			count += tryHireGardener(rc) ? 1 : 0;
 		}              
 		
+		
                 // Magic line
                 while(checkUnassignedScout(rc)) {}
 	}

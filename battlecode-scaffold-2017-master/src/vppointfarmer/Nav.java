@@ -1,10 +1,10 @@
-package turtlebot;
+package vppointfarmer;
 import battlecode.common.*;
 
 public class Nav {
 
     static Direction heading = Nav.randomDirection();
-    
+	
 	/**
      * Attempts to move in a given direction, while avoiding small obstacles directly in the path.
      *
@@ -97,19 +97,18 @@ public class Nav {
         return new Direction((float)Math.random() * 2 * (float)Math.PI);
     }
     
-    public static boolean explore(RobotController rc) throws GameActionException {
+    public static void explore(RobotController rc) throws GameActionException {
     	MapLocation myLocation = rc.getLocation();
     	int moveAttemptCount = 0;
     	while(moveAttemptCount < 30) {
     		if(rc.onTheMap(myLocation.add(heading,RobotType.GARDENER.strideRadius),RobotType.GARDENER.bodyRadius+2)) {
     			if(Nav.tryMove(rc, heading)) {
-    				return true;
+    				break;
     			}
     		}
     		heading = Nav.randomDirection();
     		moveAttemptCount++;
     	}
-    	return false;
     }
     
     public static boolean avoidBullets(RobotController rc, MapLocation myLocation) throws GameActionException {
