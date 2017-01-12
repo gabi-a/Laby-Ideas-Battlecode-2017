@@ -113,6 +113,7 @@ public class BotGardener {
 							break;
 						}
 						direction = direction.rotateLeftRads((float) Math.PI * MULTIPLICITY);
+						System.out.format("%f\n", direction.radians);
 					}	
 				}
 			}
