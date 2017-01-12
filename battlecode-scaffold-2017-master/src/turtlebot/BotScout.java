@@ -47,7 +47,7 @@ public class BotScout {
 
 		if (enemyTarget == null) {
 			if (moveTarget == null && returning == false) {
-				// Nav.explore(rc);
+				Nav.explore(rc);
 			} else {
 				if (!returning) {
 					Direction moveDirection = new Direction(myLocation, moveTarget);
