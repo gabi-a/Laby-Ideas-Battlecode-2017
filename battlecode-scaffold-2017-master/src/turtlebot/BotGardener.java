@@ -12,7 +12,7 @@ public class BotGardener {
     public static final float MULTIPLICITY = 0.333334f;
     public static final int TRAPPED_THRESHOLD = 10;
     
-    public static final int DISTANCE_BETWEEN_GARDENS = 7;
+    public static final int DISTANCE_BETWEEN_GARDENS = 10;
     
     public static void turn(RobotController rc) throws GameActionException {
         
@@ -82,32 +82,27 @@ public class BotGardener {
             }
             if(rc.getRoundNum() > 300) {
 	            RobotType typeToBuild;
-                    int lumberjacks = Comms.readNumLumberjacks(rc);
-                    TreeInfo[] nearbyTrees = rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL);
-                    if(numScouts == 0) {
-                        typeToBuild = RobotType.SCOUT;
-                    }
-                    else if(nearbyTrees.length > 0) {
-                        if(lumberjacks < 5) {
-                                typeToBuild = RobotType.LUMBERJACK;
-                        } else {
-                                Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
-                                typeToBuild = RobotType.SOLDIER;
-                        }
-                    } 
-                    else {
-                        typeToBuild = RobotType.SOLDIER;
-                    }
-                    if (rc.canBuildRobot(typeToBuild, spawnDirection)) {
-                        rc.buildRobot(typeToBuild, spawnDirection);
-                        if(typeToBuild == RobotType.LUMBERJACK) {
+	            int lumberjacks = Comms.readNumLumberjacks(rc);
+	            TreeInfo[] nearbyTrees = rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL);
+	            if(nearbyTrees.length > 0) {
+	            	if(lumberjacks < 5) {
+	            		typeToBuild = RobotType.LUMBERJACK;
+	            	} else {
+	            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
+	            		typeToBuild = RobotType.SOLDIER;
+	            	}
+	            } else {
+	            	typeToBuild = RobotType.SOLDIER;
+	            }
+	            if (rc.canBuildRobot(typeToBuild, spawnDirection)) {
+	                rc.buildRobot(typeToBuild, spawnDirection);
+	                if(typeToBuild == RobotType.LUMBERJACK) {
                                 Comms.writeNumLumberjacks(rc, lumberjacks+1);
-                        }
-                        else if(typeToBuild == RobotType.SCOUT) {
-                            broadcastUnassignedScout(rc);
-                            numScouts++;
-                        }
-                    }
+	                }
+	            }
+	            else {
+	                //System.out.println(":(");
+	            }
             }
         }
 
