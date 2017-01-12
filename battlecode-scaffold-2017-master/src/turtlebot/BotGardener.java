@@ -25,19 +25,18 @@ public class BotGardener {
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		boolean notJustScoutFlag = false;
 		for(int i=0; i < enemies.length; i++) {
-			if((enemies[i].type != RobotType.SCOUT && enemies[i].type != RobotType.GARDENER) 
+			if((enemies[i].type != RobotType.SCOUT && enemies[i].type != RobotType.GARDENER && enemies[i].type != RobotType.ARCHON) 
 					|| (enemies[i].type == RobotType.SCOUT && enemies[i].location.distanceTo(selfLoc) < 3f)) {
 				notJustScoutFlag = true;
 				break;
 			}
 		}	
-		if (notJustScoutFlag && spawnDirection != null) {
+		if (notJustScoutFlag && spawnDirection != null && !(Comms.readGardenerUniversalHoldRound(rc) <= rc.getRoundNum())) {
 			Comms.writeGardenerUniversalHold(rc, selfLoc, rc.getRoundNum() + 1);
 			Direction direction = new Direction(0f);
 			for(int i=0; i<6; i++) {
 				if (rc.canBuildRobot(RobotType.LUMBERJACK, spawnDirection)) {
 					rc.buildRobot(RobotType.LUMBERJACK, spawnDirection);
-					broadcastUnassignedScout();
 					break;
 				}
 				direction = direction.rotateLeftRads((float) Math.PI * MULTIPLICITY);

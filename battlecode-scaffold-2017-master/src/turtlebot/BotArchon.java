@@ -37,7 +37,8 @@ public class BotArchon {
 
 		if (count <= 7
 				&& !(Comms.readGardenerUniversalHoldRound(rc) <= rc.getRoundNum()
-					&& Comms.readGardenerUniversalHoldLocation(rc).distanceTo(selfLoc) <= 20f)) {
+					&& Comms.readGardenerUniversalHoldLocation(rc).distanceTo(selfLoc) <= 20f)
+						&& rc.getTeamBullets() > 60) {
 			//if(rc.onTheMap(selfLoc, RobotType.ARCHON.sensorRadius-3))
 				count += BotArchon.tryHireGardener(rc) ? 1 : 0;
 		}
