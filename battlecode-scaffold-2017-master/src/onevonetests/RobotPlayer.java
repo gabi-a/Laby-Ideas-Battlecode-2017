@@ -1,12 +1,13 @@
 package onevonetests;
 import battlecode.common.*;
-import turtlebot.Comms;
+import turtlebot.*;
 
 public class RobotPlayer {
 
  	static RobotController rc;
  	static int gardenersCount = 0;
  	static int botsBuilt = 0;
+ 	static TreeInfo target;
  	
  	public static void run(RobotController rc) throws GameActionException {
  		RobotPlayer.rc = rc;
@@ -36,18 +37,8 @@ public class RobotPlayer {
 
 	private static void runLumberjack() throws GameActionException {
 		// TODO Auto-generated method stub
-		MapLocation myLocation = rc.getLocation();
-		RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(RobotType.LUMBERJACK.sensorRadius, rc.getTeam().opponent());
 		
-		if(nearbyEnemies.length == 0) {	
-			if(rc.canMove(Direction.getSouth())) {
-				rc.move(Direction.getSouth());
-			}
-		}
-		else {
-			RobotInfo enemySoldier = nearbyEnemies[0];
-			System.out.print(nearbyEnemies.length);
-		}
+		BotLumberjack.turn(rc);
 		
 	}
 
