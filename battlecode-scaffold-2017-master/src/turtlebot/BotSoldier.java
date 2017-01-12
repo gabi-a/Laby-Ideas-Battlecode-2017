@@ -37,26 +37,26 @@ public class BotSoldier {
 					Nav.tryMove(rc, dir.opposite());
 				}
 			}
-			else {
+			else if(!rc.hasMoved()) {
 				RobotInfo[] allyRobots = rc.senseNearbyRobots(-1, rc.getTeam());
 				RobotInfo allyBot;
-				boolean moved = false;
 				for(int i = allyRobots.length;i-->0;) {
 					allyBot = allyRobots[i];
 					if(allyBot.getType() == RobotType.GARDENER) {
 						float distance = myLocation.distanceTo(allyBot.getLocation());
 						if (distance > 6) {
-							moved = Nav.tryMove(rc, myLocation.directionTo(allyBot.getLocation()));
+							Nav.tryMove(rc, myLocation.directionTo(allyBot.getLocation()));
+							break;
 						}
 					}
 				}
-				if(!moved)
+				if(!rc.hasMoved())
 					Nav.tryMove(rc, Nav.randomDirection());
 			}
 		}
 
 		if (target != null && rc.canFireSingleShot()) {
-			rc.fireSingleShot(dir);
+			rc.fireSingleShot(dir.rotateRightDegrees(10f*((float)Math.random()-0.5f)));
 		}
 	}
 
