@@ -5,9 +5,8 @@ import battlecode.common.*;
 public class BotLumberjack {
 	static RobotController rc;
 	static TreeInfo target = null;
-	static TreeInfo path_target = null;
+	static TreeInfo oldTarget= null;
 	static final int HOME_RADIUS= 20;
-	static int moves_blocked = 0;
 	
 	static boolean toldArchonsImDead = false;
 	
@@ -24,67 +23,31 @@ public class BotLumberjack {
 		MapLocation myLocation = rc.getLocation();
 
 		if(target == null){
-			BotLumberjack.rc = rc;
-			Comms comms = new Comms();
-			target = comms.popHighPriorityTree(rc);
+			// try and find a target
+			target = Comms.popHighPriorityTree(rc);
 			if(target != null) {
 				// stay on current tree or switch to new high priority?
 			} else {
-				target = comms.popLowPriorityTree(rc);
+				target = Comms.popLowPriorityTree(rc);
 				if(target != null){
 
 				} else {
-					target = nearestTree(rc);
+					target = nearestTree();
 					if(target == null){
-						MapLocation loc = new MapLocation(0,0);
-						Direction dir = rc.getLocation().directionTo(loc).opposite();
-						while(!rc.canMove(dir))
-							dir = rc.getLocation().directionTo(loc).rotateLeftDegrees(90+(float)Math.random()*180);
-						rc.move(dir);
+						Nav.explore(rc);
 						return;
 					}
 				}
 			}
 		}
 
-		if(path_target != null){
-				if(rc.canChop(path_target.getID())) rc.chop(path_target.getID());
-
-				// Stop trying to chop if the tree is dead
-				if(rc.getLocation().distanceTo(path_target.getLocation()) < 7 && !rc.canSenseTree(path_target.getID())) path_target = null;
-		}
-		if(rc.canChop(target.getID())){
-			rc.chop(target.getID());
+		if(target != null){
+			cutTree();
 			return;
 		}
-		if(rc.canMove(target.getLocation())){
-			rc.move(target.getLocation());
-		} else {
-			moves_blocked++;
-			if(moves_blocked < 10){
-				MapLocation loc = new MapLocation(0,0);
-				Direction dir = new Direction((float)Math.random() * 2 * (float)Math.PI);
-				while(!rc.canMove(dir))
-					dir = new Direction((float)Math.random() * 2 * (float)Math.PI);
-				rc.move(dir);
-			} else {
-				path_target = nearestTree(rc);
-				moves_blocked = 0;
-			}
-			if(path_target != null){
-				if(rc.canChop(path_target.getID())) rc.chop(path_target.getID());
-
-				// Stop trying to chop if the tree is dead
-				if(rc.getLocation().distanceTo(path_target.getLocation()) < 7 && !rc.canSenseTree(path_target.getID())) path_target = null;
-			}
-		}
-		if(rc.canChop(target.getID())) rc.chop(target.getID());
-
-		// Stop trying to chop if the tree is dead
-		if(rc.getLocation().distanceTo(target.getLocation()) < 7 && !rc.canSenseTree(target.getID())) target = null;
 	}
 
-	public static TreeInfo nearestTree(RobotController rc) throws GameActionException {
+	public static TreeInfo nearestTree() throws GameActionException {
 		TreeInfo[] trees = new TreeInfo[0];
 		trees = rc.senseNearbyTrees();
 		int tree_id = -1;
@@ -97,12 +60,31 @@ public class BotLumberjack {
 			}
 		}
 		if(trees.length == 0 || tree_id == -1){
-			Direction dir = new Direction((float)Math.random() * 2 * (float)Math.PI);
-			while(!rc.canMove(dir))
-				dir = new Direction((float)Math.random() * 2 * (float)Math.PI);
-			rc.move(dir);
+			Nav.explore(rc);
 			return null;
 		}
 		return trees[tree_id];
+	}
+
+	public static void cutTree() throws GameActionException{
+		if(rc.canChop(target.getID())){
+			rc.chop(target.getID());
+		}
+		if(!Nav.tryMove(rc, rc.getLocation().directionTo(target.getLocation()))){
+			if(oldTarget == null) oldTarget = target;
+			target = nearestTree();
+			cutTree();
+		}
+		if(rc.canChop(target.getID())) rc.chop(target.getID());
+
+		// Stop trying to chop if the tree is dead
+		if(rc.getLocation().distanceTo(target.getLocation()) < 7 && !rc.canSenseTree(target.getID())){
+			if(oldTarget != null){
+				target = oldTarget;
+				oldTarget = null;
+			} else {
+				target = null;
+			}
+		}
 	}
 }
