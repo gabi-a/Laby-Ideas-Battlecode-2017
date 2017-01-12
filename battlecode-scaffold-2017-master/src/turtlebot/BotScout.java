@@ -3,14 +3,27 @@ package turtlebot;
 import battlecode.common.*;
 
 public class BotScout {
-	public static RobotInfo enemyTarget = null;
+    
         public static MapLocation moveTarget = null;
         public static boolean startupFlag = true;
         public static MapLocation homeMemoryLocation = null;
         public static boolean returning = false;
+        public static RobotInfo enemyTarget = null;
 
-    public static void turn(RobotController rc) throws GameActionException {
+        public static void turn(RobotController rc) throws GameActionException {
 		MapLocation myLocation = rc.getLocation();
+                
+                RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+                enemyTarget = null;
+
+		for(int i = 0; i < enemies.length; i++){
+			if(enemies[i].getType() == RobotType.GARDENER){
+				//Comms.writeStack(rc, Comms.ENEMY_ARCHON_START, Comms.ENEMY_ARCHON_END, enemies[i].getLocation());
+				enemyTarget = enemies[i];
+			} else {
+				//Comms.writeStack(rc, Comms.ENEMY_START, Comms.ENEMY_END, enemies[i].getLocation());
+			}
+		}
                 
                 if(startupFlag) {
                    System.out.format("I'm here!\n");
@@ -53,36 +66,23 @@ public class BotScout {
                                 }
                             }
                         }
-			/*RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
-
-			for(int i = 0; i < enemies.length; i++){
-				if(enemies[i].getType() == RobotType.ARCHON){
-					Comms.writeStack(rc, Comms.ENEMY_ARCHON_START, Comms.ENEMY_ARCHON_END, enemies[i].getLocation());
-					enemyTarget = enemies[i];
-				} else {
-					Comms.writeStack(rc, Comms.ENEMY_START, Comms.ENEMY_END, enemies[i].getLocation());
-				}
-			}*/
 		}
                 else {
 			Direction dir = rc.getLocation().directionTo(enemyTarget.location);
 			float dist = enemyTarget.location.distanceTo(rc.getLocation());
 			if(!Nav.avoidBullets(rc, myLocation)) {
-				if (dist >= 6) {
-					Nav.tryMove(rc, dir);
-				}
-				else if (dist < 4 && rc.canMove(dir.opposite())) {
-					Nav.tryMove(rc, dir.opposite());
-				}
+                            if (dist >= 1) {
+                                Nav.tryMove(rc, dir);
+                            }
 			}
                         if(rc.canFireSingleShot()) {
                             rc.fireSingleShot(dir);
                         }
 		}
-    }
-    
-    public static void broadcastUnassigned(RobotController rc) throws GameActionException {
-        Comms.writeStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END, rc.getLocation());
-    }
-    
+        }
+
+        public static void broadcastUnassigned(RobotController rc) throws GameActionException {
+            Comms.writeStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END, rc.getLocation());
+        }
+
 }
