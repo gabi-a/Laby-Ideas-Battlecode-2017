@@ -21,7 +21,7 @@ public class BotScout {
 			}
 		}
 
-		if(target != null){
+                else {
 			Direction dir = rc.getLocation().directionTo(target.location);
 			float dist = target.location.distanceTo(rc.getLocation());
 			if(!Nav.avoidBullets(rc, myLocation)) {
@@ -32,8 +32,9 @@ public class BotScout {
 					Nav.tryMove(rc, dir.opposite());
 				}
 			}
-
-			rc.fireSingleShot(dir);
+                        if(rc.canFireSingleShot()) {
+                            rc.fireSingleShot(dir);
+                        }
 		}
     }
     
