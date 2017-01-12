@@ -40,7 +40,12 @@ public class BotScout {
 		if (moveTarget == null) {
 			moveTarget = Comms.popStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END);
 		}
-
+		if( rc.getRoundNum() <= Comms.readGardenerUniversalHoldRound(rc) 
+					&& Comms.readGardenerUniversalHoldLocation(rc).distanceTo(myLocation) >= 10f ) {
+			moveTarget = Comms.readGardenerUniversalHoldLocation(rc);
+			enemyTarget = null;
+			returning = false;
+		}
 		if (enemyTarget == null) {
 			if (moveTarget == null && returning == false) {
 				Nav.explore(rc);
@@ -70,7 +75,7 @@ public class BotScout {
 			float dist = enemyTarget.location.distanceTo(rc.getLocation());
 			if (/*!Nav.avoidBullets(rc, myLocation) &&*/ !Nav.avoidLumberjacks(rc, myLocation)) {
 				if ((dist >= 0f && enemyTarget.type != RobotType.LUMBERJACK) || dist >= 2f) {
-					Nav.tryMove(rc, dir);
+					Nav.tryPrecisionMove(rc, dir, dist / 2);
 				}
 			}
 			if (rc.canFireSingleShot()) {

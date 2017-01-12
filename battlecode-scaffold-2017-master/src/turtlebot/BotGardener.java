@@ -32,12 +32,11 @@ public class BotGardener {
 			}
 		}	
 		if (notJustScoutFlag && spawnDirection != null) {
-			Comms.writeGardenerUniversalHold(rc, selfLoc, rc.getRoundNum() + 5);
-			rc.setIndicatorDot(selfLoc, 0, 255, 0);
+			Comms.writeGardenerUniversalHold(rc, selfLoc, rc.getRoundNum() + 1);
 			Direction direction = new Direction(0f);
 			for(int i=0; i<6; i++) {
-				if (rc.canBuildRobot(RobotType.SCOUT, spawnDirection)) {
-					rc.buildRobot(RobotType.SCOUT, spawnDirection);
+				if (rc.canBuildRobot(RobotType.LUMBERJACK, spawnDirection)) {
+					rc.buildRobot(RobotType.LUMBERJACK, spawnDirection);
 					broadcastUnassignedScout();
 					break;
 				}
