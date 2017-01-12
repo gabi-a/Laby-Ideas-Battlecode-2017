@@ -15,7 +15,7 @@ public class BotArchon {
 	public static void turn(RobotController rc) throws GameActionException {
 
 		if (!Nav.explore(rc)) {
-			System.out.format("\nCouldn't move");
+			//System.out.format("\nCouldn't move");
 		}
 		
 		// Donate all of our bullets if we can  win or the game's about to end
@@ -58,9 +58,13 @@ public class BotArchon {
 	}
 	
 	public static void delegateScout(RobotController rc) throws GameActionException {
-        Comms.writeStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END, exploreLocations[exploreLocationsPointer]);
+		MapLocation[] enemyArchons = rc.getInitialArchonLocations(rc.getTeam().opponent());
+		int numEnemyArchons = enemyArchons.length;
+		MapLocation delegationLocation = (exploreLocationsPointer < numEnemyArchons) 
+				? enemyArchons[exploreLocationsPointer] : exploreLocations[exploreLocationsPointer - numEnemyArchons];
+        Comms.writeStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END, delegationLocation);
         exploreLocationsPointer++;
-        exploreLocationsPointer %= exploreLocations.length;
+        exploreLocationsPointer %= (exploreLocations.length + numEnemyArchons);
     }
     
     public static boolean checkUnassignedScout(RobotController rc) throws GameActionException {
