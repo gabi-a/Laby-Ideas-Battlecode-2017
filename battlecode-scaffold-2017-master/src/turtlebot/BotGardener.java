@@ -74,13 +74,13 @@ public class BotGardener {
                     spawnDirection = new Direction(0);
                 }
             }
-			if(rc.canBuildRobot(RobotType.SCOUT, spawnDirection) && rc.getRoundNum() < 100) {
+			if(rc.canBuildRobot(RobotType.SCOUT, spawnDirection) && rc.getRoundNum() < 50) {
 				rc.buildRobot(RobotType.SCOUT, spawnDirection);
 				broadcastUnassignedScout();
 				numScouts++;
 			}
             for (Direction plantDirection : treeDirections) {
-                if (plantDirection != null && rc.canPlantTree(plantDirection) && (rc.getRoundNum() > 100 || rc.getTeamBullets() > 80)) {
+                if (plantDirection != null && rc.canPlantTree(plantDirection) && (rc.getRoundNum() > 50 || rc.getTeamBullets() > 100)) {
                     rc.plantTree(plantDirection);
                 }
             }

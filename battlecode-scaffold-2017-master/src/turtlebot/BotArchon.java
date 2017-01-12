@@ -17,9 +17,10 @@ public class BotArchon {
 		if (!Nav.explore(rc)) {
 			System.out.format("\nCouldn't move");
 		}
-
-		if (rc.getTeamBullets() >= 10000) {
-			rc.donate(10000);
+		
+		// Donate all of our bullets if we can  win or the game's about to end
+		if (rc.getTeamBullets() >= 10000 || rc.getRoundNum() == rc.getRoundLimit() - 1) {
+			rc.donate(rc.getTeamBullets());
 		}
 
 		MapLocation selfLoc = rc.getLocation();
@@ -36,7 +37,8 @@ public class BotArchon {
 		// Nav.avoidBullets(rc, selfLoc);
 
 		if (count <= 7) {
-			count += BotArchon.tryHireGardener(rc) ? 1 : 0;
+			//if(rc.onTheMap(selfLoc, RobotType.ARCHON.sensorRadius-3))
+				count += BotArchon.tryHireGardener(rc) ? 1 : 0;
 		}
 		
 		while(checkUnassignedScout(rc)) {}
