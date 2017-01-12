@@ -3,7 +3,8 @@ package turtlebot;
 import battlecode.common.*;
 
 public class BotGardener {
-
+	static RobotController rc;
+	
     public static boolean atTargetLoc = false;
     public static Direction[] treeDirections = new Direction[5];
     public static Direction spawnDirection = null;
@@ -15,7 +16,8 @@ public class BotGardener {
     public static final int DISTANCE_BETWEEN_GARDENS = 10;
     
     public static void turn(RobotController rc) throws GameActionException {
-        
+    	BotGardener.rc = rc;
+    	
         MapLocation selfLoc = rc.getLocation();
 
         if (!atTargetLoc) {
@@ -89,15 +91,17 @@ public class BotGardener {
 	            		typeToBuild = RobotType.LUMBERJACK;
 	            	} else {
 	            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
-	            		typeToBuild = RobotType.SOLDIER;
+	            		typeToBuild = RobotType.SCOUT;
 	            	}
 	            } else {
-	            	typeToBuild = RobotType.SOLDIER;
+	            	typeToBuild = RobotType.SCOUT;
 	            }
 	            if (rc.canBuildRobot(typeToBuild, spawnDirection)) {
 	                rc.buildRobot(typeToBuild, spawnDirection);
 	                if(typeToBuild == RobotType.LUMBERJACK) {
-                                Comms.writeNumLumberjacks(rc, lumberjacks+1);
+	                	Comms.writeNumLumberjacks(rc, lumberjacks+1);
+	                } else if(typeToBuild == RobotType.SCOUT) {
+	                	broadcastUnassignedScout();
 	                }
 	            }
 	            else {
@@ -108,7 +112,7 @@ public class BotGardener {
 
     }
     
-    public static void broadcastUnassignedScout(RobotController rc) throws GameActionException {
+    public static void broadcastUnassignedScout() throws GameActionException {
         Comms.writeStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END, rc.getLocation());
     }
 
