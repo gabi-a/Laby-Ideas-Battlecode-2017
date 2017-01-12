@@ -23,18 +23,22 @@ public class BotGardener {
         scoutThreshold = rc.getRoundNum() / 200;
 		
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
-		boolean notScoutFlag = false;
+		boolean notJustScoutFlag = false;
 		for(int i=0; i < enemies.length; i++) {
-			if(enemies[i].type != RobotType.SCOUT && enemies[i].type != RobotType.GARDENER) {
-				notScoutFlag = true;
+			if((enemies[i].type != RobotType.SCOUT && enemies[i].type != RobotType.GARDENER) 
+					|| (enemies[i].type == RobotType.SCOUT && enemies[i].location.distanceTo(selfLoc) < 3f)) {
+				notJustScoutFlag = true;
 				break;
 			}
 		}	
-		if (notScoutFlag && spawnDirection != null) {
+		if (notJustScoutFlag && spawnDirection != null) {
+			Comms.writeGardenerUniversalHold(rc, selfLoc, rc.getRoundNum() + 5);
+			rc.setIndicatorDot(selfLoc, 0, 255, 0);
 			Direction direction = new Direction(0f);
 			for(int i=0; i<6; i++) {
-				if (rc.canBuildRobot(RobotType.SOLDIER, spawnDirection)) {
-					rc.buildRobot(RobotType.SOLDIER, spawnDirection);
+				if (rc.canBuildRobot(RobotType.SCOUT, spawnDirection)) {
+					rc.buildRobot(RobotType.SCOUT, spawnDirection);
+					broadcastUnassignedScout();
 					break;
 				}
 				direction = direction.rotateLeftRads((float) Math.PI * MULTIPLICITY);
@@ -100,11 +104,14 @@ public class BotGardener {
 				broadcastUnassignedScout();
 				numScouts++;
 			}
-            for (Direction plantDirection : treeDirections) {
-                if (plantDirection != null && rc.canPlantTree(plantDirection) && (rc.getRoundNum() > 50 || rc.getTeamBullets() > 100)) {
-                    rc.plantTree(plantDirection);
-                }
-            }
+			if(!(Comms.readGardenerUniversalHoldRound(rc) <= rc.getRoundNum()
+					&& Comms.readGardenerUniversalHoldLocation(rc).distanceTo(selfLoc) <= 20f)) {
+				for (Direction plantDirection : treeDirections) {
+					if (plantDirection != null && rc.canPlantTree(plantDirection) && (rc.getRoundNum() > 50 || rc.getTeamBullets() > 100)) {
+						rc.plantTree(plantDirection);
+					}
+				}
+			}
             for (TreeInfo treeInfo : rc.senseNearbyTrees(1.5f, rc.getTeam())) {
                 if (treeInfo.health <= 0.9f * treeInfo.maxHealth && rc.canWater(treeInfo.ID)) {
                     rc.water(treeInfo.ID);
