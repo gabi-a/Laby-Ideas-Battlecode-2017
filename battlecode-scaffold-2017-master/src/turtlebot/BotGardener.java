@@ -4,11 +4,8 @@ import battlecode.common.*;
 
 public class BotGardener {
 
-    public static MapLocation targetLoc = null; 
     public static boolean atTargetLoc = false;
-    public static int trappedCount = 0;
     
-    public static final float POSITION_FIDELITY = 1f;
     public static final float MULTIPLICITY = 0.333334f;
     public static final Direction[] TREE_DIRECTIONS = 
         { 
@@ -19,6 +16,7 @@ public class BotGardener {
     public static final Direction SPAWN_DIRECTION = new Direction((float) Math.PI * MULTIPLICITY * 5);
     public static final int TRAPPED_THRESHOLD = 10;
     
+    public static final int DISTANCE_BETWEEN_GARDENS = 7;
     
     public static void turn(RobotController rc) throws GameActionException {
         
@@ -32,17 +30,17 @@ public class BotGardener {
         	boolean goodToSettle = true;
         	MapLocation myLocation = rc.getLocation();
         	
-        	RobotInfo[] nearbyBots = rc.senseNearbyRobots(5);
-        	if(nearbyBots.length > 0) {
-        		goodToSettle = false;
-        		System.out.format("\n Too many nearby bots to settle");
-        	}
+        	//RobotInfo[] nearbyBots = rc.senseNearbyRobots(5);
+        	//if(nearbyBots.length > 0) {
+        	//	goodToSettle = false;
+        	//	System.out.format("\n Too many nearby bots to settle");
+        	//}
         	
         	if(goodToSettle) {
             	MapLocation[] gardens = Comms.readGardenLocs(rc);
             	for(int i = gardens.length;i-->0;) {
             		MapLocation otherGardenLoc = gardens[i];
-            		if(otherGardenLoc != null && myLocation.distanceTo(otherGardenLoc) < 10) {
+            		if(otherGardenLoc != null && myLocation.distanceTo(otherGardenLoc) < DISTANCE_BETWEEN_GARDENS) {
             			goodToSettle = false;
                 		System.out.format("\n Too close to another garden to settle");
             			break;
@@ -52,22 +50,8 @@ public class BotGardener {
         	
         	if(goodToSettle) {
         		atTargetLoc = true;
-        		Comms.writeGarden(rc, myLocation);
+        		System.out.format("\nWrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
         	}
-        	
-        	/*
-        	Direction moveDirection = new Direction(selfLoc, targetLoc);
-            if(rc.canMove(moveDirection)) {
-                rc.move(moveDirection);
-                trappedCount = 0;
-            }
-            else {
-                trappedCount++;
-            }
-            if(selfLoc.distanceTo(targetLoc) <= POSITION_FIDELITY) {
-                atTargetLoc = true;
-            }
-            */
         }
         else {
             for (Direction plantDirection : TREE_DIRECTIONS) {
@@ -82,8 +66,14 @@ public class BotGardener {
             }
             RobotType typeToBuild;
             int lumberjacks = Comms.readNumLumberjacks(rc);
-            if(rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL).length > 0 && lumberjacks < 10) {
-            	typeToBuild = RobotType.LUMBERJACK;
+            TreeInfo[] nearbyTrees = rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL);
+            if(nearbyTrees.length > 0) {
+            	if(lumberjacks < 5) {
+            		typeToBuild = RobotType.LUMBERJACK;
+            	} else {
+            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
+            		typeToBuild = RobotType.SOLDIER;
+            	}
             } else {
             	typeToBuild = RobotType.SOLDIER;
             }
@@ -98,12 +88,6 @@ public class BotGardener {
             }
         }
 
-    }
-    
-    public static void broadcastUnassigned(RobotController rc) throws GameActionException {
-        Comms.writeStack(rc, 121, 140, new MapLocation(0,0));
-        trappedCount = 0;
-        System.out.println("No, I'm trapped :|");
     }
 
 }

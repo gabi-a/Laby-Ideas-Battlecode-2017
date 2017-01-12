@@ -51,7 +51,7 @@ public class BotGardener {
                 }
             }
             for (TreeInfo treeInfo : rc.senseNearbyTrees(1.5f)) {
-                if (treeInfo.health <= 0.9f * treeInfo.maxHealth && rc.canWater(treeInfo.ID)) {
+                if (treeInfo.health <= 0.9f * treeInfo.maxHealth && rc.canWater(treeInfo.ID) && treeInfo.team == rc.getTeam()) {
                     rc.water(treeInfo.ID);
                 }
             }
