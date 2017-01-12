@@ -9,6 +9,7 @@ public class BotGardener {
     public static Direction[] treeDirections = new Direction[5];
     public static Direction spawnDirection = null;
     public static int numScouts = 0;
+    public static int scoutThreshold = 0;
     
     public static final float MULTIPLICITY = 0.333334f;
     public static final int TRAPPED_THRESHOLD = 10;
@@ -19,6 +20,7 @@ public class BotGardener {
     	BotGardener.rc = rc;
     	
         MapLocation selfLoc = rc.getLocation();
+        scoutThreshold = rc.getRoundNum() / 100;
 
         if (!atTargetLoc) {
             //System.out.format("Hm. %d, (%f - %f)\n", trappedCount, targetLoc.x, targetLoc.y);
@@ -48,7 +50,7 @@ public class BotGardener {
         	
         	if(goodToSettle) {
         		atTargetLoc = true;
-        		System.out.format("\nWrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
+        		//System.out.format("\nWrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
         	}
         }
         else {
@@ -86,15 +88,18 @@ public class BotGardener {
 	            RobotType typeToBuild;
 	            int lumberjacks = Comms.readNumLumberjacks(rc);
 	            TreeInfo[] nearbyTrees = rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL);
-	            if(nearbyTrees.length > 0) {
+                    if (numScouts < scoutThreshold) {
+                        typeToBuild = RobotType.SCOUT;
+                    }
+                    else if(nearbyTrees.length > 0) {
 	            	if(lumberjacks < 5) {
 	            		typeToBuild = RobotType.LUMBERJACK;
 	            	} else {
 	            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
-	            		typeToBuild = RobotType.SCOUT;
+	            		typeToBuild = RobotType.SOLDIER;
 	            	}
 	            } else {
-	            	typeToBuild = RobotType.SCOUT;
+	            	typeToBuild = RobotType.SOLDIER;
 	            }
 	            if (rc.canBuildRobot(typeToBuild, spawnDirection)) {
 	                rc.buildRobot(typeToBuild, spawnDirection);
@@ -102,6 +107,7 @@ public class BotGardener {
 	                	Comms.writeNumLumberjacks(rc, lumberjacks+1);
 	                } else if(typeToBuild == RobotType.SCOUT) {
 	                	broadcastUnassignedScout();
+                                numScouts++;
 	                }
 	            }
 	            else {

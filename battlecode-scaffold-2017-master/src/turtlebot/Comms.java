@@ -6,10 +6,10 @@ public class Comms {
 	
 	public static final int GARDENS_START = 100;
 	public static final int GARDENS_END = 120;
-        public static final int ARCHON_SCOUT_DELEGATION_START = 121;
-        public static final int ARCHON_SCOUT_DELEGATION_END = 170;
-        public static final int SCOUT_ARCHON_REQUEST_START = 171;
-        public static final int SCOUT_ARCHON_REQUEST_END = 220;
+        public static final int ARCHON_SCOUT_DELEGATION_START = 200;
+        public static final int ARCHON_SCOUT_DELEGATION_END = 240;
+        public static final int SCOUT_ARCHON_REQUEST_START = 250;
+        public static final int SCOUT_ARCHON_REQUEST_END = 290;
 	public static final int LUMBERJACKS_COUNTER = 500;
 	public static final int ENEMY_START = 600;
 	public static final int ENEMY_END = 699;
@@ -22,7 +22,7 @@ public class Comms {
     // Up to 20 gardeners
     public static boolean writeGarden(RobotController rc, MapLocation loc) throws GameActionException {
     	// Loop through channels until one is empty
-    	System.out.format("\nWriting garden");
+    	//System.out.format("\nWriting garden");
     	for(int i = GARDENS_END; i-->GARDENS_START;) {
     		if(rc.readBroadcast(i) == 0) {
     			rc.broadcast(i, Comms.packLocation(loc));

@@ -43,9 +43,9 @@ public class BotScout {
                     }
                 }
                 
-		if(enemyTarget == null) {
+		if(true) {
                         if (moveTarget == null && returning == false) {
-                            Nav.explore(rc);
+                            //Nav.explore(rc);
                         }
                         else {
                             if (!returning) {
