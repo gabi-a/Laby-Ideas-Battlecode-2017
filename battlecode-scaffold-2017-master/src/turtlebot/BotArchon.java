@@ -26,6 +26,11 @@ public class BotArchon {
 
 		if (rc.getRoundNum() == 1) {
 			Comms.writeGarden(rc, selfLoc);
+			Direction exploreDir = new Direction(0);
+			for (int i=0; i < EXPLORE_SPOKES; i++) {
+				exploreDirections[i] = exploreDir;
+				exploreDir = exploreDir.rotateLeftRads(7 * (float) Math.PI / EXPLORE_SPOKES);
+			}
 		}
 
 		// Nav.avoidBullets(rc, selfLoc);
@@ -54,7 +59,7 @@ public class BotArchon {
         MapLocation exploreLocation = rc.getInitialArchonLocations(rc.getTeam())[0].add(exploreDirections[exploreDirectionsPointer], 100f);
         Comms.writeStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END, exploreLocation);
         exploreDirectionsPointer++;
-        exploreDirectionsPointer %= 24;
+        exploreDirectionsPointer %= EXPLORE_SPOKES;
     }
     
     public static boolean checkUnassignedScout(RobotController rc) throws GameActionException {
