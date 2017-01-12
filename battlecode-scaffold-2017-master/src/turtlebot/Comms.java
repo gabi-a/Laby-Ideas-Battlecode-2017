@@ -6,11 +6,13 @@ public class Comms {
 	
 	public static final int GARDENS_START = 100;
 	public static final int GARDENS_END = 120;
-        public static final int ARCHON_SCOUT_DELEGATION_START = 200;
-        public static final int ARCHON_SCOUT_DELEGATION_END = 240;
-        public static final int SCOUT_ARCHON_REQUEST_START = 250;
-        public static final int SCOUT_ARCHON_REQUEST_END = 290;
+    public static final int ARCHON_SCOUT_DELEGATION_START = 200;
+    public static final int ARCHON_SCOUT_DELEGATION_END = 240;
+    public static final int SCOUT_ARCHON_REQUEST_START = 250;
+    public static final int SCOUT_ARCHON_REQUEST_END = 290;
 	public static final int LUMBERJACKS_COUNTER = 500;
+	public static final int GARDENER_UNIVERSAL_HOLD_LOCATION = 501;
+	public static final int GARDENER_UNIVERSAL_HOLD_ROUND = 502;
 	public static final int ENEMY_START = 600;
 	public static final int ENEMY_END = 699;
 	public static final int ENEMY_ARCHON_START = 700;
@@ -192,5 +194,19 @@ public class Comms {
 	}
 	public static int readNumLumberjacks(RobotController rc) throws GameActionException {
 		return rc.readBroadcast(LUMBERJACKS_COUNTER);
+	}
+	
+	//channel 
+	public static void writeGardenerUniversalHold(RobotController rc, MapLocation location, int holdRound) throws GameActionException {
+		rc.broadcast(GARDENER_UNIVERSAL_HOLD_LOCATION, packLocation(location));
+		rc.broadcast(GARDENER_UNIVERSAL_HOLD_ROUND, holdRound);
+	}
+	
+	public static MapLocation readGardenerUniversalHoldLocation(RobotController rc) throws GameActionException {
+		return unpackLocation(rc.readBroadcast(GARDENER_UNIVERSAL_HOLD_LOCATION));
+	}
+	
+	public static int readGardenerUniversalHoldRound(RobotController rc) throws GameActionException {
+		return rc.readBroadcast(GARDENER_UNIVERSAL_HOLD_ROUND);
 	}
 }
