@@ -47,7 +47,7 @@ public class BotGardener {
         	if(goodToSettle) {
         		atTargetLoc = true;
                         spawnDirection = null;
-        		System.out.format("\nWrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
+        		//System.out.format("\nWrote garden succesfully: %b", Comms.writeGarden(rc, myLocation));
         	}
         }
         else {
@@ -104,6 +104,7 @@ public class BotGardener {
                 	Comms.writeNumLumberjacks(rc, lumberjacks+1);
                 }
                 else if(typeToBuild == RobotType.SCOUT) {
+                    broadcastUnassignedScout(rc);
                     numScouts++;
                 }
             }
@@ -112,6 +113,10 @@ public class BotGardener {
             }
         }
 
+    }
+    
+    public static void broadcastUnassignedScout(RobotController rc) throws GameActionException {
+        Comms.writeStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END, rc.getLocation());
     }
 
 }
