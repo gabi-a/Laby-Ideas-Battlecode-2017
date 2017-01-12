@@ -54,7 +54,7 @@ public class BotGardener {
                 int validPlantCount = 0;
                 Direction direction = new Direction(0f);
                 for(int i=0; i<6; i++) {
-                    if(rc.canPlantTree(direction)) {
+                    if(rc.isCircleOccupied(selfLoc.add(direction),1)) {
                         if(spawnDirection == null) {
                             spawnDirection = direction;
                         }
