@@ -21,8 +21,26 @@ public class BotGardener {
     	
         MapLocation selfLoc = rc.getLocation();
         scoutThreshold = rc.getRoundNum() / 200;
-
-        if (!atTargetLoc) {
+		
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		boolean notScoutFlag = false;
+		for(int i=0; i < enemies.length; i++) {
+			if(enemies[i].type != RobotType.SCOUT && enemies[i].type != RobotType.GARDENER) {
+				notScoutFlag = true;
+				break;
+			}
+		}	
+		if (notScoutFlag && spawnDirection != null) {
+			Direction direction = new Direction(0f);
+			for(int i=0; i<6; i++) {
+				if (rc.canBuildRobot(RobotType.SOLDIER, spawnDirection)) {
+					rc.buildRobot(RobotType.SOLDIER, spawnDirection);
+					break;
+				}
+				direction = direction.rotateLeftRads((float) Math.PI * MULTIPLICITY);
+			}		
+		}
+		else if (!atTargetLoc) {
             //System.out.format("Hm. %d, (%f - %f)\n", trappedCount, targetLoc.x, targetLoc.y);
 
         	Nav.explore(rc);

@@ -33,7 +33,7 @@ public class BotLumberjack {
 
 				} else {
 					target = nearestTree();
-					if(target == null){
+					if(target == null && !rc.hasMoved()){
 						Nav.explore(rc);
 						return;
 					}
@@ -74,6 +74,9 @@ public class BotLumberjack {
 			if(oldTarget == null) oldTarget = target;
 			target = nearestTree();
 			cutTree();
+		}
+		if(target == null) {
+			return;
 		}
 		if(rc.canChop(target.getID())) rc.chop(target.getID());
 
