@@ -36,7 +36,8 @@ public class BotArchon {
 		// Nav.avoidBullets(rc, selfLoc);
 
 		if (count <= 7) {
-			count += BotArchon.tryHireGardener(rc) ? 1 : 0;
+			//if(rc.onTheMap(selfLoc, RobotType.ARCHON.sensorRadius-3))
+				count += BotArchon.tryHireGardener(rc) ? 1 : 0;
 		}
 		
 		while(checkUnassignedScout(rc)) {}
