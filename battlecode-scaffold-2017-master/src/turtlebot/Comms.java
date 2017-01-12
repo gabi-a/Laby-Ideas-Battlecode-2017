@@ -27,7 +27,7 @@ public class Comms {
     	//System.out.format("\nWriting garden");
     	for(int i = GARDENS_END; i-->GARDENS_START;) {
     		if(rc.readBroadcast(i) == 0) {
-    			rc.broadcast(i, Comms.packLocation(loc));
+    			rc.broadcast(i, Comms.packLocation(rc, loc));
     			return true;
     		}
     	}
@@ -42,7 +42,7 @@ public class Comms {
     		if(data == 0) {
     			gardenLocs[j] = null;
     		} else {
-    			gardenLocs[j] = Comms.unpackLocation(data);
+    			gardenLocs[j] = Comms.unpackLocation(rc, data);
     		}
     		j++;
     	}
@@ -58,20 +58,8 @@ public class Comms {
             System.out.println("Oops! Exceeded stack limit.");
             return;
         }
-        
-        Team myTeam = rc.getTeam();
-        MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
-        MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, -100);
-        
-        int mapZoneX = (int) (location.x - cornerPoint.x);
-        int mapZoneY = (int) (location.y - cornerPoint.y);
-        
-        // Debug only!
-        if (mapZoneX < 0 || mapZoneY < 0 || mapZoneX > 200 || mapZoneY > 200) {
-            System.out.format("\nWe shouldn't be here! Map zone X/Y < 0 or > 200, is %d,%d\n", mapZoneX, mapZoneY);
-        }
-        
-        int packedLocation = (mapZoneX << 8) | (mapZoneY);
+
+		int packedLocation = packLocation(rc, location);
 
         rc.broadcast(stackStart + POINTER_OFFSET + stackPointer, packedLocation);
         rc.broadcast(stackStart, stackPointer + 1);
@@ -89,15 +77,7 @@ public class Comms {
         
         int packedLocation = rc.readBroadcast(stackStart + POINTER_OFFSET + stackPointer);
 
-        int mapZoneX = (packedLocation & 0xFF00) >> 8;
-        int mapZoneY = packedLocation & 0x00FF;
-        
-        Team myTeam = rc.getTeam();
-        MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
-        MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, -100);
-        
-        
-        return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
+		return unpackLocation(rc, packedLocation);
     }
     
     public static MapLocation popStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
@@ -118,24 +98,44 @@ public class Comms {
         return returnValue;
     }
 
-	public static int packLocation(MapLocation loc) {
-		return (int)loc.x + (int)loc.y*(int)Math.pow(2,10);
+	public static int packLocation(RobotController rc, MapLocation loc) {
+        Team myTeam = rc.getTeam();
+        MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
+        MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, -100);
+        
+        int mapZoneX = (int) (loc.x - cornerPoint.x);
+        int mapZoneY = (int) (loc.y - cornerPoint.y);
+        
+        // Debug only!
+        if (mapZoneX < 0 || mapZoneY < 0 || mapZoneX > 200 || mapZoneY > 200) {
+            System.out.format("\nWe shouldn't be here! Map zone X/Y < 0 or > 200, is %d,%d\n", mapZoneX, mapZoneY);
+        }
+        
+        return (mapZoneX << 8) | (mapZoneY);
 	}
 
-	public static MapLocation unpackLocation(int loc) {
-		return new MapLocation(loc%(int)Math.pow(2,10), loc/(int)Math.pow(2,10));
+	public static MapLocation unpackLocation(RobotController rc, int loc) {
+        int mapZoneX = (loc & 0xFF00) >> 8;
+        int mapZoneY = loc & 0x00FF;
+        
+        Team myTeam = rc.getTeam();
+        MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
+        MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, -100);
+        
+        
+        return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
 	}
 
 	// Uses channels 7 to 26
 	// 10 high priority trees, 10 low priority trees
-	public static int packTree(TreeInfo tree, int count){
-		return packLocation(tree.getLocation()) + count*(int)Math.pow(2,20)+ tree.getID()*(int)Math.pow(2,24);
+	public static int packTree(RobotController rc, TreeInfo tree, int count){
+		return packLocation(rc, tree.getLocation()) + count*(int)Math.pow(2,20)+ tree.getID()*(int)Math.pow(2,24);
 	}
 
-	public static TreeInfo unpackTree(int data){
+	public static TreeInfo unpackTree(RobotController rc, int data){
 		int id = data/(int)Math.pow(2, 24);
 		int count = (data - (id*(int)Math.pow(2, 24)))/(int)Math.pow(2,20);
-		MapLocation loc = unpackLocation(data - id*(int)Math.pow(2,24) - count*(int)Math.pow(2,20));
+		MapLocation loc = unpackLocation(rc, data - id*(int)Math.pow(2,24) - count*(int)Math.pow(2,20));
 
 		return new TreeInfo(id, null, loc, 0, 0, count, null);
 	}
@@ -144,7 +144,7 @@ public class Comms {
 		for(int i = 7; i < 17; i++){
 			int data = rc.readBroadcast(i);
 			if(data == 0){
-				rc.broadcast(i, packTree(tree, count));
+				rc.broadcast(i, packTree(rc, tree, count));
 				break;
 			}
 		}
@@ -154,9 +154,9 @@ public class Comms {
 		for(int i = 16; i > 6; i--){
 			int data = rc.readBroadcast(i);
 			if(data != 0){
-				TreeInfo tree = unpackTree(data);
+				TreeInfo tree = unpackTree(rc, data);
 				if(tree.getContainedBullets() > 1){
-					rc.broadcast(i, packTree(tree, tree.getContainedBullets()-1));
+					rc.broadcast(i, packTree(rc, tree, tree.getContainedBullets()-1));
 				} else rc.broadcast(i, 0);
 				return tree;
 			}
@@ -168,7 +168,7 @@ public class Comms {
 		for(int i = 17; i < 27; i++){
 			int data = rc.readBroadcast(i);
 			if(data == 0){
-				rc.broadcast(i, packTree(tree, count));
+				rc.broadcast(i, packTree(rc, tree, count));
 				break;
 			}
 		}
@@ -178,9 +178,9 @@ public class Comms {
 		for(int i = 26; i > 16; i--){
 			int data = rc.readBroadcast(i);
 			if(data != 0){
-				TreeInfo tree = unpackTree(data);
+				TreeInfo tree = unpackTree(rc, data);
 				if(tree.getContainedBullets() > 1){
-					rc.broadcast(i, packTree(tree, tree.getContainedBullets()-1));
+					rc.broadcast(i, packTree(rc, tree, tree.getContainedBullets()-1));
 				} else rc.broadcast(i, 0);
 				return tree;
 			}
@@ -198,12 +198,12 @@ public class Comms {
 	
 	//channel 
 	public static void writeGardenerUniversalHold(RobotController rc, MapLocation location, int holdRound) throws GameActionException {
-		rc.broadcast(GARDENER_UNIVERSAL_HOLD_LOCATION, packLocation(location));
+		rc.broadcast(GARDENER_UNIVERSAL_HOLD_LOCATION, packLocation(rc, location));
 		rc.broadcast(GARDENER_UNIVERSAL_HOLD_ROUND, holdRound);
 	}
 	
 	public static MapLocation readGardenerUniversalHoldLocation(RobotController rc) throws GameActionException {
-		return unpackLocation(rc.readBroadcast(GARDENER_UNIVERSAL_HOLD_LOCATION));
+		return unpackLocation(rc, rc.readBroadcast(GARDENER_UNIVERSAL_HOLD_LOCATION));
 	}
 	
 	public static int readGardenerUniversalHoldRound(RobotController rc) throws GameActionException {
