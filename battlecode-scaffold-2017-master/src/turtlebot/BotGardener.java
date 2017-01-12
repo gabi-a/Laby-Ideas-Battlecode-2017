@@ -64,27 +64,29 @@ public class BotGardener {
                     rc.water(treeInfo.ID);
                 }
             }
-            RobotType typeToBuild;
-            int lumberjacks = Comms.readNumLumberjacks(rc);
-            TreeInfo[] nearbyTrees = rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL);
-            if(nearbyTrees.length > 0) {
-            	if(lumberjacks < 5) {
-            		typeToBuild = RobotType.LUMBERJACK;
-            	} else {
-            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
-            		typeToBuild = RobotType.SOLDIER;
-            	}
-            } else {
-            	typeToBuild = RobotType.SOLDIER;
-            }
-            if (rc.canBuildRobot(typeToBuild, SPAWN_DIRECTION)) {
-                rc.buildRobot(typeToBuild, SPAWN_DIRECTION);
-                if(typeToBuild == RobotType.LUMBERJACK) {
-                	Comms.writeNumLumberjacks(rc, lumberjacks+1);
-                }
-            }
-            else {
-                //System.out.println(":(");
+            if(rc.getRoundNum() > 300) {
+	            RobotType typeToBuild;
+	            int lumberjacks = Comms.readNumLumberjacks(rc);
+	            TreeInfo[] nearbyTrees = rc.senseNearbyTrees(RobotType.GARDENER.sensorRadius, Team.NEUTRAL);
+	            if(nearbyTrees.length > 0) {
+	            	if(lumberjacks < 5) {
+	            		typeToBuild = RobotType.LUMBERJACK;
+	            	} else {
+	            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
+	            		typeToBuild = RobotType.SOLDIER;
+	            	}
+	            } else {
+	            	typeToBuild = RobotType.SOLDIER;
+	            }
+	            if (rc.canBuildRobot(typeToBuild, SPAWN_DIRECTION)) {
+	                rc.buildRobot(typeToBuild, SPAWN_DIRECTION);
+	                if(typeToBuild == RobotType.LUMBERJACK) {
+	                	Comms.writeNumLumberjacks(rc, lumberjacks+1);
+	                }
+	            }
+	            else {
+	                //System.out.println(":(");
+	            }
             }
         }
 

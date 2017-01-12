@@ -10,6 +10,10 @@ public class BotArchon {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		
+		if(!Nav.explore(rc)) {
+			System.out.format("\nCouldn't move");
+		}
+		
 		if(rc.getTeamBullets() >= 10000) {
 			rc.donate(10000);
 		}
@@ -21,11 +25,12 @@ public class BotArchon {
 		}
 		
 		
-		Nav.avoidBullets(rc, selfLoc);
+		//Nav.avoidBullets(rc, selfLoc);
 
 		while (count <= 7) {
 			count += BotArchon.tryHireGardener(rc) ? 1 : 0;
 		}
+		
 		
 	}
     

@@ -16,7 +16,8 @@ public class BotGardener {
     public static final Direction SPAWN_DIRECTION = new Direction((float) Math.PI * MULTIPLICITY * 5);
     public static final int TRAPPED_THRESHOLD = 10;
     
-    public static final int DISTANCE_BETWEEN_GARDENS = 7;
+    public static final int DISTANCE_BETWEEN_GARDENS = 10;
+    
     
     public static void turn(RobotController rc) throws GameActionException {
         
@@ -72,7 +73,7 @@ public class BotGardener {
             	if(lumberjacks < 5) {
             		typeToBuild = RobotType.LUMBERJACK;
             	} else {
-            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
+            		//Comms.pushLowPriorityTree(rc, nearbyTrees[0], 1);
             		return;
             		//typeToBuild = RobotType.SOLDIER;
             	}
