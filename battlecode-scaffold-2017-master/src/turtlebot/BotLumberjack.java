@@ -53,6 +53,11 @@ public class BotLumberjack {
 			TreeInfo[] nearbyTrees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 			for(int i = nearbyTrees.length;i-->0;) {
 				if(rc.canChop(nearbyTrees[i].ID)) {
+					if(nearbyTrees[i].ID == target.ID) {
+						if(nearbyTrees[i].getHealth() - GameConstants.LUMBERJACK_CHOP_DAMAGE <= 0) {
+							target = null;
+						}
+					}
 					rc.chop(nearbyTrees[i].ID);
 					break;
 				}
