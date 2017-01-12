@@ -67,7 +67,7 @@ public class BotLumberjack {
 	}
 
 	public static void cutTree() throws GameActionException{
-		if(rc.canChop(target.getID())){
+		if(target != null && rc.canChop(target.getID())){
 			rc.chop(target.getID());
 		}
 		if(!Nav.tryMove(rc, rc.getLocation().directionTo(target.getLocation()))){
