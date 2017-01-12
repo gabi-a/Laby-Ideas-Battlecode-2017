@@ -32,7 +32,7 @@ public class BotArchon {
     public static boolean tryHireGardener(RobotController rc) throws GameActionException {
         Direction hireDirection = new Direction(0);
         for (int i =0 ; i < 8; i++) {
-            if(rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection), 5)) {
+            if(rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection, 5f))) {
                 rc.hireGardener(hireDirection);
                 return true;
             }
