@@ -73,7 +73,7 @@ public class BotLumberjack {
 		if(!Nav.tryMove(rc, rc.getLocation().directionTo(target.getLocation()))){
 			if(oldTarget == null) oldTarget = target;
 			target = nearestTree();
-			cutTree();
+			//cutTree();
 		}
 		if(target == null) {
 			return;
