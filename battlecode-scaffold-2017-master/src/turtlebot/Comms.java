@@ -7,9 +7,9 @@ public class Comms {
 	public static final int GARDENS_START = 100;
 	public static final int GARDENS_END = 120;
         public static final int ARCHON_SCOUT_DELEGATION_START = 121;
-        public static final int ARCHON_SCOUT_DELEGATION_END = 140;
-        public static final int SCOUT_ARCHON_REQUEST_START = 141;
-        public static final int SCOUT_ARCHON_REQUEST_END = 160;
+        public static final int ARCHON_SCOUT_DELEGATION_END = 170;
+        public static final int SCOUT_ARCHON_REQUEST_START = 171;
+        public static final int SCOUT_ARCHON_REQUEST_END = 220;
 	public static final int LUMBERJACKS_COUNTER = 500;
 	public static final int ENEMY_START = 600;
 	public static final int ENEMY_END = 699;
