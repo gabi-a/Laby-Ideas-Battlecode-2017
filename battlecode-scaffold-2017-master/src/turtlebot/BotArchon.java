@@ -19,6 +19,10 @@ public class BotArchon {
 		}
 
 		MapLocation selfLoc = rc.getLocation();
+                
+                if (!Nav.explore(rc)) {
+                    System.out.format("\nCouldn't move");
+                }
 		
 		if(startupFlag) {
 			Comms.writeGarden(rc, selfLoc);
@@ -30,8 +34,9 @@ public class BotArchon {
                         startupFlag = false;
 		}
 		
-		
-		Nav.avoidBullets(rc, selfLoc);
+		if( !rc.hasMoved()) {
+                    Nav.avoidBullets(rc, selfLoc);
+                }
 
 		if (count <= 7) {
 			count += tryHireGardener(rc) ? 1 : 0;
