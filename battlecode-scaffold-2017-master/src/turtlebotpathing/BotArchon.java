@@ -17,6 +17,12 @@ public class BotArchon {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		
+		int scoutsBuilt = Comms.readNumRobots(rc, RobotType.SCOUT);
+    	int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
+    	int gardenersBuilt = Comms.readNumRobots(rc, RobotType.GARDENER);
+		
+		System.out.format("\nScouts: %d", scoutsBuilt);
+		
 		MapLocation selfLoc = rc.getLocation();
 		
 		if (!Nav.avoidBullets(rc, selfLoc) && !Nav.explore(rc)) {
@@ -27,10 +33,6 @@ public class BotArchon {
 		if (rc.getTeamBullets() >= 10000 || rc.getRoundNum() == rc.getRoundLimit() - 1) {
 			rc.donate(rc.getTeamBullets());
 		}
-		
-		int scoutsBuilt = Comms.readNumRobots(rc, RobotType.SCOUT);
-    	int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
-    	int gardenersBuilt = Comms.readNumRobots(rc, RobotType.GARDENER);
     	
 		if (rc.getRoundNum() == 1) {
 			Comms.writeGarden(rc, selfLoc);
@@ -54,7 +56,7 @@ public class BotArchon {
 		}
 		*/
 		
-		if(gardenersBuilt <= (2 + rc.getRoundNum() / 100)) {
+		if(gardenersBuilt <= (1 + rc.getRoundNum() / 100)) {
 			gardenersBuilt += tryHireGardener() ? 1 : 0;
 			Comms.writeNumRobots(rc, RobotType.GARDENER, gardenersBuilt);
 		}
