@@ -1,10 +1,11 @@
 package turtlebot;
 import battlecode.common.*;
+import experimentalbot.BotScout.MoveState;
 
 public class Nav {
-
-    static Direction heading = Nav.randomDirection();
     
+	static Direction heading = Nav.randomDirection();
+	
 	/**
      * Attempts to move in a given direction, while avoiding small obstacles directly in the path.
      *
@@ -208,4 +209,5 @@ public class Nav {
 		}
 		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
 	}
+	
 }
