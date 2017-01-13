@@ -10,7 +10,7 @@ public class BotArchon {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		
-		if(rc.getRoundNum() == 0) {
+		if(rc.getRoundNum() == 1) {
 			rc.buildRobot(RobotType.GARDENER, new Direction(0));
 		}
 	}
