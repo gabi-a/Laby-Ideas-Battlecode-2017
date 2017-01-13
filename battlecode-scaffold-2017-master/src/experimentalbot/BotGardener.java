@@ -31,17 +31,18 @@ public class BotGardener {
 		
 		float degreeOffset = 15f;
 		Direction trial;
+		float stride = rc.getType().strideRadius;
 		
-		for(int i = 0; i < 12; i++) {
+		for(int i = 0; i < 7; i++) {
 			trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
-			if(rc.canMove(trial) && myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal) < dMin) {
+			if(rc.canMove(trial) && myLocation.add(trial, stride).distanceTo(goal) < dMin) {
 				rc.move(trial);
 				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
 				moveState = chooseMoveState();
 				return;
 			}
 			trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
-			if(rc.canMove(trial) && myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal) < dMin) {
+			if(rc.canMove(trial) && myLocation.add(trial, stride).distanceTo(goal) < dMin) {
 				rc.move(trial);
 				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
 				moveState = chooseMoveState();
@@ -63,7 +64,7 @@ public class BotGardener {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 					if(rc.canMove(trial)) {
 						rc.move(trial);
-						dMin = Math.min(dMin, myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal));
+						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
 						return;
 					}
 				}
@@ -74,7 +75,7 @@ public class BotGardener {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
 					if(rc.canMove(trial)) {
 						rc.move(trial);
-						dMin = Math.min(dMin, myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal));
+						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
 						return;
 					}
 				}
