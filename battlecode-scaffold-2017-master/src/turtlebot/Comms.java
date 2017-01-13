@@ -17,6 +17,8 @@ public class Comms {
 	public static final int ENEMY_END = 699;
 	public static final int ENEMY_ARCHON_START = 700;
 	public static final int ENEMY_ARCHON_END = 702;
+	public static final int ROBOT_NUMS_START = 703; // End is 709
+	
 	
     private static final int POINTER_OFFSET = 1;
     
@@ -209,4 +211,13 @@ public class Comms {
 	public static int readGardenerUniversalHoldRound(RobotController rc) throws GameActionException {
 		return rc.readBroadcast(GARDENER_UNIVERSAL_HOLD_ROUND);
 	}
+	
+	public static void writeNumRobots(RobotController rc, RobotType type, int num) throws GameActionException {
+		rc.broadcast(ROBOT_NUMS_START-1+type.ordinal(), num);
+	}
+	
+	public static int readNumRobots(RobotController rc, RobotType type) throws GameActionException {
+		return rc.readBroadcast(ROBOT_NUMS_START-1+type.ordinal());
+	}
+	
 }

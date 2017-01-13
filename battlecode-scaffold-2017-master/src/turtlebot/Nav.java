@@ -198,7 +198,6 @@ public class Nav {
 
         return (perpendicularDist <= rc.getType().bodyRadius);
     }
-	
 	public static boolean simpleRunAway(RobotController rc, MapLocation myLocation, RobotInfo[] nearbyEnemies, TreeInfo[] nearbyTrees) throws GameActionException {
 		MapLocation goalLoc = myLocation;
 		for(int i = nearbyEnemies.length;i-->0;) {

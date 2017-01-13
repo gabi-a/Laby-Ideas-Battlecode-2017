@@ -11,10 +11,7 @@ public class BotGardener {
     public static final float MULTIPLICITY = 0.333334f;
 	
     public static final int MAX_SCOUTS = 1;
-    public static int scoutsBuilt = 0;
-    
     public static final int MAX_LUMBERJACKS = 2;
-    public static int lumberjacksBuilt = 0;
     
     /*
 	public static boolean atTargetLoc = false;
@@ -28,25 +25,36 @@ public class BotGardener {
     public static final int DISTANCE_BETWEEN_GARDENS = 10;
     */
     
+    static boolean reportedDeath = false;
+    
     public static void turn(RobotController rc) throws GameActionException {
     	BotGardener.rc = rc;
+    	
+    	if(!reportedDeath && rc.getHealth() < 10f) {
+    		Comms.writeNumRobots(rc, RobotType.GARDENER, Comms.readNumRobots(rc, RobotType.GARDENER) - 1);
+    		reportedDeath = true;
+    	}
     	
     	MapLocation myLocation = rc.getLocation();
     	
     	// Action
     	boolean actioned = false;
+    	int scoutsBuilt = Comms.readNumRobots(rc, RobotType.SCOUT);
+    	int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
     	if(settled) {
     		if (spawnDirection == null) setSpawnDirection(myLocation);
     		if(scoutsBuilt < MAX_SCOUTS) {
     			actioned = tryToBuild(RobotType.SCOUT);
     			if(actioned) {
     				scoutsBuilt++;
+    				Comms.writeNumRobots(rc, RobotType.SCOUT, scoutsBuilt);
     			}
     		}
     		if(!actioned && lumberjacksBuilt < MAX_LUMBERJACKS) {
     			actioned = tryToBuild(RobotType.LUMBERJACK);
     			if(actioned) {
-    				scoutsBuilt++;
+    				lumberjacksBuilt++;
+    				Comms.writeNumRobots(rc, RobotType.LUMBERJACK, lumberjacksBuilt);
     			}
     		}
     		if(!actioned)
@@ -69,7 +77,7 @@ public class BotGardener {
 	    		}
 	    	}
     	}
-    	System.out.format("\nThere are %d enemies and I moved: %b", rc.senseNearbyRobots(-1, rc.getTeam().opponent()).length, moved);
+    	//System.out.format("\nThere are %d enemies and I moved: %b", rc.senseNearbyRobots(-1, rc.getTeam().opponent()).length, moved);
     	if(moved) {
     		settled = false;
     	} else { // We haven't moved yet

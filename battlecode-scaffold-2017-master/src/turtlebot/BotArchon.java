@@ -4,6 +4,8 @@ import battlecode.common.*;
 
 public class BotArchon {
 
+	public static RobotController rc;
+	
 	public static final float GARDEN_DISTANCE = 10f;
 	public static final int EXPLORE_SPOKES = 24;
 
@@ -13,7 +15,8 @@ public class BotArchon {
 	public static int exploreLocationsPointer = 0;
 
 	public static void turn(RobotController rc) throws GameActionException {
-
+		BotArchon.rc = rc;
+		
 		MapLocation selfLoc = rc.getLocation();
 		
 		if (!Nav.avoidBullets(rc, selfLoc) && !Nav.explore(rc)) {
@@ -24,8 +27,11 @@ public class BotArchon {
 		if (rc.getTeamBullets() >= 10000 || rc.getRoundNum() == rc.getRoundLimit() - 1) {
 			rc.donate(rc.getTeamBullets());
 		}
-
-
+		
+		int scoutsBuilt = Comms.readNumRobots(rc, RobotType.SCOUT);
+    	int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
+    	int gardenersBuilt = Comms.readNumRobots(rc, RobotType.GARDENER);
+    	
 		if (rc.getRoundNum() == 1) {
 			Comms.writeGarden(rc, selfLoc);
 			Direction exploreDir = new Direction(0);
@@ -35,6 +41,7 @@ public class BotArchon {
 			}
 		}
 
+		/*
 		if ( (count <= 7
 				&& !(Comms.readGardenerUniversalHoldRound(rc) <= rc.getRoundNum()
 					&& Comms.readGardenerUniversalHoldLocation(rc).distanceTo(selfLoc) <= 20f)
@@ -44,12 +51,18 @@ public class BotArchon {
 			//if(rc.onTheMap(selfLoc, RobotType.ARCHON.sensorRadius-3))
 				count += BotArchon.tryHireGardener(rc) ? 1 : 0;
 		}
+		*/
 		
-		while(checkUnassignedScout(rc)) {}
+		if(gardenersBuilt <= (3 + rc.getRoundNum() / 100)) {
+			gardenersBuilt += tryHireGardener() ? 1 : 0;
+			Comms.writeNumRobots(rc, RobotType.GARDENER, gardenersBuilt);
+		}
+		
+		while(checkUnassignedScout()) {}
 
 	}
 
-	public static boolean tryHireGardener(RobotController rc) throws GameActionException {
+	public static boolean tryHireGardener() throws GameActionException {
 		Direction hireDirection = new Direction(0);
 		for (int i = 0; i < 8; i++) {
 			if (rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection, 5f))) {
@@ -61,7 +74,7 @@ public class BotArchon {
 		return false;
 	}
 	
-	public static void delegateScout(RobotController rc) throws GameActionException {
+	public static void delegateScout() throws GameActionException {
 		MapLocation[] enemyArchons = rc.getInitialArchonLocations(rc.getTeam().opponent());
 		int numEnemyArchons = enemyArchons.length;
 		MapLocation delegationLocation = (exploreLocationsPointer < numEnemyArchons) 
@@ -71,10 +84,10 @@ public class BotArchon {
         exploreLocationsPointer %= (exploreLocations.length + numEnemyArchons);
     }
     
-    public static boolean checkUnassignedScout(RobotController rc) throws GameActionException {
+    public static boolean checkUnassignedScout() throws GameActionException {
          MapLocation unassignedCheck = Comms.popStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END);
          if(unassignedCheck != null) {
-            delegateScout(rc);
+            delegateScout();
             System.out.println("DELEGATED");
             return true;
         }
