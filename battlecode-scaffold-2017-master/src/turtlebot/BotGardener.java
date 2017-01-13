@@ -25,6 +25,9 @@ public class BotGardener {
     public static final int DISTANCE_BETWEEN_GARDENS = 10;
     */
     
+    static int roundCounter = 0;
+    static int bulletsRequired = 0;
+    
     static boolean reportedDeath = false;
     
     public static void turn(RobotController rc) throws GameActionException {
@@ -33,6 +36,11 @@ public class BotGardener {
     	if(!reportedDeath && rc.getHealth() < 10f) {
     		Comms.writeNumRobots(rc, RobotType.GARDENER, Comms.readNumRobots(rc, RobotType.GARDENER) - 1);
     		reportedDeath = true;
+    	}
+    	
+    	roundCounter--;
+    	if(roundCounter <= 0) {
+    		bulletsRequired = 0;
     	}
     	
     	MapLocation myLocation = rc.getLocation();
@@ -57,7 +65,7 @@ public class BotGardener {
     				Comms.writeNumRobots(rc, RobotType.LUMBERJACK, lumberjacksBuilt);
     			}
     		}
-    		if(!actioned)
+    		if(!actioned && rc.getTeamBullets() >= bulletsRequired)
     			actioned = plantTrees();
     		if(!actioned) 
     			actioned = waterTrees();
@@ -295,6 +303,8 @@ public class BotGardener {
     	for (Direction plantDirection : treeDirections) {
 			if (plantDirection != null && rc.canPlantTree(plantDirection) && (rc.getRoundNum() > 50 || rc.getTeamBullets() > 100)) {
 				rc.plantTree(plantDirection);
+				bulletsRequired = 52;
+				roundCounter = 15;
 				return true;
 			}
 		}
