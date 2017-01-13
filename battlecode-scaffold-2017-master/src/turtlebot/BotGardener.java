@@ -303,8 +303,8 @@ public class BotGardener {
     	for (Direction plantDirection : treeDirections) {
 			if (plantDirection != null && rc.canPlantTree(plantDirection) && (rc.getRoundNum() > 50 || rc.getTeamBullets() > 100)) {
 				rc.plantTree(plantDirection);
-				bulletsRequired = 52;
-				roundCounter = 15;
+				bulletsRequired = 55;
+				roundCounter = 20;
 				return true;
 			}
 		}
