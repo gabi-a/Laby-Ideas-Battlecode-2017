@@ -20,6 +20,7 @@ public class Comms {
 	public static final int ROBOT_NUMS_START = 703; // End is 709
 	public static final int ATTACK_LOCATION = 710;
 	public static final int ATTACK_ID = 711;
+	private static final int FOUND_ENEMY = 712;
 	
     private static final int POINTER_OFFSET = 1;
     
@@ -242,4 +243,11 @@ public class Comms {
 		return rc.readBroadcast(ATTACK_ID);
 	}
 	
+	public static void writeFoundEnemy(RobotController rc) throws GameActionException {
+		rc.broadcast(FOUND_ENEMY, 1);
+	}
+	
+	public static boolean readFoundEnemy(RobotController rc) throws GameActionException {
+		return rc.readBroadcast(FOUND_ENEMY) == 1 ? true : false;
+	}
 }

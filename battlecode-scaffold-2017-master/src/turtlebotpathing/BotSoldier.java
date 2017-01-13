@@ -51,23 +51,24 @@ public class BotSoldier {
 			}
 			else if(!rc.hasMoved()) {
 				RobotInfo allyBot;
-				for(int i = allyRobots.length;i-->0;) {
-					allyBot = allyRobots[i];
-					if(allyBot.getType() == RobotType.GARDENER) {
-						float distance = myLocation.distanceTo(allyBot.getLocation());
-						if (distance > 6) {
-							moved = Nav.tryMove(rc, myLocation.directionTo(allyBot.getLocation()));
-							break;
-						}
-					}
-				}
+				//for(int i = allyRobots.length;i-->0;) {
+					//allyBot = allyRobots[i];
+					//if(allyBot.getType() == RobotType.GARDENER) {
+					//	float distance = myLocation.distanceTo(allyBot.getLocation());
+					//	if (distance > 6) {
+					//		moved = Nav.tryMove(rc, myLocation.directionTo(allyBot.getLocation()));
+					///		break;
+					//	}
+					//}
+				//}
 				if(!moved) {
 					MapLocation attackLocation = Comms.readAttackLocation(rc);
 					if(attackLocation != null) {
-						moved = Nav.pathTo(rc, attackLocation, new RobotType[]{RobotType.SCOUT,RobotType.SOLDIER,RobotType.LUMBERJACK});
-					}
-					if(!moved) {
-						moved = Nav.explore(rc);
+						moved = Nav.pathTo(rc, attackLocation, new RobotType[]{RobotType.SCOUT,RobotType.LUMBERJACK});
+					} else {
+						if(!moved) {
+							moved = Nav.explore(rc);
+						}
 					}
 				}
 			}
@@ -75,6 +76,7 @@ public class BotSoldier {
 
 		if (target != null && Nav.safeToShoot(rc, allyRobots, dir) && rc.canFireSingleShot()) {
 			rc.fireSingleShot(dir.rotateRightDegrees(10f*((float)Math.random()-0.5f)));
+			
 		}
 	}
 

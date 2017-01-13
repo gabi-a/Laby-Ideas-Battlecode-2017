@@ -29,9 +29,12 @@ public class BotGardener {
     static int bulletsRequired = 0;
     
     static boolean reportedDeath = false;
+    static boolean foundEnemy = false;
     
     public static void turn(RobotController rc) throws GameActionException {
     	BotGardener.rc = rc;
+    	
+    	foundEnemy = Comms.readFoundEnemy(rc);
     	
     	if(!reportedDeath && rc.getHealth() < 10f) {
     		Comms.writeNumRobots(rc, RobotType.GARDENER, Comms.readNumRobots(rc, RobotType.GARDENER) - 1);
@@ -51,6 +54,15 @@ public class BotGardener {
     	//int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
     	if(settled) {
     		if (spawnDirection == null) setSpawnDirection(myLocation);
+    		if(rc.getRoundNum() > 100 && Comms.readAttackID(rc) == 0) {
+    			actioned = tryToBuild(RobotType.SCOUT);
+    		}
+    		if(!foundEnemy && !actioned) {
+    			actioned = tryToBuild(RobotType.LUMBERJACK);
+    		} else {
+    			actioned = tryToBuild(RobotType.SOLDIER);
+    		}
+    		/*
     		if(rc.getRoundNum() < 300) {
     			actioned = tryToBuild(RobotType.SCOUT);
     			//if(actioned) {
@@ -69,6 +81,7 @@ public class BotGardener {
     			//	Comms.writeNumRobots(rc, typeToBuild, lumberjacksBuilt);
     			//}
     		}
+    		*/
     		if(!actioned && rc.getTeamBullets() >= bulletsRequired)
     			actioned = plantTrees();
     		if(!actioned) 

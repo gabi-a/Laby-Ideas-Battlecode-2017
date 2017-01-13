@@ -54,7 +54,7 @@ public class BotArchon {
 		}
 		*/
 		
-		if(gardenersBuilt <= (3 + rc.getRoundNum() / 100)) {
+		if(gardenersBuilt <= (2 + rc.getRoundNum() / 100)) {
 			gardenersBuilt += tryHireGardener() ? 1 : 0;
 			Comms.writeNumRobots(rc, RobotType.GARDENER, gardenersBuilt);
 		}

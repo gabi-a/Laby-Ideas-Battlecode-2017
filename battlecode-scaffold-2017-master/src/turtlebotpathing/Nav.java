@@ -185,6 +185,11 @@ public class Nav {
 		RobotType[] avoid = new RobotType[0];
 		return pathTo(rc, goal, avoid); 
 	}
+	
+	static boolean lumberjackPathTo(RobotController rc, MapLocation goal, boolean chopping) throws GameActionException {
+		RobotType[] avoid = new RobotType[0];
+		return lumberjackPathTo(rc, goal, avoid, chopping); 
+	}
 
 	static boolean pathTo(RobotController rc, MapLocation goal, RobotType[] avoid) throws GameActionException {
 
@@ -224,6 +229,88 @@ public class Nav {
 		}
 
 		// Else, let's start following a wall.
+		if (moveState == MoveState.TOWARD_LEFT) {
+			moveState = moveState.LEFT;
+		} else if (moveState == MoveState.TOWARD_RIGHT) {
+			moveState = moveState.RIGHT;
+		}
+
+		switch (moveState) {
+			case LEFT:
+				rc.setIndicatorDot(myLocation, 255, 0, 0);
+				for (int i = 0; i < 12; i++) {
+					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
+					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
+						rc.move(trial);
+						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+						return true;
+					}
+				}
+				break;
+			case RIGHT:
+				rc.setIndicatorDot(myLocation, 0, 255, 0);
+				for (int i = 0; i < 12; i++) {
+					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
+					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
+						rc.move(trial);
+						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+						return true;
+					}
+				}
+				break;
+			default:
+				System.out.println("PATHING SHOULDN'T GET HERE!");
+				break;
+		}
+
+		moveState = (moveState == moveState.LEFT) ? moveState.RIGHT : moveState.LEFT;
+		return false;
+
+	}
+	
+	static boolean lumberjackPathTo(RobotController rc, MapLocation goal, RobotType[] avoid, boolean chopping) throws GameActionException {
+
+		int roundNum = rc.getRoundNum();
+		MapLocation myLocation = rc.getLocation();
+		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
+		
+		// If this is the first time going here, clear our pathing memory
+		if (goal != goalCache) {
+			goalCache = goal;
+			dMin = 10000f;
+			moveState = MoveState.TOWARD_LEFT;
+		}
+
+		float degreeOffset = 15f;
+		Direction trial;
+		float stride = rc.getType().strideRadius;
+
+		// Idea: if we can go closer to the goal than we ever have before, do so.
+		for (int i = 0; i < 7; i++) {
+			trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
+			if (rc.canMove(trial) && myLocation.add(trial, stride).distanceTo(goal) < dMin
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
+				rc.move(trial);
+				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
+				moveState = chooseMoveState();
+				return true;
+			}
+			trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
+			if (rc.canMove(trial) && myLocation.add(trial, stride).distanceTo(goal) < dMin
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
+				rc.move(trial);
+				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
+				moveState = chooseMoveState();
+				return true;
+			}
+		}
+
+		// Else, let's start following a wall unless chopping.
+		
+		if(chopping) {
+			return false;
+		}
+		
 		if (moveState == MoveState.TOWARD_LEFT) {
 			moveState = moveState.LEFT;
 		} else if (moveState == MoveState.TOWARD_RIGHT) {
