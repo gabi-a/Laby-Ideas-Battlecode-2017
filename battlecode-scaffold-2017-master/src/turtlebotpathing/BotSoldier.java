@@ -1,4 +1,4 @@
-package turtlebot;
+package turtlebotpathing;
 import battlecode.common.*;
 
 public class BotSoldier {
@@ -19,11 +19,22 @@ public class BotSoldier {
 				target = robots[i];
 				targetRating = curRating;
 			}
+			
+			if(robots[i].getType() == RobotType.GARDENER || robots[i].getType() == RobotType.ARCHON) {
+				Comms.writeAttackEnemy(rc, robots[i].getLocation(), robots[i].getID());
+			}
+			
+			if(robots[i].getID() == Comms.readAttackID(rc)) {
+				if(robots[i].getHealth() < 20f) {
+					Comms.clearAttackEnemy(rc);
+				}
+			}
 		}
 
 		boolean moved = false;
 		float dist = 0;
 		Direction dir = new Direction(0);
+		RobotInfo[] allyRobots = rc.senseNearbyRobots(-1, rc.getTeam());
 		if (target != null) {
 			dir = rc.getLocation().directionTo(target.location);
 			dist = target.location.distanceTo(rc.getLocation());
@@ -39,7 +50,6 @@ public class BotSoldier {
 				}
 			}
 			else if(!rc.hasMoved()) {
-				RobotInfo[] allyRobots = rc.senseNearbyRobots(-1, rc.getTeam());
 				RobotInfo allyBot;
 				for(int i = allyRobots.length;i-->0;) {
 					allyBot = allyRobots[i];
@@ -54,16 +64,16 @@ public class BotSoldier {
 				if(!moved) {
 					MapLocation attackLocation = Comms.readAttackLocation(rc);
 					if(attackLocation != null) {
-						moved = Nav.tryMove(rc, myLocation.directionTo(attackLocation));
+						moved = Nav.pathTo(rc, attackLocation, new RobotType[]{RobotType.SCOUT,RobotType.SOLDIER,RobotType.LUMBERJACK});
 					}
 					if(!moved) {
-						Nav.explore(rc);
+						moved = Nav.explore(rc);
 					}
 				}
 			}
 		}
 
-		if (target != null && rc.canFireSingleShot()) {
+		if (target != null && Nav.safeToShoot(rc, allyRobots, dir) && rc.canFireSingleShot()) {
 			rc.fireSingleShot(dir.rotateRightDegrees(10f*((float)Math.random()-0.5f)));
 		}
 	}

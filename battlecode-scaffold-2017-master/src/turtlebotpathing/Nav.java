@@ -1,4 +1,4 @@
-package experimentalbot;
+package turtlebotpathing;
 import battlecode.common.*;
 
 public class Nav {
@@ -181,12 +181,12 @@ public class Nav {
 	}
 	
 	
-	static void pathTo(RobotController rc, MapLocation goal) throws GameActionException {
+	static boolean pathTo(RobotController rc, MapLocation goal) throws GameActionException {
 		RobotType[] avoid = new RobotType[0];
-		pathTo(rc, goal, avoid); 
+		return pathTo(rc, goal, avoid); 
 	}
 
-	static void pathTo(RobotController rc, MapLocation goal, RobotType[] avoid) throws GameActionException {
+	static boolean pathTo(RobotController rc, MapLocation goal, RobotType[] avoid) throws GameActionException {
 
 		int roundNum = rc.getRoundNum();
 		MapLocation myLocation = rc.getLocation();
@@ -211,7 +211,7 @@ public class Nav {
 				rc.move(trial);
 				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
 				moveState = chooseMoveState();
-				return;
+				return true;
 			}
 			trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
 			if (rc.canMove(trial) && myLocation.add(trial, stride).distanceTo(goal) < dMin
@@ -219,7 +219,7 @@ public class Nav {
 				rc.move(trial);
 				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
 				moveState = chooseMoveState();
-				return;
+				return true;
 			}
 		}
 
@@ -238,7 +238,7 @@ public class Nav {
 					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
 						rc.move(trial);
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
-						return;
+						return true;
 					}
 				}
 				break;
@@ -249,7 +249,7 @@ public class Nav {
 					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
 						rc.move(trial);
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
-						return;
+						return true;
 					}
 				}
 				break;
@@ -259,7 +259,7 @@ public class Nav {
 		}
 
 		moveState = (moveState == moveState.LEFT) ? moveState.RIGHT : moveState.LEFT;
-		return;
+		return false;
 
 	}
 
@@ -323,5 +323,15 @@ public class Nav {
 			return tryPrecisionMove(rc, (new Direction((float) Math.atan2(s, c)).opposite()), 2f, 5, 2.5f - closestDistance);
 		}
 		
+	}
+	
+	public static boolean safeToShoot(RobotController rc, RobotInfo[] allies, Direction dir) {
+		BulletInfo bullet = new BulletInfo(0, new MapLocation(0,0), dir, rc.getType().bulletSpeed, 0f);
+		for(int i = allies.length;i-->0;) {
+			if(Nav.willCollideWithMe(rc, bullet, allies[i].getLocation())) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

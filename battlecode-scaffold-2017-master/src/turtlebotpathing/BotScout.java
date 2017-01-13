@@ -1,4 +1,4 @@
-package turtlebot;
+package turtlebotpathing;
 
 import battlecode.common.*;
 
@@ -97,7 +97,7 @@ public class BotScout {
 					Nav.tryPrecisionMove(rc, dir, 1.49f);
 				}
 			}
-			if (rc.canFireSingleShot()) {
+			if (rc.canFireSingleShot() && Nav.safeToShoot(rc, rc.senseNearbyRobots(-1, rc.getTeam()), dir)) {
 				rc.fireSingleShot(dir);
 			}
 		}

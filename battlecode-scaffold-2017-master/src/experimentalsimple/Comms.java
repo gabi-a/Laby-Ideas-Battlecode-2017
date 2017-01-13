@@ -1,4 +1,5 @@
-package turtlebot;
+package experimentalsimple;
+
 import battlecode.common.*;
 
 public class Comms {
@@ -18,8 +19,9 @@ public class Comms {
 	public static final int ENEMY_ARCHON_START = 700;
 	public static final int ENEMY_ARCHON_END = 702;
 	public static final int ROBOT_NUMS_START = 703; // End is 709
-	public static final int ATTACK_LOCATION = 710;
-	public static final int ATTACK_ID = 711;
+	public static final int ENEMY_GARDENER_START = 704;
+	public static final int ENEMY_GARDENER_END = 724;
+	
 	
     private static final int POINTER_OFFSET = 1;
     
@@ -219,27 +221,6 @@ public class Comms {
 	
 	public static int readNumRobots(RobotController rc, RobotType type) throws GameActionException {
 		return rc.readBroadcast(ROBOT_NUMS_START-1+type.ordinal());
-	}
-	
-	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id) throws GameActionException {
-		rc.broadcast(ATTACK_LOCATION, Comms.packLocation(loc));
-		rc.broadcast(ATTACK_ID, id);
-	}
-	
-	public static void clearAttackEnemy(RobotController rc) throws GameActionException {
-		rc.broadcast(ATTACK_LOCATION, 0);
-		rc.broadcast(ATTACK_ID, 0);
-	}
-	
-	public static MapLocation readAttackLocation(RobotController rc) throws GameActionException {
-		int data = rc.readBroadcast(ATTACK_LOCATION);
-		if(data == 0)
-			return null;
-		return Comms.unpackLocation(data);
-	}
-	
-	public static int readAttackID(RobotController rc) throws GameActionException {
-		return rc.readBroadcast(ATTACK_ID);
 	}
 	
 }

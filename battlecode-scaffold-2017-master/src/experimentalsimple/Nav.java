@@ -1,10 +1,23 @@
-package turtlebot;
+package experimentalsimple;
 import battlecode.common.*;
 
 public class Nav {
-    
-	static Direction heading = Nav.randomDirection();
+
+	public static enum MoveState {
+		LEFT,
+		RIGHT,
+		TOWARD_LEFT,
+		TOWARD_RIGHT
+	}
 	
+	// NAVIGATION VARIABLES
+	static MoveState moveState = MoveState.TOWARD_LEFT;
+	static float dMin = 10000f;
+	static MapLocation goalCache = new MapLocation(-1, -1);
+
+	static Team myTeam = RobotPlayer.rc.getTeam();
+    static Direction heading = Nav.randomDirection();
+    
 	/**
      * Attempts to move in a given direction, while avoiding small obstacles directly in the path.
      *
@@ -130,6 +143,145 @@ public class Nav {
 		}
 		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
 		
+	}	
+	
+	static boolean willCollideWithMe(RobotController rc, BulletInfo bullet, MapLocation loc) {
+
+        // Get relevant bullet information
+        Direction propagationDirection = bullet.dir;
+        MapLocation bulletLocation = bullet.location;
+
+        // Calculate bullet relations to this robot
+        Direction directionToRobot = bulletLocation.directionTo(loc);
+        float distToRobot = bulletLocation.distanceTo(loc);
+        float theta = propagationDirection.radiansBetween(directionToRobot);
+
+        // If theta > 90 degrees, then the bullet is traveling away from us and we can break early
+        if (Math.abs(theta) > Math.PI/2) {
+            return false;
+        }
+
+        // distToRobot is our hypotenuse, theta is our angle, and we want to know this length of the opposite leg.
+        // This is the distance of a line that goes from myLocation and intersects perpendicularly with propagationDirection.
+        // This corresponds to the smallest radius circle centered at our location that would intersect with the
+        // line that is the path of the bullet.
+        float perpendicularDist = (float)Math.abs(distToRobot * Math.sin(theta)); // soh cah toa :)
+
+        return (perpendicularDist <= rc.getType().bodyRadius);
+    }
+	public static boolean simpleRunAway(RobotController rc, MapLocation myLocation, RobotInfo[] nearbyEnemies, TreeInfo[] nearbyTrees) throws GameActionException {
+		MapLocation goalLoc = myLocation;
+		for(int i = nearbyEnemies.length;i-->0;) {
+			goalLoc = goalLoc.add(myLocation.directionTo(nearbyEnemies[i].getLocation()).opposite());
+		}
+		for(int i = nearbyTrees.length;i-->0;) {
+			goalLoc = goalLoc.add(myLocation.directionTo(nearbyTrees[i].getLocation()).opposite());
+		}
+		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
+	}
+	
+	
+	static void pathTo(RobotController rc, MapLocation goal) throws GameActionException {
+		RobotType[] avoid = new RobotType[0];
+		pathTo(rc, goal, avoid); 
+	}
+
+	static void pathTo(RobotController rc, MapLocation goal, RobotType[] avoid) throws GameActionException {
+
+		int roundNum = rc.getRoundNum();
+		MapLocation myLocation = rc.getLocation();
+		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
+		
+		// If this is the first time going here, clear our pathing memory
+		if (goal != goalCache) {
+			goalCache = goal;
+			dMin = 10000f;
+			moveState = MoveState.TOWARD_LEFT;
+		}
+
+		float degreeOffset = 15f;
+		Direction trial;
+		float stride = rc.getType().strideRadius;
+
+		// Idea: if we can go closer to the goal than we ever have before, do so.
+		for (int i = 0; i < 7; i++) {
+			trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
+			if (rc.canMove(trial) && myLocation.add(trial, stride).distanceTo(goal) < dMin
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
+				rc.move(trial);
+				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
+				moveState = chooseMoveState();
+				return;
+			}
+			trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
+			if (rc.canMove(trial) && myLocation.add(trial, stride).distanceTo(goal) < dMin
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
+				rc.move(trial);
+				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
+				moveState = chooseMoveState();
+				return;
+			}
+		}
+
+		// Else, let's start following a wall.
+		if (moveState == MoveState.TOWARD_LEFT) {
+			moveState = moveState.LEFT;
+		} else if (moveState == MoveState.TOWARD_RIGHT) {
+			moveState = moveState.RIGHT;
+		}
+
+		switch (moveState) {
+			case LEFT:
+				rc.setIndicatorDot(myLocation, 255, 0, 0);
+				for (int i = 0; i < 12; i++) {
+					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
+					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
+						rc.move(trial);
+						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+						return;
+					}
+				}
+				break;
+			case RIGHT:
+				rc.setIndicatorDot(myLocation, 0, 255, 0);
+				for (int i = 0; i < 12; i++) {
+					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
+					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
+						rc.move(trial);
+						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+						return;
+					}
+				}
+				break;
+			default:
+				System.out.println("PATHING SHOULDN'T GET HERE!");
+				break;
+		}
+
+		moveState = (moveState == moveState.LEFT) ? moveState.RIGHT : moveState.LEFT;
+		return;
+
+	}
+
+	private static MoveState chooseMoveState() {
+		if (moveState == MoveState.LEFT || moveState == MoveState.TOWARD_LEFT) {
+			return MoveState.TOWARD_LEFT;
+		} else {
+			return MoveState.TOWARD_RIGHT;
+		}
+	}
+	
+	private static boolean inEnemySight(RobotController rc, Direction trial, RobotType[] avoid, RobotInfo[] enemyList, MapLocation myLocation) {
+		if (avoid.length == 0) {
+			return false;
+		}
+		for(RobotInfo enemy : enemyList) {
+			if(java.util.Arrays.asList(avoid).contains(enemy.type)
+					&& enemy.location.distanceTo(myLocation.add(trial, rc.getType().strideRadius)) <= enemy.type.sensorRadius) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public static boolean avoidLumberjacks(RobotController rc, MapLocation myLocation) throws GameActionException {
@@ -172,42 +324,4 @@ public class Nav {
 		}
 		
 	}
-	
-	
-	static boolean willCollideWithMe(RobotController rc, BulletInfo bullet, MapLocation loc) {
-
-        // Get relevant bullet information
-        Direction propagationDirection = bullet.dir;
-        MapLocation bulletLocation = bullet.location;
-
-        // Calculate bullet relations to this robot
-        Direction directionToRobot = bulletLocation.directionTo(loc);
-        float distToRobot = bulletLocation.distanceTo(loc);
-        float theta = propagationDirection.radiansBetween(directionToRobot);
-
-        // If theta > 90 degrees, then the bullet is traveling away from us and we can break early
-        if (Math.abs(theta) > Math.PI/2) {
-            return false;
-        }
-
-        // distToRobot is our hypotenuse, theta is our angle, and we want to know this length of the opposite leg.
-        // This is the distance of a line that goes from myLocation and intersects perpendicularly with propagationDirection.
-        // This corresponds to the smallest radius circle centered at our location that would intersect with the
-        // line that is the path of the bullet.
-        float perpendicularDist = (float)Math.abs(distToRobot * Math.sin(theta)); // soh cah toa :)
-
-        return (perpendicularDist <= rc.getType().bodyRadius);
-    }
-	
-	public static boolean simpleRunAway(RobotController rc, MapLocation myLocation, RobotInfo[] nearbyEnemies, TreeInfo[] nearbyTrees) throws GameActionException {
-		MapLocation goalLoc = myLocation;
-		for(int i = nearbyEnemies.length;i-->0;) {
-			goalLoc = goalLoc.add(myLocation.directionTo(nearbyEnemies[i].getLocation()).opposite());
-		}
-		for(int i = nearbyTrees.length;i-->0;) {
-			goalLoc = goalLoc.add(myLocation.directionTo(nearbyTrees[i].getLocation()).opposite());
-		}
-		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
-	}
-	
 }

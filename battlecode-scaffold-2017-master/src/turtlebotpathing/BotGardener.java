@@ -1,4 +1,4 @@
-package turtlebot;
+package turtlebotpathing;
 
 import battlecode.common.*;
 
@@ -51,14 +51,14 @@ public class BotGardener {
     	//int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
     	if(settled) {
     		if (spawnDirection == null) setSpawnDirection(myLocation);
-    		if(rc.getRoundNum() < 200) {
+    		if(rc.getRoundNum() < 300) {
     			actioned = tryToBuild(RobotType.SCOUT);
     			//if(actioned) {
     			//	scoutsBuilt++;
     			//	Comms.writeNumRobots(rc, RobotType.SCOUT, scoutsBuilt);
     			//}
     		}
-    		if(!actioned && rc.getRoundNum() > 200) {
+    		if(!actioned && rc.getRoundNum() > 300) {
     			TreeInfo[] nearbyTrees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
     			RobotType typeToBuild = RobotType.SOLDIER;
     			if(nearbyTrees.length > 2) {

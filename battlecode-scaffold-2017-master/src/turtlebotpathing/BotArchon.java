@@ -1,4 +1,4 @@
-package turtlebot;
+package turtlebotpathing;
 
 import battlecode.common.*;
 
