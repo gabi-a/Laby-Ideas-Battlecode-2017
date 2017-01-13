@@ -59,7 +59,7 @@ public class BotGardener {
 		switch (moveState) {
 			case LEFT:
 				rc.setIndicatorDot(myLocation, 255, 0, 0);
-				for(int i = 3; i < 12; i++) {
+				for(int i = 0; i < 12; i++) {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 					if(rc.canMove(trial)) {
 						rc.move(trial);
@@ -70,7 +70,7 @@ public class BotGardener {
 				break;
 			case RIGHT:
 				rc.setIndicatorDot(myLocation, 0, 255, 0);
-				for(int i = 3; i < 12; i++) {
+				for(int i = 0; i < 12; i++) {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
 					if(rc.canMove(trial)) {
 						rc.move(trial);
