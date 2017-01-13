@@ -16,7 +16,7 @@ public class BotGardener {
 	static MapLocation myLocation;
 	static float dMin = 1000f;
 	static float dLeave = 1000f;
-	static MoveState moveState = MoveState.TOWARD_LEFT;
+	static MoveState moveState = MoveState.TOWARD_RIGHT;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		
@@ -32,7 +32,7 @@ public class BotGardener {
 		float degreeOffset = 15f;
 		Direction trial;
 		
-		for(int i = 0; i < 3; i++) {
+		for(int i = 0; i < 12; i++) {
 			trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 			if(rc.canMove(trial) && myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal) < dMin) {
 				rc.move(trial);
