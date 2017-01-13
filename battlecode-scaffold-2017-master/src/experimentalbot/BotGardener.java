@@ -23,7 +23,11 @@ public class BotGardener {
 		BotGardener.rc = rc;
 		roundNum = rc.getRoundNum();
 		myLocation = rc.getLocation();
-		pathTo(rc.getInitialArchonLocations(rc.getTeam().opponent())[0]);
+		if(roundNum == 2) {
+			RobotType type = (rc.getTeam() == Team.A) ? RobotType.SCOUT : RobotType.SOLDIER; 
+			rc.buildRobot(type, new Direction((float) Math.PI * 0.5f));
+		}
+		//pathTo(rc.getInitialArchonLocations(rc.getTeam().opponent())[0]);
 		
 	}
 	
