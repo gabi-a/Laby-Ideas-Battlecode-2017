@@ -26,43 +26,56 @@ public class BotLumberjack {
 		
 		// Movement
 		boolean moved = false;
-		RobotInfo[] enemies = rc.senseNearbyRobots(RobotType.LUMBERJACK.sensorRadius, enemyTeam);
-		if(enemies.length > 0) {
-			RobotInfo closestEnemy = Util.getClosestBot(rc, enemies);
-			moved = Nav.tryMove(rc, myLocation.directionTo(closestEnemy.getLocation()));
-		} else {
-			if(target != null) {
-				moved = Nav.tryMove(rc, myLocation.directionTo(target.getLocation()));
-			} else {
-				TreeInfo[] nearbyTrees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
-				if(nearbyTrees.length > 0) {
-					TreeInfo nearbyTree = Util.getClosestTree(rc, nearbyTrees);
-					moved = Nav.tryMove(rc, myLocation.directionTo(nearbyTree.getLocation()));
-				}
-				if(!moved) {
-					Nav.explore(rc);
-				}
-			}
-		}
+		moved = Nav.avoidBullets(rc, myLocation);
 		
-		// Action
-		RobotInfo[] enemiesInStrikeRange = rc.senseNearbyRobots(RobotType.LUMBERJACK.bodyRadius+GameConstants.LUMBERJACK_STRIKE_RADIUS, enemyTeam);
-		if(enemiesInStrikeRange.length > 0 && rc.canStrike()) {
-			rc.strike();
-		} else {
-			TreeInfo[] nearbyTrees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
-			for(int i = nearbyTrees.length;i-->0;) {
-				if(rc.canChop(nearbyTrees[i].ID)) {
-					if(target != null && nearbyTrees[i].ID == target.ID) {
-						if(rc.getLocation().distanceTo(target.getLocation()) < 7 && !rc.canSenseTree(target.getID())){
-							target = null;
-						}
+		RobotInfo[] enemies = rc.senseNearbyRobots(RobotType.LUMBERJACK.sensorRadius, enemyTeam);
+		if(!moved) {
+			if(enemies.length > 0) {
+				RobotInfo closestEnemy = Util.getClosestBot(rc, enemies);
+				moved = Nav.tryMove(rc, myLocation.directionTo(closestEnemy.getLocation()));
+				System.out.format("\n1 moved: %b", moved);
+			} else {
+				if(target != null) {
+					moved = Nav.tryMove(rc, myLocation.directionTo(target.getLocation()));
+					System.out.format("\n2 moved: %b", moved);
+				} else {
+					TreeInfo[] nearbyTrees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
+					if(nearbyTrees.length > 0) {
+						TreeInfo nearbyTree = Util.getClosestTree(rc, nearbyTrees);
+						moved = Nav.tryMove(rc, myLocation.directionTo(nearbyTree.getLocation()));
+						System.out.format("\n3 moved: %b", moved);
 					}
-					rc.chop(nearbyTrees[i].ID);
-					break;
+					if(!moved) {
+						moved = Nav.explore(rc);
+						System.out.format("\n4 moved: %b", moved);
+					}
+				}
+				
+				if(!moved) {
+					moved = Nav.explore(rc);
+					System.out.format("\n5 moved: %b", moved);
 				}
 			}
 		}
+    	if (!moved) System.out.println("\nI'm Stuck");
+    	
+		// Action
+        RobotInfo[] enemiesInStrikeRange = rc.senseNearbyRobots(RobotType.LUMBERJACK.bodyRadius+GameConstants.LUMBERJACK_STRIKE_RADIUS, enemyTeam);
+        if(enemiesInStrikeRange.length > 0 && rc.canStrike()) {
+            rc.strike();
+        } else {
+            if(target != null && rc.canSenseLocation(target.getLocation()) && !rc.canSenseTree(target.getID())) {
+                target = null;
+            }
+            
+            TreeInfo[] nearbyTrees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
+            for(int i = nearbyTrees.length;i-->0;) {
+                if(rc.canChop(nearbyTrees[i].ID)) {
+                    rc.chop(nearbyTrees[i].ID);
+                    break;
+                }
+            }
+        }
 
 		
 		/*

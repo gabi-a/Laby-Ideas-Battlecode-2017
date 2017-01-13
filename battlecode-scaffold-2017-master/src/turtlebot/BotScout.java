@@ -19,7 +19,7 @@ public class BotScout {
 
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		enemyTarget = null;
-		float lowestHealth = 10000f;
+		double lowestHealth = 10000d;
 
 		for (int i = 0; i < enemies.length; i++) {
 			if (enemies[i].getType() == RobotType.GARDENER 
