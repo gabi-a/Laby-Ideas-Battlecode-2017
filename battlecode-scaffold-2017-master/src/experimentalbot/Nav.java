@@ -143,49 +143,7 @@ public class Nav {
 		}
 		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
 		
-	}
-	
-	public static boolean avoidLumberjacks(RobotController rc, MapLocation myLocation) throws GameActionException {
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
-		if(enemies.length == 0) {
-			return false;
-		}
-		Float[] enemyAngles = new Float[enemies.length];
-		float s = 0;
-		float c = 0;
-		int eaPointer = 0;
-		float closestDistance = 2.5f;
-		for (RobotInfo enemy : enemies) {
-			if(enemy.type == RobotType.LUMBERJACK && enemy.location.distanceTo(myLocation) <= 2.5f) {
-				enemyAngles[eaPointer] = new Direction(myLocation, enemy.location).radians;
-				float distanceToEnemy = enemy.location.distanceTo(myLocation);
-				if(distanceToEnemy < closestDistance) {
-					closestDistance = distanceToEnemy;
-				}
-				eaPointer++;
-			}
-		}
-		if (enemyAngles[0] == null) {
-			return false;
-		}
-		// Find best escape route
-		for (Float angle : enemyAngles) {
-			if( angle != null ) {
-				s += Math.sin(angle);
-				c += Math.cos(angle);
-			}
-		}
-		s /= eaPointer;
-		c /= eaPointer;
-		if (c < 0) {
-			return tryPrecisionMove(rc, new Direction((float) Math.atan2(s, c)), 2f, 5, 2.5f - closestDistance);			
-		}
-		else {
-			return tryPrecisionMove(rc, (new Direction((float) Math.atan2(s, c)).opposite()), 2f, 5, 2.5f - closestDistance);
-		}
-		
-	}
-	
+	}	
 	
 	static boolean willCollideWithMe(RobotController rc, BulletInfo bullet, MapLocation loc) {
 
@@ -223,7 +181,7 @@ public class Nav {
 	}
 	
 	
-	private static void pathTo(RobotController rc, MapLocation goal) throws GameActionException {
+	static void pathTo(RobotController rc, MapLocation goal) throws GameActionException {
 		RobotType[] avoid = new RobotType[0];
 		pathTo(rc, goal, avoid); 
 	}
