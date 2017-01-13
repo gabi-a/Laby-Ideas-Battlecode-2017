@@ -7,12 +7,39 @@ public class BotLumberjack {
 	static TreeInfo target = null;
 	static TreeInfo oldTarget= null;
 	static final int HOME_RADIUS= 20;
-	
-	static boolean toldArchonsImDead = false;
-	
+	static int strategy = 0; //Should be an enum, but apparently those have *issues*.
+
 	public static void turn(RobotController rc) throws GameActionException {
-		// TODO: Find trees, kill trees
 		BotLumberjack.rc = rc;
+		
+		switch (BotLumberjack.strategy) {
+			case 0: //No strategy yet
+				BotLumberjack.strategy = 1;// Comms.readNumLumberjacks(rc) % 3 + 1;
+				break;
+			case 1: //Clearing trees to make a path (useful on Barrier)
+				target = Comms.getTree(rc);
+				if (target == null) break; //Okay, no trees requested for clearance
+				if (target.location.distanceTo(rc.getLocation()) > 1.5) {
+					Nav.tryMove(rc, rc.getLocation().directionTo(target.getLocation()));
+				}
+				else {
+					if (rc.canChop(target.getID())) {
+						rc.chop(target.getID());
+					}
+					else {
+						Comms.removeTree(rc, target);
+					}
+				}
+				break;
+			case 2: //Destroying enemy trees
+				break;
+			case 3: //Attack enemies
+				break;
+		}
+	}
+}
+		
+/*		BotLumberjack.rc = rc;
 		
 		Team enemyTeam = rc.getTeam().opponent();
 		MapLocation myLocation = rc.getLocation();
@@ -26,7 +53,7 @@ public class BotLumberjack {
 		
 		// Movement
 		boolean moved = false;
-		RobotInfo[] enemies = rc.senseNearbyRobots(RobotType.LUMBERJACK.sensorRadius, enemyTeam);
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		if(enemies.length > 0) {
 			RobotInfo closestEnemy = Util.getClosestBot(rc, enemies);
 			moved = Nav.tryMove(rc, myLocation.directionTo(closestEnemy.getLocation()));
@@ -62,7 +89,7 @@ public class BotLumberjack {
 					break;
 				}
 			}
-		}
+		}*/
 
 		
 		/*
@@ -98,7 +125,6 @@ public class BotLumberjack {
 			return;
 		}
 		*/
-	}
 	/*
 	public static TreeInfo nearestTree() throws GameActionException {
 		TreeInfo[] trees = new TreeInfo[0];
@@ -144,4 +170,3 @@ public class BotLumberjack {
 		}
 	}
 	*/
-}

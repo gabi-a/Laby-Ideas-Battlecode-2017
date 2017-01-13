@@ -141,7 +141,7 @@ public class BotGardener {
 	            	if(lumberjacks < 5) {
 	            		typeToBuild = RobotType.LUMBERJACK;
 	            	} else {
-	            		Comms.pushHighPriorityTree(rc, nearbyTrees[0], 5);
+	            		Comms.addTree(rc, nearbyTrees[0]);
 	            		typeToBuild = RobotType.SOLDIER;
 	            	}
 	            } else {

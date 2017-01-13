@@ -2,30 +2,27 @@ package turtlebot;
 import battlecode.common.*;
 
 public class Comms {
-
 	
-	public static final int GARDENS_START = 100;
-	public static final int GARDENS_END = 120;
-    public static final int ARCHON_SCOUT_DELEGATION_START = 200;
-    public static final int ARCHON_SCOUT_DELEGATION_END = 240;
-    public static final int SCOUT_ARCHON_REQUEST_START = 250;
-    public static final int SCOUT_ARCHON_REQUEST_END = 290;
-	public static final int LUMBERJACKS_COUNTER = 500;
-	public static final int GARDENER_UNIVERSAL_HOLD_LOCATION = 501;
-	public static final int GARDENER_UNIVERSAL_HOLD_ROUND = 502;
-	public static final int ENEMY_START = 600;
-	public static final int ENEMY_END = 699;
-	public static final int ENEMY_ARCHON_START = 700;
-	public static final int ENEMY_ARCHON_END = 702;
-	public static final int HIGH_PRIORITY_TREE_START = 7;
-	public static final int HIGH_PRIORITY_TREE_END = 16;
-	public static final int LOW_PRIORITY_TREE_START = 17;
-	public static final int LOW_PRIORITY_TREE_END = 26;
+	public static final int TREE_START = 0;
+	public static final int TREE_END = 9;
+	// Empty 10 - 21
+	public static final int GARDENS_START = 22;
+	public static final int GARDENS_END = 42;
+	public static final int ARCHON_SCOUT_DELEGATION_START = 43;
+	public static final int ARCHON_SCOUT_DELEGATION_END = 83;
+	public static final int SCOUT_ARCHON_REQUEST_START = 84;
+	public static final int SCOUT_ARCHON_REQUEST_END = 124;
+	public static final int GARDENER_UNIVERSAL_HOLD_LOCATION = 125;
+	public static final int GARDENER_UNIVERSAL_HOLD_ROUND = 126;
+	public static final int ENEMY_START = 127;
+	public static final int ENEMY_END = 226;
+	public static final int ENEMY_ARCHON_START = 227;
+	public static final int ENEMY_ARCHON_END = 229;
+	public static final int LUMBERJACKS_COUNTER = 230;
 	
-    private static final int POINTER_OFFSET = 1;
+	private static final int POINTER_OFFSET = 1;
     
     
-    // Up to 20 gardeners
     public static boolean writeGarden(RobotController rc, MapLocation loc) throws GameActionException {
     	// Loop through channels until one is empty
     	//System.out.format("\nWriting garden");
@@ -130,38 +127,45 @@ public class Comms {
         return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
 	}
 
-	// Uses channels 7 to 26
-	// 10 high priority trees, 10 low priority trees
-	public static int packTree(RobotController rc, TreeInfo tree, int count){
-		return packLocation(rc, tree.getLocation()) + count*(int)Math.pow(2,20)+ tree.getID()*(int)Math.pow(2,24);
+	public static int packTree(RobotController rc, TreeInfo tree){
+		return packLocation(rc, tree.getLocation()) + /*count*(int)Math.pow(2,20) */+ tree.getID()*(int)Math.pow(2,24);
 	}
 
-	public static TreeInfo unpackTree(RobotController rc, int data){
+	public static TreeInfo unpackTree(RobotController rc, int data, int our_ref){
 		int id = data/(int)Math.pow(2, 24);
-		int count = (data - (id*(int)Math.pow(2, 24)))/(int)Math.pow(2,20);
-		MapLocation loc = unpackLocation(rc, data - id*(int)Math.pow(2,24) - count*(int)Math.pow(2,20));
+		//int count = (data - (id*(int)Math.pow(2, 24)))/(int)Math.pow(2,20);
+		MapLocation loc = unpackLocation(rc, data - id*(int)Math.pow(2,24) /* - count*(int)Math.pow(2,20)*/);
 		if(loc == null) return null;
 
-		return new TreeInfo(id, null, loc, 0, 0, count, null);
+		return new TreeInfo(id, null, loc, 0, 0, our_ref, null);
 	}
 
-	public static void pushHighPriorityTree(RobotController rc, TreeInfo tree, int count) throws GameActionException {
-		writeStack(rc, HIGH_PRIORITY_TREE_START, HIGH_PRIORITY_TREE_END, packTree(rc, tree, count));
-	}
-
-	public static TreeInfo popHighPriorityTree(RobotController rc) throws GameActionException {
-		return unpackTree(rc, popStack(rc, HIGH_PRIORITY_TREE_START, HIGH_PRIORITY_TREE_END));
-	}
-
-	public static void pushLowPriorityTree(RobotController rc, TreeInfo tree, int count) throws GameActionException {
-		writeStack(rc, LOW_PRIORITY_TREE_START, LOW_PRIORITY_TREE_END, packTree(rc, tree, count));
-	}
-
-	public static TreeInfo popLowPriorityTree(RobotController rc) throws GameActionException {
-		return unpackTree(rc, popStack(rc, LOW_PRIORITY_TREE_START, LOW_PRIORITY_TREE_END));
+	public static boolean addTree(RobotController rc, TreeInfo tree) throws GameActionException {
+		System.out.format("Adding tree target at %f, %f\n", tree.location.x, tree.location.y);
+		int i = TREE_END + 1;
+		while (i --> TREE_START) {
+			if (rc.readBroadcast(i) == 0) {
+				rc.broadcast(i, Comms.packTree(rc, tree));
+				return true;
+			}
+		}
+		return false;
 	}
 	
-	// uses channel 500 for the lols
+	/* Note: We (ab)use TreeInfo.containedBullets to hold the channel the info came from */
+	public static TreeInfo getTree(RobotController rc) throws GameActionException {
+		int i = TREE_END + 1;
+		int packedTree;
+		while (i --> TREE_START) {
+			if ((packedTree = rc.readBroadcast(i)) != 0) return unpackTree(rc, packedTree, i);
+		}
+		return null;
+	}
+	
+	public static void removeTree(RobotController rc, TreeInfo tree) throws GameActionException {
+		rc.broadcast(tree.containedBullets, 0);
+	}
+
 	public static void writeNumLumberjacks(RobotController rc, int data) throws GameActionException {
 		rc.broadcast(LUMBERJACKS_COUNTER, data);
 	}
