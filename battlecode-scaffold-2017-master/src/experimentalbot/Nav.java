@@ -186,10 +186,14 @@ public class Nav {
 	
 	static void pathTo(RobotController rc, MapLocation goal) throws GameActionException {
 		RobotType[] avoid = new RobotType[0];
-		pathTo(rc, goal, avoid); 
+		pathTo(rc, goal, avoid, rc.getType().strideRadius); 
+	}
+	
+	static void pathTo(RobotController rc, MapLocation goal, RobotType[] avoid) throws GameActionException {
+		pathTo(rc, goal, avoid, rc.getType().strideRadius); 
 	}
 
-	static void pathTo(RobotController rc, MapLocation goal, RobotType[] avoid) throws GameActionException {
+	static void pathTo(RobotController rc, MapLocation goal, RobotType[] avoid, float stride) throws GameActionException {
 
 		int roundNum = rc.getRoundNum();
 		MapLocation myLocation = rc.getLocation();
@@ -204,23 +208,22 @@ public class Nav {
 
 		float degreeOffset = 15f;
 		Direction trial;
-		float stride = rc.getType().strideRadius;
 
 		// Idea: if we can go closer to the goal than we ever have before, do so.
 		for (int i = 0; i < 7; i++) {
 			trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
-			if (rc.canMove(trial) && myLocation.add(trial, stride).distanceTo(goal) < dMin
-					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
-				rc.move(trial);
-				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
+			if (rc.canMove(trial, stride) && myLocation.add(trial, stride).distanceTo(goal) < dMin
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+				rc.move(trial, stride);
+				dMin = myLocation.add(trial, stride).distanceTo(goal);
 				moveState = chooseMoveState();
 				return;
 			}
 			trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
-			if (rc.canMove(trial) && myLocation.add(trial, stride).distanceTo(goal) < dMin
-					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
-				rc.move(trial);
-				dMin = myLocation.add(trial, rc.getType().strideRadius).distanceTo(goal);
+			if (rc.canMove(trial, stride) && myLocation.add(trial, stride).distanceTo(goal) < dMin
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+				rc.move(trial, stride);
+				dMin = myLocation.add(trial, stride).distanceTo(goal);
 				moveState = chooseMoveState();
 				return;
 			}
@@ -237,8 +240,8 @@ public class Nav {
 			case LEFT:
 				for (int i = 0; i < 12; i++) {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
-					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
-						rc.move(trial);
+					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+						rc.move(trial, stride);
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
 						return;
 					}
@@ -247,8 +250,8 @@ public class Nav {
 			case RIGHT:
 				for (int i = 0; i < 12; i++) {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
-					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
-						rc.move(trial);
+					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+						rc.move(trial, stride);
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
 						return;
 					}
@@ -272,7 +275,7 @@ public class Nav {
 		}
 	}
 	
-	private static boolean inEnemySight(RobotController rc, Direction trial, RobotType[] avoid, RobotInfo[] enemyList, MapLocation myLocation) {
+	private static boolean inEnemySight(RobotController rc, Direction trial, RobotType[] avoid, RobotInfo[] enemyList, MapLocation myLocation, float stride) {
 		if (avoid.length == 0) {
 			return false;
 		}
@@ -282,16 +285,16 @@ public class Nav {
 		}
 		for(RobotInfo enemy : enemyList) {
 			if(java.util.Arrays.asList(avoid).contains(enemy.type)
-					&& enemy.location.distanceTo(myLocation.add(trial, rc.getType().strideRadius)) <= enemy.type.sensorRadius
-					&& (!scoutFlag || !hiddenInTrees(rc, trial, myLocation))) {
+					&& enemy.location.distanceTo(myLocation.add(trial, stride)) <= enemy.type.sensorRadius
+					&& (!scoutFlag || !hiddenInTrees(rc, trial, myLocation, stride))) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	private static boolean hiddenInTrees(RobotController rc, Direction trial, MapLocation myLocation) {
-		MapLocation trialLocation = myLocation.add(trial, rc.getType().strideRadius);
+	private static boolean hiddenInTrees(RobotController rc, Direction trial, MapLocation myLocation, float stride) {
+		MapLocation trialLocation = myLocation.add(trial, stride);
 		float bodyRadius = rc.getType().bodyRadius;
 		TreeInfo[] treeList = rc.senseNearbyTrees(bodyRadius);
 		if(treeList.length == 0) {
@@ -312,7 +315,7 @@ public class Nav {
 	public static void scoutAttackMove(RobotController rc, MapLocation myLocation, RobotInfo enemy) throws GameActionException {
 		if(!scoutAttack(rc, myLocation, enemy)) {
 			treeCache = null;
-			pathTo(rc, enemy.location);
+			pathTo(rc, enemy.location, new RobotType[]{}, 1.5f);
 		}
 	}
 	
@@ -352,7 +355,7 @@ public class Nav {
 			MapLocation targetPosition = closestTree.location.add(new Direction(closestTree.location, enemy.location), closestTree.radius - 1f);
 			Direction heading =  new Direction(myLocation, targetPosition);
 			if(rc.canMove(heading)) {
-				rc.move(heading, Math.min(myLocation.distanceTo(targetPosition), 2.5f));
+				rc.move(heading, Math.min(myLocation.distanceTo(targetPosition), 1.5f));
 				return true;
 			}
 		}
