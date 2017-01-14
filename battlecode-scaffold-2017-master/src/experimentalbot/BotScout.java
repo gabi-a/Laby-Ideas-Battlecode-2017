@@ -35,8 +35,13 @@ public class BotScout {
 				enemyCache = enemyTarget;
 			}
 			Nav.scoutAttackMove(rc, myLocation, enemyTarget);
+			
+			// This is all you have to do for prediction! 
+			MapLocation nextEnemyLocation = Util.predictNextEnemyLocation(enemyTarget);
+			
+			
 			if (rc.canFireSingleShot()) {
-				Direction dir = new Direction(myLocation, enemyTarget.location);
+				Direction dir = new Direction(myLocation, nextEnemyLocation);
 				rc.fireSingleShot(dir);
 			}
 		}
