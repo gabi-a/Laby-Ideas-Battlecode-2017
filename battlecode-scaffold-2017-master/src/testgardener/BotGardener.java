@@ -61,7 +61,7 @@ public class BotGardener {
     	}
     	System.out.format("\n4 Actioned: %b\n", actioned);
 		if(!actioned && !(typeToBuild != null && prio > 5))
-			actioned = plantTrees();
+			actioned = plantTrees(myLocation);
 		if(!actioned) 
 			actioned = waterTrees();
     	
@@ -122,17 +122,31 @@ public class BotGardener {
     	return validPlantCount;
     }
     */
-    public static boolean plantTrees() throws GameActionException {
+    public static boolean plantTrees(MapLocation myLocation) throws GameActionException {
     	
     	Direction plantDirection = new Direction(0);
 		for (int i = 0; i < 8; i++) {
-			if (rc.canPlantTree(plantDirection)) {
+			if (rc.canPlantTree(plantDirection) && checkIcanEscape(myLocation, plantDirection)) {
 				rc.plantTree(plantDirection);
 				return true;
 			}
 			plantDirection = plantDirection.rotateLeftRads((float) Math.PI * 0.25f);
 		}
 		return false;
+    }
+    
+    public static boolean checkIcanEscape(MapLocation myLocation, Direction plantDirection) throws GameActionException {
+    	plantDirection = plantDirection.rotateLeftRads((float) Math.PI * 0.3333333f);
+    	int occupied = 0;
+    	for (int i = 0; i < 5; i++) {
+    		//rc.setIndicatorDot(myLocation.add(plantDirection, 2f), 255, 0, 0);
+    		if(rc.isCircleOccupiedExceptByThisRobot(myLocation.add(plantDirection, 2f), 2f)) {
+    			occupied++;
+    		}
+    		plantDirection = plantDirection.rotateLeftRads((float) Math.PI * 0.3333333f);
+    	}
+    	//System.out.format("Spaces occupied: %d\n", occupied);
+    	return occupied < 4;
     }
     
     public static boolean waterTrees() throws GameActionException {
@@ -146,11 +160,20 @@ public class BotGardener {
     }
     
     public static boolean moveToTrees() throws GameActionException {
-    	for (TreeInfo treeInfo : rc.senseNearbyTrees(1.5f, rc.getTeam())) {
-            
-                if(Nav.pathTo(rc, treeInfo.getLocation())) {
-                	return true;
-                }
+    	TreeInfo[] closeTrees = rc.senseNearbyTrees(-1, rc.getTeam());
+    	if(closeTrees.length == 0) {
+    		return false;
+    	}
+    	float lowestHealth = 1000;
+    	TreeInfo lowestHealthTree = null;
+    	for (TreeInfo treeInfo : closeTrees) {
+            if(treeInfo.getHealth() < lowestHealth) {
+            	lowestHealth = treeInfo.getHealth();
+            	lowestHealthTree = treeInfo;
+            }
+        }
+        if(Nav.pathTo(rc, lowestHealthTree.getLocation())) {
+        	return true;
         }
     	return false;
     }
