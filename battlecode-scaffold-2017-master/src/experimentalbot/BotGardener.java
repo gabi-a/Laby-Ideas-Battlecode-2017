@@ -25,8 +25,7 @@ public class BotGardener {
 		myLocation = rc.getLocation();
 		if(roundNum == 2) {
 			RobotType type = (rc.getTeam() == Team.A) ? RobotType.SCOUT : RobotType.SOLDIER; 
-			//rc.buildRobot(type, new Direction((float) Math.PI * 0.5f));
+			rc.buildRobot(type, new Direction((rc.getTeam() == Team.A) ? 2.5f : (float) Math.PI * 0.5f));
 		}
-		Nav.pathTo(rc, rc.getInitialArchonLocations(rc.getTeam().opponent())[0]);
 	}
 }

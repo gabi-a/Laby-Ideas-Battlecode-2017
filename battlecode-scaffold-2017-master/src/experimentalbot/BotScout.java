@@ -5,11 +5,19 @@ import battlecode.common.*;
 public class BotScout {
 
 	static RobotController rc;
+	static MapLocation[] initialArchonLocations;
+	static boolean startupFlag = true;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotScout.rc = rc;
 		
 		MapLocation myLocation = rc.getLocation();
+		
+		if(startupFlag) {
+			// costs 100 bytecodes per call! cache it
+			initialArchonLocations = rc.getInitialArchonLocations(rc.getTeam().opponent());
+			startupFlag = false;
+		}
 		
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		RobotInfo enemyTarget = null;
@@ -24,18 +32,12 @@ public class BotScout {
 		boolean moved = false;
 		if(enemyTarget != null) {
 			Direction dir = rc.getLocation().directionTo(enemyTarget.location);
-			float dist = enemyTarget.location.distanceTo(rc.getLocation());
-			if (/*!Nav.avoidBullets(rc, myLocation) &&*/ !Nav.avoidLumberjacks(rc, myLocation)) {
-				if ((dist >= 0f && enemyTarget.type != RobotType.LUMBERJACK) || dist >= 2f) {
-					moved = Nav.tryPrecisionMove(rc, dir, 1.49f);
-				}
-			}
 			if (rc.canFireSingleShot()) {
 				rc.fireSingleShot(dir);
 			}
 		}
 		if(!moved)
-			Nav.pathTo(rc, rc.getInitialArchonLocations(rc.getTeam().opponent())[0], new RobotType[]{RobotType.SOLDIER});
+			Nav.pathTo(rc, initialArchonLocations[0], new RobotType[]{RobotType.SOLDIER, RobotType.LUMBERJACK, RobotType.TANK});
 
 	}
 	

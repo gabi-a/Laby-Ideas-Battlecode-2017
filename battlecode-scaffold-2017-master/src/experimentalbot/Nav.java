@@ -232,7 +232,6 @@ public class Nav {
 
 		switch (moveState) {
 			case LEFT:
-				rc.setIndicatorDot(myLocation, 255, 0, 0);
 				for (int i = 0; i < 12; i++) {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
@@ -243,7 +242,6 @@ public class Nav {
 				}
 				break;
 			case RIGHT:
-				rc.setIndicatorDot(myLocation, 0, 255, 0);
 				for (int i = 0; i < 12; i++) {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
 					if (rc.canMove(trial) && !inEnemySight(rc, trial, avoid, enemyList, myLocation)) {
@@ -275,53 +273,36 @@ public class Nav {
 		if (avoid.length == 0) {
 			return false;
 		}
+		boolean scoutFlag = false;
+		if (rc.getType() == RobotType.SCOUT) {
+			scoutFlag = true;
+		}
 		for(RobotInfo enemy : enemyList) {
 			if(java.util.Arrays.asList(avoid).contains(enemy.type)
-					&& enemy.location.distanceTo(myLocation.add(trial, rc.getType().strideRadius)) <= enemy.type.sensorRadius) {
+					&& enemy.location.distanceTo(myLocation.add(trial, rc.getType().strideRadius)) <= enemy.type.sensorRadius
+					&& (!scoutFlag || !hiddenInTrees(rc, trial, myLocation))) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public static boolean avoidLumberjacks(RobotController rc, MapLocation myLocation) throws GameActionException {
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
-		if(enemies.length == 0) {
+	private static boolean hiddenInTrees(RobotController rc, Direction trial, MapLocation myLocation) {
+		MapLocation trialLocation = myLocation.add(trial, rc.getType().strideRadius);
+		float bodyRadius = rc.getType().bodyRadius;
+		TreeInfo[] treeList = rc.senseNearbyTrees(bodyRadius);
+		if(treeList.length == 0) {
 			return false;
 		}
-		Float[] enemyAngles = new Float[enemies.length];
-		float s = 0;
-		float c = 0;
-		int eaPointer = 0;
-		float closestDistance = 2.5f;
-		for (RobotInfo enemy : enemies) {
-			if(enemy.type == RobotType.LUMBERJACK && enemy.location.distanceTo(myLocation) <= 2.5f) {
-				enemyAngles[eaPointer] = new Direction(myLocation, enemy.location).radians;
-				float distanceToEnemy = enemy.location.distanceTo(myLocation);
-				if(distanceToEnemy < closestDistance) {
-					closestDistance = distanceToEnemy;
-				}
-				eaPointer++;
+		for(TreeInfo tree : treeList) {
+			rc.setIndicatorDot(tree.location,0,0,0);
+			if(tree.radius < 1 ) {
+				continue;
+			}
+			if(trialLocation.distanceTo(tree.location) <= tree.radius - bodyRadius) {
+				return true;
 			}
 		}
-		if (enemyAngles[0] == null) {
-			return false;
-		}
-		// Find best escape route
-		for (Float angle : enemyAngles) {
-			if( angle != null ) {
-				s += Math.sin(angle);
-				c += Math.cos(angle);
-			}
-		}
-		s /= eaPointer;
-		c /= eaPointer;
-		if (c < 0) {
-			return tryPrecisionMove(rc, new Direction((float) Math.atan2(s, c)), 2f, 5, 2.5f - closestDistance);			
-		}
-		else {
-			return tryPrecisionMove(rc, (new Direction((float) Math.atan2(s, c)).opposite()), 2f, 5, 2.5f - closestDistance);
-		}
-		
+		return false;
 	}
 }

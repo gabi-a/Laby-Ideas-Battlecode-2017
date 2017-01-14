@@ -48,7 +48,7 @@ public class BotArchon {
 				}
 			}
 			if(archonDesignation == Archon.FIRST) {
-				rc.buildRobot(RobotType.GARDENER, new Direction(0));
+				rc.buildRobot(RobotType.GARDENER, new Direction(2.5f));
 			}
 		}
 	}
