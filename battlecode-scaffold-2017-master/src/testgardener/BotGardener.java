@@ -13,23 +13,11 @@ public class BotGardener {
     public static final int MAX_SCOUTS = 20;
     public static final int MAX_LUMBERJACKS = 2;
     
-    /*
-	public static boolean atTargetLoc = false;
-    public static Direction spawnDirection = null;
-    public static int numScouts = 0;
-    public static int scoutThreshold = 0;
-	public static boolean hasBuiltStartingLumberjack = false;
-    
-    public static final int TRAPPED_THRESHOLD = 10;
-    
-    public static final int DISTANCE_BETWEEN_GARDENS = 10;
-    */
-    
-    static int roundCounter = 0;
-    static int bulletsRequired = 0;
-    
     static boolean reportedDeath = false;
     static boolean foundEnemy = false;
+    
+    static RobotType typeToBuild = null;
+    static int prio = 0;
     
     public static void turn(RobotController rc) throws GameActionException {
     	BotGardener.rc = rc;
@@ -41,57 +29,41 @@ public class BotGardener {
     		reportedDeath = true;
     	}
     	
-    	roundCounter--;
-    	if(roundCounter <= 0) {
-    		bulletsRequired = 0;
-    	}
-    	
-
-		int scoutsBuilt = Comms.readNumRobots(rc, RobotType.SCOUT);
-    	int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
-    	
     	MapLocation myLocation = rc.getLocation();
     	
     	// Action
+
     	boolean actioned = false;
-    	//int scoutsBuilt = Comms.readNumRobots(rc, RobotType.SCOUT);
-    	//int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
-    	//if(settled) {
-    		if (spawnDirection == null) setSpawnDirection(myLocation);
-    		if(scoutsBuilt < 3 || (rc.getRoundNum() > 100 && Comms.readAttackID(rc) == 0)) {
-    			actioned = tryToBuild(RobotType.SCOUT, scoutsBuilt);
-    			System.out.println("Trying to build a scout");
+    	// If we aren't trying to build anything,
+    	// pop the next unit to build
+    	// If there are no units to build, plant trees
+    	if(typeToBuild != null) System.out.println(typeToBuild);
+    	System.out.format("\n1 Actioned: %b\n", actioned);
+    	if(typeToBuild == null) {
+    		int[] buildQueue = Comms.popBuildStack(rc);
+    		if(buildQueue != null) {
+        		typeToBuild = RobotType.values()[buildQueue[0]];
+        		prio = buildQueue[1];
+        		if((rc.getTeamBullets() > typeToBuild.bulletCost)) {
+        			actioned = tryToBuild(typeToBuild, Comms.readNumRobots(rc, typeToBuild));
+        	    	System.out.format("\n2 Actioned: %b\n", actioned);
+        			if(actioned) {
+        				typeToBuild = null;
+        			}
+        		}
     		}
-    		if(!foundEnemy && !actioned) {
-    			actioned = tryToBuild(RobotType.LUMBERJACK, lumberjacksBuilt);
-    		} else {
-    			actioned = tryToBuild(RobotType.SOLDIER, 0);
+    	} else if((rc.getTeamBullets() > typeToBuild.bulletCost)){
+    		actioned = tryToBuild(typeToBuild, Comms.readNumRobots(rc, typeToBuild));
+        	System.out.format("\n3 Actioned: %b\n", actioned);
+    		if(actioned) {
+    			typeToBuild = null;
     		}
-    		/*
-    		if(rc.getRoundNum() < 300) {
-    			actioned = tryToBuild(RobotType.SCOUT);
-    			//if(actioned) {
-    			//	scoutsBuilt++;
-    			//	Comms.writeNumRobots(rc, RobotType.SCOUT, scoutsBuilt);
-    			//}
-    		}
-    		if(!actioned && rc.getRoundNum() > 300) {
-    			TreeInfo[] nearbyTrees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
-    			RobotType typeToBuild = RobotType.SOLDIER;
-    			if(nearbyTrees.length > 2) {
-    				typeToBuild = RobotType.LUMBERJACK;
-    			}
-    			actioned = tryToBuild(typeToBuild);
-    			//if(actioned) {
-    			//	Comms.writeNumRobots(rc, typeToBuild, lumberjacksBuilt);
-    			//}
-    		}
-    		*/
-    		if(!actioned && scoutsBuilt > 0 && rc.getTeamBullets() >= bulletsRequired)
-    			actioned = plantTrees();
-    		if(!actioned) 
-    			actioned = waterTrees();
-    	//}
+    	}
+    	System.out.format("\n4 Actioned: %b\n", actioned);
+		if(!actioned && !(typeToBuild != null && prio > 5))
+			actioned = plantTrees();
+		if(!actioned) 
+			actioned = waterTrees();
     	
     	// Movement
     	boolean moved = false;
@@ -99,16 +71,12 @@ public class BotGardener {
     	if(!moved) {
 	    	RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 	    	if(nearbyEnemies.length > 0) {
-	    		//if(settled) {
-	    		//	moved = Nav.tryMove(rc, spawnDirection.opposite());
-	    		//} else {
 	    			TreeInfo[] nearbyTrees = rc.senseNearbyTrees(2f);
 	    			moved = Nav.simpleRunAway(rc, myLocation, nearbyEnemies, nearbyTrees);
-	    		//}
 	    	}
     	}
     	//System.out.format("\nThere are %d enemies and I moved: %b", rc.senseNearbyRobots(-1, rc.getTeam().opponent()).length, moved);
-    	if(!moved){ // We haven't moved yet
+    	if(!moved){
     		moved = moveToTrees();
     	}
     	if(!moved) {
@@ -117,13 +85,14 @@ public class BotGardener {
     }
     
     private static boolean tryToBuild(RobotType typeToBuild, int num) throws GameActionException {
-		if(rc.canBuildRobot(typeToBuild, spawnDirection)) {
-			rc.buildRobot(typeToBuild, spawnDirection);
-			if(typeToBuild == RobotType.SCOUT) {
-				broadcastUnassignedScout();
+		
+    	Direction buildDirection = new Direction(0);
+		for (int i = 0; i < 8; i++) {
+			if (rc.canBuildRobot(typeToBuild, buildDirection) && rc.onTheMap(rc.getLocation().add(buildDirection, 5f))) {
+				rc.buildRobot(typeToBuild, buildDirection);
+				return true;
 			}
-			Comms.writeNumRobots(rc, typeToBuild, num+1);
-			return true;
+			buildDirection = buildDirection.rotateLeftRads((float) Math.PI * 0.25f);
 		}
 		return false;
 	}
@@ -131,7 +100,7 @@ public class BotGardener {
 	public static void broadcastUnassignedScout() throws GameActionException {
         Comms.writeStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END, rc.getLocation());
     }
-    
+    /*
     public static int setSpawnDirection(MapLocation myLocation) throws GameActionException {
     	int validPlantCount = 0;
         Direction direction = new Direction(0f);
@@ -152,22 +121,18 @@ public class BotGardener {
         }
     	return validPlantCount;
     }
-    
+    */
     public static boolean plantTrees() throws GameActionException {
-    	if(!rc.onTheMap(rc.getLocation(), 5)) {
-    		return false;
-    	}
     	
-    	for (Direction plantDirection : treeDirections) {
-    		MapLocation plantLocation = rc.getLocation().add(plantDirection);
-			if (plantDirection != null /*&& ((int)plantLocation.x % 8 == 0) && ((int)plantLocation.y % 8 == 0)*/ && rc.canPlantTree(plantDirection) && (rc.getRoundNum() > 50 || rc.getTeamBullets() > 100)) {
+    	Direction plantDirection = new Direction(0);
+		for (int i = 0; i < 8; i++) {
+			if (rc.canPlantTree(plantDirection)) {
 				rc.plantTree(plantDirection);
-				bulletsRequired = 55;
-				roundCounter = 20;
 				return true;
 			}
+			plantDirection = plantDirection.rotateLeftRads((float) Math.PI * 0.25f);
 		}
-    	return false;
+		return false;
     }
     
     public static boolean waterTrees() throws GameActionException {

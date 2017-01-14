@@ -3,7 +3,8 @@ import battlecode.common.*;
 
 public class Comms {
 
-	
+	public static final int BUILD_START = 0;
+	public static final int BUILD_END = 100;
     public static final int ARCHON_SCOUT_DELEGATION_START = 200;
     public static final int ARCHON_SCOUT_DELEGATION_END = 240;
     public static final int SCOUT_ARCHON_REQUEST_START = 250;
@@ -49,6 +50,21 @@ public class Comms {
         rc.broadcast(stackStart, stackPointer + 1);
     }
     
+    public static void writeBuildStack(RobotController rc, RobotType botType, int prio) throws GameActionException {
+        
+        int stackPointer = rc.readBroadcast(BUILD_START);
+        
+        if (BUILD_START + stackPointer + 1 > BUILD_END) {
+            System.out.println("Oops! Exceeded stack limit.");
+            return;
+        }
+        
+        int packedData = (botType.ordinal() << 8) | (prio);
+        
+        rc.broadcast(BUILD_START + POINTER_OFFSET + stackPointer, packedData);
+        rc.broadcast(BUILD_START, stackPointer + 1);
+    }
+    
     public static MapLocation readStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
         
         int stackPointer = rc.readBroadcast(stackStart);
@@ -72,6 +88,19 @@ public class Comms {
         return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
     }
     
+    public static int readBuildStack(RobotController rc) throws GameActionException {
+        
+        int stackPointer = rc.readBroadcast(BUILD_START);
+        
+        if (stackPointer == 0) {
+            return 0;
+        }
+        
+        stackPointer--;
+        
+        return rc.readBroadcast(BUILD_START + POINTER_OFFSET + stackPointer);
+    }
+    
     public static MapLocation popStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
         
         MapLocation returnValue = Comms.readStack(rc, stackStart, stackEnd);
@@ -88,6 +117,27 @@ public class Comms {
         rc.broadcast(stackStart, stackPointer);
         
         return returnValue;
+    }
+    
+    public static int[] popBuildStack(RobotController rc) throws GameActionException {
+        
+        int packedData = Comms.readBuildStack(rc);
+        
+        int stackPointer = rc.readBroadcast(BUILD_START);
+        
+        if (stackPointer == 0) {
+            return null;
+        }
+        
+        stackPointer--;
+        
+        rc.broadcast(BUILD_START + POINTER_OFFSET + stackPointer, 0);
+        rc.broadcast(BUILD_START, stackPointer);
+        
+        int botType = (packedData & 0xFF00) >> 8;
+        int prio = packedData & 0x00FF;
+        
+        return new int[]{botType, prio};
     }
 
 	public static int packLocation(MapLocation loc) {

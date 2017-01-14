@@ -21,7 +21,7 @@ public class BotArchon {
     	int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
     	int gardenersBuilt = Comms.readNumRobots(rc, RobotType.GARDENER);
 		
-		System.out.format("\nScouts: %d", scoutsBuilt);
+		//System.out.format("\nScouts: %d", scoutsBuilt);
 		
 		MapLocation selfLoc = rc.getLocation();
 		

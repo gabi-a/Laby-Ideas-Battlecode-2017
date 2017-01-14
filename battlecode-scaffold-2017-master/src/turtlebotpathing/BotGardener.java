@@ -60,7 +60,7 @@ public class BotGardener {
     		if (spawnDirection == null) setSpawnDirection(myLocation);
     		if(scoutsBuilt < 3 || (rc.getRoundNum() > 100 && Comms.readAttackID(rc) == 0)) {
     			actioned = tryToBuild(RobotType.SCOUT, scoutsBuilt);
-    			System.out.println("Trying to build a scout");
+    			//System.out.println("Trying to build a scout");
     		}
     		if(!foundEnemy && !actioned) {
     			actioned = tryToBuild(RobotType.LUMBERJACK, lumberjacksBuilt);

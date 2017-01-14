@@ -21,10 +21,17 @@ public class BotArchon {
     	int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
     	int gardenersBuilt = Comms.readNumRobots(rc, RobotType.GARDENER);
 		
-		System.out.format("\nScouts: %d", scoutsBuilt);
+		//System.out.format("\nScouts: %d", scoutsBuilt);
 		
 		MapLocation selfLoc = rc.getLocation();
 		
+		// Only one archon should set the spawn list
+		if(rc.getRoundNum() == 1 && selfLoc == rc.getInitialArchonLocations(rc.getTeam())[0]) {
+			Comms.writeBuildStack(rc, RobotType.SCOUT, 0);
+			Comms.writeBuildStack(rc, RobotType.SCOUT, 0);
+			Comms.writeBuildStack(rc, RobotType.SOLDIER, 0);
+			System.out.println(Comms.popBuildStack(rc));
+		}
 
 		TreeInfo[] allTrees = rc.senseNearbyTrees(-1);
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
