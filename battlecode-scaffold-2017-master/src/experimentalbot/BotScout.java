@@ -29,15 +29,16 @@ public class BotScout {
 				lowestHealth = enemies[i].health;
 			}
 		}
-		boolean moved = false;
 		if(enemyTarget != null) {
-			Direction dir = rc.getLocation().directionTo(enemyTarget.location);
+			Nav.scoutAttackMove(rc, myLocation, enemyTarget);
+			Direction dir = new Direction(myLocation, enemyTarget.location);
 			if (rc.canFireSingleShot()) {
 				rc.fireSingleShot(dir);
 			}
 		}
-		if(!moved)
+		else {
 			Nav.pathTo(rc, initialArchonLocations[0], new RobotType[]{RobotType.SOLDIER, RobotType.LUMBERJACK, RobotType.TANK});
+		}
 
 	}
 	

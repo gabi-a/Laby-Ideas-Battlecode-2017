@@ -17,6 +17,9 @@ public class Nav {
 
 	static Team myTeam = RobotPlayer.rc.getTeam();
     static Direction heading = Nav.randomDirection();
+	
+	//SCOUT ATTACK MOVE VARIABLE
+	static TreeInfo treeCache;
     
 	/**
      * Attempts to move in a given direction, while avoiding small obstacles directly in the path.
@@ -295,11 +298,51 @@ public class Nav {
 			return false;
 		}
 		for(TreeInfo tree : treeList) {
-			rc.setIndicatorDot(tree.location,0,0,0);
+			//rc.setIndicatorDot(tree.location,0,0,0);
 			if(tree.radius < 1 ) {
 				continue;
 			}
 			if(trialLocation.distanceTo(tree.location) <= tree.radius - bodyRadius) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static void scoutAttackMove(RobotController rc, MapLocation myLocation, RobotInfo enemy) throws GameActionException {
+		if(!scoutAttack(rc, myLocation, enemy)) {
+			treeCache = null;
+			pathTo(rc, enemy.location);
+		}
+	}
+	
+	private static boolean scoutAttack(RobotController rc, MapLocation myLocation, RobotInfo enemy) throws GameActionException {
+		float scoutSightRadius = 10f;
+		if(myLocation.distanceTo(enemy.location) <= scoutSightRadius - enemy.getType().strideRadius) {
+			float bodyRadius = rc.getType().bodyRadius;
+			TreeInfo[] treeList = rc.senseNearbyTrees(bodyRadius);
+			if(treeList.length == 0) {
+				return false;
+			}
+			float closestTreeDist = 10000f;
+			TreeInfo closestTree = null;
+			if (treeCache == null) {
+				for(TreeInfo tree : treeList) {
+					rc.setIndicatorDot(tree.location,255,255,255);
+					float d = myLocation.distanceTo(tree.location) + tree.location.distanceTo(enemy.location);			
+					if(tree.radius >= 1 && d < closestTreeDist) {
+						closestTreeDist = d;
+						closestTree = tree;
+					}
+				}
+			}
+			else {
+				closestTree = treeCache;
+			}
+			MapLocation targetPosition = closestTree.location.add(new Direction(closestTree.location, enemy.location), closestTree.radius - 1f);
+			Direction heading =  new Direction(myLocation, targetPosition);
+			if(rc.canMove(heading)) {
+				rc.move(heading, Math.min(myLocation.distanceTo(targetPosition), 2.5f));
 				return true;
 			}
 		}
