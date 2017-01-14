@@ -328,16 +328,22 @@ public class Nav {
 			TreeInfo closestTree = null;
 			if (treeCache == null) {
 				for(TreeInfo tree : treeList) {
-					rc.setIndicatorDot(tree.location,255,255,255);
+					if(tree.radius < 1) {
+						continue;
+					}
 					float d = myLocation.distanceTo(tree.location) + tree.location.distanceTo(enemy.location);			
-					if(tree.radius >= 1 && d < closestTreeDist) {
+					if(d < closestTreeDist) {
 						closestTreeDist = d;
 						closestTree = tree;
+						treeCache = tree;
 					}
 				}
 			}
 			else {
 				closestTree = treeCache;
+			}
+			if(closestTree == null) {
+				return false;
 			}
 			MapLocation targetPosition = closestTree.location.add(new Direction(closestTree.location, enemy.location), closestTree.radius - 1f);
 			Direction heading =  new Direction(myLocation, targetPosition);
