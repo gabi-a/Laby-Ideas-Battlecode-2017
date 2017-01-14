@@ -1,4 +1,4 @@
-package turtlebotpathing;
+package testgardener;
 import battlecode.common.*;
 
 public class Nav {
@@ -177,7 +177,8 @@ public class Nav {
 		for(int i = nearbyTrees.length;i-->0;) {
 			goalLoc = goalLoc.add(myLocation.directionTo(nearbyTrees[i].getLocation()).opposite());
 		}
-		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
+		heading =  myLocation.directionTo(goalLoc);
+		return Nav.tryMove(rc, heading);
 	}
 	
 	

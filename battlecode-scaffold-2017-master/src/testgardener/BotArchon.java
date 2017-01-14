@@ -1,4 +1,4 @@
-package turtlebotpathing;
+package testgardener;
 
 import battlecode.common.*;
 
@@ -25,7 +25,32 @@ public class BotArchon {
 		
 		MapLocation selfLoc = rc.getLocation();
 		
-		if (!Nav.avoidBullets(rc, selfLoc) && !Nav.explore(rc)) {
+		// Only one archon should set the spawn list
+		if(rc.getRoundNum() == 1 && selfLoc == rc.getInitialArchonLocations(rc.getTeam())[0]) {
+			Comms.writeBuildStack(rc, RobotType.SCOUT, 0);
+			Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
+			Comms.writeBuildStack(rc, RobotType.LUMBERJACK, 0);
+			Comms.writeBuildStack(rc, RobotType.SOLDIER, 0);
+			System.out.println(Comms.popBuildStack(rc));
+		}
+
+		TreeInfo[] allTrees = rc.senseNearbyTrees(-1);
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		boolean moved = false;
+		if (!Nav.avoidBullets(rc, selfLoc)) {
+			if(enemies.length > 0) {
+				moved = Nav.simpleRunAway(rc, selfLoc, enemies, allTrees);
+			}
+			if(!moved) {
+				TreeInfo[] ourTrees = rc.senseNearbyTrees(-1, rc.getTeam());
+				if(ourTrees.length > 0) {
+					if(!Nav.pathTo(rc, ourTrees[0].location)) {
+						Nav.explore(rc);
+					}
+				} else {
+					Nav.explore(rc);
+				}
+			}
 			//System.out.format("\nCouldn't move");
 		}
 		
@@ -35,7 +60,6 @@ public class BotArchon {
 		}
     	
 		if (rc.getRoundNum() == 1) {
-			Comms.writeGarden(rc, selfLoc);
 			Direction exploreDir = new Direction(0);
 			for (int i=0; i < EXPLORE_SPOKES; i++) {
 				exploreLocations[i] = selfLoc.add(exploreDir,100f);
@@ -56,7 +80,7 @@ public class BotArchon {
 		}
 		*/
 		
-		if(gardenersBuilt <= (1 + rc.getRoundNum() / 100)) {
+		if(gardenersBuilt <= (rc.getRoundNum() / 100)) {
 			gardenersBuilt += tryHireGardener() ? 1 : 0;
 			Comms.writeNumRobots(rc, RobotType.GARDENER, gardenersBuilt);
 		}

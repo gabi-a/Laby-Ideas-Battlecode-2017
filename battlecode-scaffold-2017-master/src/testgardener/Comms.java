@@ -1,11 +1,10 @@
-package turtlebotpathing;
+package testgardener;
 import battlecode.common.*;
 
 public class Comms {
 
-	
-	public static final int GARDENS_START = 100;
-	public static final int GARDENS_END = 120;
+	public static final int BUILD_START = 0;
+	public static final int BUILD_END = 100;
     public static final int ARCHON_SCOUT_DELEGATION_START = 200;
     public static final int ARCHON_SCOUT_DELEGATION_END = 240;
     public static final int SCOUT_ARCHON_REQUEST_START = 250;
@@ -23,36 +22,6 @@ public class Comms {
 	private static final int FOUND_ENEMY = 712;
 	
     private static final int POINTER_OFFSET = 1;
-    
-    
-    // Up to 20 gardeners
-    public static boolean writeGarden(RobotController rc, MapLocation loc) throws GameActionException {
-    	// Loop through channels until one is empty
-    	//System.out.format("\nWriting garden");
-    	for(int i = GARDENS_END; i-->GARDENS_START;) {
-    		if(rc.readBroadcast(i) == 0) {
-    			rc.broadcast(i, Comms.packLocation(loc));
-    			return true;
-    		}
-    	}
-    	return false;
-    }
-    
-    public static MapLocation[] readGardenLocs(RobotController rc) throws GameActionException {
-    	MapLocation[] gardenLocs = new MapLocation[GARDENS_END-GARDENS_START];
-    	int j = 0;
-    	for(int i = GARDENS_END; i-->GARDENS_START;) {
-    		int data = rc.readBroadcast(i);
-    		if(data == 0) {
-    			gardenLocs[j] = null;
-    		} else {
-    			gardenLocs[j] = Comms.unpackLocation(data);
-    		}
-    		j++;
-    	}
-    	return gardenLocs;
-    }
-    
     
     public static void writeStack(RobotController rc, int stackStart, int stackEnd, MapLocation location) throws GameActionException {
         
@@ -81,6 +50,21 @@ public class Comms {
         rc.broadcast(stackStart, stackPointer + 1);
     }
     
+    public static void writeBuildStack(RobotController rc, RobotType botType, int prio) throws GameActionException {
+        
+        int stackPointer = rc.readBroadcast(BUILD_START);
+        
+        if (BUILD_START + stackPointer + 1 > BUILD_END) {
+            System.out.println("Oops! Exceeded stack limit.");
+            return;
+        }
+        
+        int packedData = (botType.ordinal() << 8) | (prio);
+        
+        rc.broadcast(BUILD_START + POINTER_OFFSET + stackPointer, packedData);
+        rc.broadcast(BUILD_START, stackPointer + 1);
+    }
+    
     public static MapLocation readStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
         
         int stackPointer = rc.readBroadcast(stackStart);
@@ -104,6 +88,19 @@ public class Comms {
         return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
     }
     
+    public static int readBuildStack(RobotController rc) throws GameActionException {
+        
+        int stackPointer = rc.readBroadcast(BUILD_START);
+        
+        if (stackPointer == 0) {
+            return 0;
+        }
+        
+        stackPointer--;
+        
+        return rc.readBroadcast(BUILD_START + POINTER_OFFSET + stackPointer);
+    }
+    
     public static MapLocation popStack(RobotController rc, int stackStart, int stackEnd) throws GameActionException {
         
         MapLocation returnValue = Comms.readStack(rc, stackStart, stackEnd);
@@ -120,6 +117,27 @@ public class Comms {
         rc.broadcast(stackStart, stackPointer);
         
         return returnValue;
+    }
+    
+    public static int[] popBuildStack(RobotController rc) throws GameActionException {
+        
+        int packedData = Comms.readBuildStack(rc);
+        
+        int stackPointer = rc.readBroadcast(BUILD_START);
+        
+        if (stackPointer == 0) {
+            return null;
+        }
+        
+        stackPointer--;
+        
+        rc.broadcast(BUILD_START + POINTER_OFFSET + stackPointer, 0);
+        rc.broadcast(BUILD_START, stackPointer);
+        
+        int botType = (packedData & 0xFF00) >> 8;
+        int prio = packedData & 0x00FF;
+        
+        return new int[]{botType, prio};
     }
 
 	public static int packLocation(MapLocation loc) {

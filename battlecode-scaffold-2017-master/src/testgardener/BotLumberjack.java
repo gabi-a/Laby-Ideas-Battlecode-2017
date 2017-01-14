@@ -1,4 +1,4 @@
-package turtlebotpathing;
+package testgardener;
 
 import battlecode.common.*;
 
@@ -133,51 +133,7 @@ public class BotLumberjack {
 		}
 		*/
 	}
-	/*
-	public static TreeInfo nearestTree() throws GameActionException {
-		TreeInfo[] trees = new TreeInfo[0];
-		trees = rc.senseNearbyTrees();
-		int tree_id = -1;
-		float dist = 200;
-		for(int i = 0; i < trees.length; i++){
-			float new_dist = rc.getLocation().distanceTo(trees[i].getLocation());
-			if(trees[i].getTeam() == Team.NEUTRAL && new_dist < dist){
-				tree_id = i;
-				dist = new_dist;
-			}
-		}
-		if(trees.length == 0 || tree_id == -1){
-			Nav.explore(rc);
-			return null;
-		}
-		return trees[tree_id];
-	}
-
-	public static void cutTree() throws GameActionException{
-		if(target != null && rc.canChop(target.getID())){
-			rc.chop(target.getID());
-		}
-		if(!Nav.tryMove(rc, rc.getLocation().directionTo(target.getLocation()))){
-			if(oldTarget == null) oldTarget = target;
-			target = nearestTree();
-			//cutTree();
-		}
-		if(target == null) {
-			return;
-		}
-		if(rc.canChop(target.getID())) rc.chop(target.getID());
-
-		// Stop trying to chop if the tree is dead
-		if(rc.getLocation().distanceTo(target.getLocation()) < 7 && !rc.canSenseTree(target.getID())){
-			if(oldTarget != null){
-				target = oldTarget;
-				oldTarget = null;
-			} else {
-				target = null;
-			}
-		}
-	}
-	*/
+	
 	public static RobotInfo getClosestEnemyBot(RobotController rc, RobotInfo[] bots) throws GameActionException {
 		RobotInfo closestBot = null;
 		RobotInfo bot;
@@ -186,7 +142,7 @@ public class BotLumberjack {
 		for(int i = bots.length;i-->0;) {
 			bot = bots[i];
 			
-			if(bot.getType() == RobotType.GARDENER || bot.getType() == RobotType.ARCHON) {
+			if(bot.getType() == RobotType.GARDENER) {
 				Comms.writeFoundEnemy(rc);
 				Comms.writeAttackEnemy(rc, bot.getLocation(), bot.getID());
 			}

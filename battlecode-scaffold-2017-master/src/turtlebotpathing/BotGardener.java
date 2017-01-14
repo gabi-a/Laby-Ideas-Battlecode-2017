@@ -29,9 +29,12 @@ public class BotGardener {
     static int bulletsRequired = 0;
     
     static boolean reportedDeath = false;
+    static boolean foundEnemy = false;
     
     public static void turn(RobotController rc) throws GameActionException {
     	BotGardener.rc = rc;
+    	
+    	foundEnemy = Comms.readFoundEnemy(rc);
     	
     	if(!reportedDeath && rc.getHealth() < 10f) {
     		Comms.writeNumRobots(rc, RobotType.GARDENER, Comms.readNumRobots(rc, RobotType.GARDENER) - 1);
@@ -43,6 +46,10 @@ public class BotGardener {
     		bulletsRequired = 0;
     	}
     	
+
+		int scoutsBuilt = Comms.readNumRobots(rc, RobotType.SCOUT);
+    	int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
+    	
     	MapLocation myLocation = rc.getLocation();
     	
     	// Action
@@ -51,6 +58,16 @@ public class BotGardener {
     	//int lumberjacksBuilt = Comms.readNumRobots(rc, RobotType.LUMBERJACK);
     	if(settled) {
     		if (spawnDirection == null) setSpawnDirection(myLocation);
+    		if(scoutsBuilt < 3 || (rc.getRoundNum() > 100 && Comms.readAttackID(rc) == 0)) {
+    			actioned = tryToBuild(RobotType.SCOUT, scoutsBuilt);
+    			//System.out.println("Trying to build a scout");
+    		}
+    		if(!foundEnemy && !actioned) {
+    			actioned = tryToBuild(RobotType.LUMBERJACK, lumberjacksBuilt);
+    		} else {
+    			actioned = tryToBuild(RobotType.SOLDIER, 0);
+    		}
+    		/*
     		if(rc.getRoundNum() < 300) {
     			actioned = tryToBuild(RobotType.SCOUT);
     			//if(actioned) {
@@ -69,7 +86,8 @@ public class BotGardener {
     			//	Comms.writeNumRobots(rc, typeToBuild, lumberjacksBuilt);
     			//}
     		}
-    		if(!actioned && rc.getTeamBullets() >= bulletsRequired)
+    		*/
+    		if(!actioned && scoutsBuilt > 0 && rc.getTeamBullets() >= bulletsRequired)
     			actioned = plantTrees();
     		if(!actioned) 
     			actioned = waterTrees();
@@ -249,12 +267,13 @@ public class BotGardener {
         }*/
     }
     
-    private static boolean tryToBuild(RobotType typeToBuild) throws GameActionException {
+    private static boolean tryToBuild(RobotType typeToBuild, int num) throws GameActionException {
 		if(rc.canBuildRobot(typeToBuild, spawnDirection)) {
 			rc.buildRobot(typeToBuild, spawnDirection);
 			if(typeToBuild == RobotType.SCOUT) {
 				broadcastUnassignedScout();
 			}
+			Comms.writeNumRobots(rc, typeToBuild, num+1);
 			return true;
 		}
 		return false;
@@ -267,16 +286,20 @@ public class BotGardener {
     public static boolean goodToSettleHere(MapLocation myLocation) throws GameActionException {
     	
     	boolean goodToSettle = true;
-    	RobotInfo[] allyBots = rc.senseNearbyRobots(-1, rc.getTeam());
-    	for(int i = allyBots.length;i-->0;) {
-    		if(allyBots[i].getType() == RobotType.GARDENER) {
-    			goodToSettle = false;
-    			break;
-    		}
-    	}
-    	
-    	if(setSpawnDirection(myLocation) < 3) {
+    	if(!rc.onTheMap(myLocation, 5f)) {
     		goodToSettle = false;
+    	} else {
+	    	RobotInfo[] allyBots = rc.senseNearbyRobots(-1, rc.getTeam());
+	    	for(int i = allyBots.length;i-->0;) {
+	    		if(allyBots[i].getType() == RobotType.GARDENER) {
+	    			goodToSettle = false;
+	    			break;
+	    		}
+	    	}
+	    	
+	    	if(setSpawnDirection(myLocation) < 3) {
+	    		goodToSettle = false;
+	    	}
     	}
     	
     	return goodToSettle;
