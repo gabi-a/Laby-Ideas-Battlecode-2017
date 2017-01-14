@@ -28,7 +28,8 @@ public class BotArchon {
 		// Only one archon should set the spawn list
 		if(rc.getRoundNum() == 1 && selfLoc == rc.getInitialArchonLocations(rc.getTeam())[0]) {
 			Comms.writeBuildStack(rc, RobotType.SCOUT, 0);
-			Comms.writeBuildStack(rc, RobotType.SCOUT, 0);
+			Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
+			Comms.writeBuildStack(rc, RobotType.LUMBERJACK, 0);
 			Comms.writeBuildStack(rc, RobotType.SOLDIER, 0);
 			System.out.println(Comms.popBuildStack(rc));
 		}
@@ -79,7 +80,7 @@ public class BotArchon {
 		}
 		*/
 		
-		if(gardenersBuilt <= (1 + rc.getRoundNum() / 100)) {
+		if(gardenersBuilt <= (rc.getRoundNum() / 100)) {
 			gardenersBuilt += tryHireGardener() ? 1 : 0;
 			Comms.writeNumRobots(rc, RobotType.GARDENER, gardenersBuilt);
 		}
