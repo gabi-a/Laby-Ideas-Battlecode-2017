@@ -35,7 +35,6 @@ public class BotArchon {
 		}
     	
 		if (rc.getRoundNum() == 1) {
-			Comms.writeGarden(rc, selfLoc);
 			Direction exploreDir = new Direction(0);
 			for (int i=0; i < EXPLORE_SPOKES; i++) {
 				exploreLocations[i] = selfLoc.add(exploreDir,100f);
