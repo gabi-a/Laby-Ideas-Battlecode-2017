@@ -46,7 +46,11 @@ public class BotScout {
 				}
 			} 
 		}
-
+		if(enemyTarget!=null) {
+			MapLocation enemyNextLocation = Util.predictNextEnemyLocation(enemyTarget);
+			rc.setIndicatorDot(enemyTarget.getLocation(), 255, 0, 0);
+			rc.setIndicatorDot(enemyNextLocation, 0, 255, 0);
+		}
 		if (startupFlag) {
 			homeMemoryLocation = myLocation;
 			if(rc.getRoundNum() < 100 || Math.random() < 0.5) {
