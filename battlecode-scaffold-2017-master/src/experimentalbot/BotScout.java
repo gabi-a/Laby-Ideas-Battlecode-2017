@@ -7,7 +7,6 @@ public class BotScout {
 	static RobotController rc;
 	static MapLocation[] initialArchonLocations;
 	static boolean startupFlag = true;
-	static RobotInfo enemyCache = null;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotScout.rc = rc;
@@ -31,14 +30,12 @@ public class BotScout {
 			}
 		}
 		if(enemyTarget != null) {
-			if(enemyCache == null || enemyCache.ID != enemyTarget.ID) {
-				enemyCache = enemyTarget;
-			}
-			Nav.scoutAttackMove(rc, myLocation, enemyTarget);
-			
-			// This is all you have to do for prediction! 
 			MapLocation nextEnemyLocation = Util.predictNextEnemyLocation(enemyTarget);
+			RobotInfo predictedEnemy = new RobotInfo(enemyTarget.ID, enemyTarget.team,
+				enemyTarget.type, nextEnemyLocation, enemyTarget.health, 
+				enemyTarget.attackCount, enemyTarget.moveCount);
 			
+			Nav.scoutAttackMove(rc, myLocation, predictedEnemy);
 			
 			if (rc.canFireSingleShot()) {
 				Direction dir = new Direction(myLocation, nextEnemyLocation);

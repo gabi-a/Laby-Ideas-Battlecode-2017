@@ -3,14 +3,14 @@ import battlecode.common.*;
 
 public class Util {
 
-	static final int enemyLocationsCacheSize = 2;
+	static final int enemyLocationsCacheSize = 5;
 	static MapLocation[] enemyLocationsCached = new MapLocation[enemyLocationsCacheSize];
 	static int enemyIDCached = -1;
 
 	private static void pushEnemyLocation(MapLocation enemyLocation) {
 		int i = 0;
 		while(i<enemyLocationsCacheSize-1) {
-			System.out.println(i+","+(i+1));
+			//System.out.println(i+","+(i+1));
 			enemyLocationsCached[i+1] = enemyLocationsCached[i];
 			i++;
 		}
