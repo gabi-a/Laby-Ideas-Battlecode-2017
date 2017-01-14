@@ -317,7 +317,9 @@ public class Nav {
 	}
 	
 	private static boolean scoutAttack(RobotController rc, MapLocation myLocation, RobotInfo enemy) throws GameActionException {
+		// This will only be called by scouts, so to save bytecodes we define this value
 		float scoutSightRadius = 10f;
+		// Chase the enemy if they are escaping
 		if(myLocation.distanceTo(enemy.location) <= scoutSightRadius - enemy.getType().strideRadius) {
 			float bodyRadius = rc.getType().bodyRadius;
 			TreeInfo[] treeList = rc.senseNearbyTrees(bodyRadius);
@@ -326,6 +328,7 @@ public class Nav {
 			}
 			float closestTreeDist = 10000f;
 			TreeInfo closestTree = null;
+			// Find the tree that minimises d(myLoc, tree) + d(tree,enemyLoc)
 			if (treeCache == null) {
 				for(TreeInfo tree : treeList) {
 					if(tree.radius < 1) {
@@ -345,6 +348,7 @@ public class Nav {
 			if(closestTree == null) {
 				return false;
 			}
+			// Head to the edge of that tree closest to the enemy location
 			MapLocation targetPosition = closestTree.location.add(new Direction(closestTree.location, enemy.location), closestTree.radius - 1f);
 			Direction heading =  new Direction(myLocation, targetPosition);
 			if(rc.canMove(heading)) {
