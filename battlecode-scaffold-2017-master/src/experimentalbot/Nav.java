@@ -313,7 +313,9 @@ public class Nav {
 	}
 	
 	public static void scoutAttackMove(RobotController rc, MapLocation myLocation, RobotInfo enemy) throws GameActionException {
-		if(!scoutAttack(rc, myLocation, enemy)) {
+		if(inEnemySight(rc, new Direction(myLocation, enemy.location), 
+				new RobotType[]{RobotType.LUMBERJACK}, rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent()), myLocation, 2.5f ) 
+				|| !scoutAttack(rc, myLocation, enemy)) {
 			treeCache = null;
 			pathTo(rc, enemy.location, new RobotType[]{}, 1.5f);
 		}
