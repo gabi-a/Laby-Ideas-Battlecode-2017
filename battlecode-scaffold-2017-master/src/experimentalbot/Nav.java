@@ -285,27 +285,7 @@ public class Nav {
 		}
 		for(RobotInfo enemy : enemyList) {
 			if(java.util.Arrays.asList(avoid).contains(enemy.type)
-					&& enemy.location.distanceTo(myLocation.add(trial, stride)) <= enemy.type.sensorRadius
-					&& (!scoutFlag || !hiddenInTrees(rc, trial, myLocation, stride))) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private static boolean hiddenInTrees(RobotController rc, Direction trial, MapLocation myLocation, float stride) {
-		MapLocation trialLocation = myLocation.add(trial, stride);
-		float bodyRadius = rc.getType().bodyRadius;
-		TreeInfo[] treeList = rc.senseNearbyTrees(bodyRadius);
-		if(treeList.length == 0) {
-			return false;
-		}
-		for(TreeInfo tree : treeList) {
-			//rc.setIndicatorDot(tree.location,0,0,0);
-			if(tree.radius < 1 ) {
-				continue;
-			}
-			if(trialLocation.distanceTo(tree.location) <= tree.radius - bodyRadius) {
+					&& enemy.location.distanceTo(myLocation.add(trial, stride)) <= enemy.type.sensorRadius) {
 				return true;
 			}
 		}
@@ -313,9 +293,11 @@ public class Nav {
 	}
 	
 	public static void scoutAttackMove(RobotController rc, MapLocation myLocation, RobotInfo enemy) throws GameActionException {
-		if(!scoutAttack(rc, myLocation, enemy)) {
+		if(inEnemySight(rc, new Direction(myLocation, enemy.location), 
+				new RobotType[]{RobotType.LUMBERJACK}, rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent()), myLocation, 2.5f ) 
+				|| !scoutAttack(rc, myLocation, enemy)) {
 			treeCache = null;
-			pathTo(rc, enemy.location, new RobotType[]{}, 1.5f);
+			pathTo(rc, enemy.location, new RobotType[]{RobotType.LUMBERJACK}, 1.5f);
 		}
 	}
 	

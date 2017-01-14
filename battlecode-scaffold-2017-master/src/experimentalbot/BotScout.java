@@ -7,6 +7,7 @@ public class BotScout {
 	static RobotController rc;
 	static MapLocation[] initialArchonLocations;
 	static boolean startupFlag = true;
+	static RobotInfo enemyCache = null;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotScout.rc = rc;
@@ -30,9 +31,12 @@ public class BotScout {
 			}
 		}
 		if(enemyTarget != null) {
+			if(enemyCache == null || enemyCache.ID != enemyTarget.ID) {
+				enemyCache = enemyTarget;
+			}
 			Nav.scoutAttackMove(rc, myLocation, enemyTarget);
-			Direction dir = new Direction(myLocation, enemyTarget.location);
 			if (rc.canFireSingleShot()) {
+				Direction dir = new Direction(myLocation, enemyTarget.location);
 				rc.fireSingleShot(dir);
 			}
 		}
