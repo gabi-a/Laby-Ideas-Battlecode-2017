@@ -25,7 +25,24 @@ public class BotArchon {
 		
 		MapLocation selfLoc = rc.getLocation();
 		
-		if (!Nav.avoidBullets(rc, selfLoc) && !Nav.explore(rc)) {
+
+		TreeInfo[] allTrees = rc.senseNearbyTrees(-1);
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		boolean moved = false;
+		if (!Nav.avoidBullets(rc, selfLoc)) {
+			if(enemies.length > 0) {
+				moved = Nav.simpleRunAway(rc, selfLoc, enemies, allTrees);
+			}
+			if(!moved) {
+				TreeInfo[] ourTrees = rc.senseNearbyTrees(-1, rc.getTeam());
+				if(ourTrees.length > 0) {
+					if(!Nav.pathTo(rc, ourTrees[0].location)) {
+						Nav.explore(rc);
+					}
+				} else {
+					Nav.explore(rc);
+				}
+			}
 			//System.out.format("\nCouldn't move");
 		}
 		
