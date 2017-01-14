@@ -21,6 +21,7 @@ public class Nav {
 	
 	//SCOUT ATTACK MOVE VARIABLE
 	static TreeInfo treeCache;
+	static TreeInfo[] treeInfoCache = new TreeInfo[0];
     
 	/**
      * Attempts to move in a given direction, while avoiding small obstacles directly in the path.
@@ -196,7 +197,6 @@ public class Nav {
 
 	static void pathTo(RobotController rc, MapLocation goal, RobotType[] avoid, float stride) throws GameActionException {
 
-		int roundNum = rc.getRoundNum();
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
 		
@@ -309,14 +309,15 @@ public class Nav {
 		// Chase the enemy if they are escaping
 		if(myLocation.distanceTo(enemy.location) <= scoutSightRadius - enemy.getType().strideRadius) {
 			float bodyRadius = rc.getType().bodyRadius;
-			TreeInfo[] treeList = rc.senseNearbyTrees(bodyRadius);
+			TreeInfo[] treeList = rc.senseNearbyTrees(myLocation.distanceTo(enemy.location));
 			if(treeList.length == 0) {
 				return false;
 			}
 			float closestTreeDist = 10000f;
 			TreeInfo closestTree = null;
 			// Find the tree that minimises d(myLoc, tree) + d(tree,enemyLoc)
-			if (treeCache == null) {
+			if (treeCache == null || treeInfoCache != treeList) {
+				treeInfoCache = treeList;
 				for(TreeInfo tree : treeList) {
 					if(tree.radius < 1) {
 						continue;
