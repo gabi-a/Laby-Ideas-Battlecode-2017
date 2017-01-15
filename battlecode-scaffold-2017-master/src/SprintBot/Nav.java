@@ -294,16 +294,13 @@ public class Nav {
 	}
 	
 	public static void scoutAttackMove(RobotController rc, MapLocation myLocation, RobotInfo enemy) throws GameActionException {
+		
+			RobotType[] scaryRobots = new RobotType[]{RobotType.LUMBERJACK, RobotType.SCOUT, RobotType.SOLDIER, RobotType.TANK};
 
-			if(inEnemySight(rc, new Direction(myLocation, enemy.location), 
-					new RobotType[]{RobotType.LUMBERJACK}, rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent()), myLocation, 2.5f ) 
+			if(inEnemySight(rc, new Direction(myLocation, enemy.location), scaryRobots, rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent()), myLocation, 2.5f ) 
 					|| 	!scoutAttack(rc, myLocation, enemy) && !Nav.avoidBullets(rc, myLocation)) {
 				treeCache = null;
-					boolean moved = false;
-					if(myLocation.distanceTo(enemy.location) < 3f) {
-						moved = Nav.tryMove(rc, myLocation.directionTo(enemy.location).opposite());
-					}
-					if (!moved) pathTo(rc, enemy.location, new RobotType[]{RobotType.LUMBERJACK}, 1.5f);
+				pathTo(rc, enemy.location, scaryRobots, 1.5f);
 			}
 
 	}
