@@ -100,6 +100,43 @@ public class Comms {
         return returnValue;
     }
 
+    public static void pushQueue(RobotController rc, int queueStart, int queueEnd, int data) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+        int head = (queueData & 0xFF00) >> 8;
+        int tail = queueData & 0x00FF;
+
+		int newTail = tail + 1;
+		if(tail == queueEnd){
+			newTail = queueStart + 1;
+		}
+
+		if(newTail == head){
+			System.out.println("error: queue overflow");
+			return;
+		}
+
+		rc.broadcast(queueStart + 1 + tail, data);
+
+        rc.broadcast(queueStart, (head << 8) | (newTail));
+	}
+
+    public static int popQueue(RobotController rc, int queueStart, int queueEnd) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+        int head = (queueData & 0xFF00) >> 8;
+        int tail = queueData & 0x00FF;
+
+		int newHead = head + 1;
+		if(head == queueEnd){
+			newHead = queueStart + 1;
+		}
+		if(tail == head) return -1; // empty queue
+
+		int data = rc.readBroadcast(queueStart + 1 + head);
+
+        rc.broadcast(queueStart, (newHead << 8) | (tail));
+		return data;
+	}
+
 	public static int packLocation(RobotController rc, MapLocation loc) {
         Team myTeam = rc.getTeam();
         MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
@@ -154,11 +191,11 @@ public class Comms {
 	}
 
 	public static void pushLowPriorityTree(RobotController rc, TreeInfo tree, int count) throws GameActionException {
-		writeStack(rc, LOW_PRIORITY_TREE_START, LOW_PRIORITY_TREE_END, packTree(rc, tree, count));
+		pushQueue(rc, LOW_PRIORITY_TREE_START, LOW_PRIORITY_TREE_END, packTree(rc, tree, count));
 	}
 
 	public static TreeInfo popLowPriorityTree(RobotController rc) throws GameActionException {
-		return unpackTree(rc, popStack(rc, LOW_PRIORITY_TREE_START, LOW_PRIORITY_TREE_END));
+		return unpackTree(rc, popQueue(rc, LOW_PRIORITY_TREE_START, LOW_PRIORITY_TREE_END));
 	}
 	
 	// uses channel 500 for the lols
