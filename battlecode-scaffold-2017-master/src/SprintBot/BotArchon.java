@@ -7,8 +7,12 @@ import java.util.logging.Logger;
 public class BotArchon {
 	static RobotController rc;
 	
-	public static void turn(RobotController rc) {
+	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
+		Util.updateBotCount(rc);
+		Util.reportDeath(rc);
+		
+		
 	}
 	
 	public static boolean tryHireGardener() throws GameActionException {
