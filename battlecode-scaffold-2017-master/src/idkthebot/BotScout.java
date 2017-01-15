@@ -43,19 +43,21 @@ public class BotScout {
 			}
 		}
 		if(enemyTarget != null) {
-			System.out.format("Bytecodes left before: %d\n", Clock.getBytecodesLeft());
+			//System.out.format("Bytecodes left before: %d\n", Clock.getBytecodesLeft());
 			MapLocation nextEnemyLocation = Util.predictNextEnemyLocation(enemyTarget, myLocation);
-			System.out.format("Bytecodes left after: %d\n", Clock.getBytecodesLeft());
-			rc.setIndicatorLine(enemyTarget.getLocation(), nextEnemyLocation, 255, 0, 0);
-			rc.setIndicatorDot(nextEnemyLocation, 255, 0, 0);
-			rc.setIndicatorDot(enemyTarget.getLocation(), 0, 255, 0);
+			//System.out.format("Bytecodes left after: %d\n", Clock.getBytecodesLeft());
+			//rc.setIndicatorLine(enemyTarget.getLocation(), nextEnemyLocation, 255, 0, 0);
+			//rc.setIndicatorDot(nextEnemyLocation, 255, 0, 0);
+			//rc.setIndicatorDot(enemyTarget.getLocation(), 0, 255, 0);
 			RobotInfo predictedEnemy = new RobotInfo(enemyTarget.ID, enemyTarget.team,
 				enemyTarget.type, nextEnemyLocation, enemyTarget.health, 
 				enemyTarget.attackCount, enemyTarget.moveCount);
 			
 			Nav.scoutAttackMove(rc, myLocation, predictedEnemy);
-			
-			if (rc.canFireSingleShot()) {
+			rc.setIndicatorDot(Util.halfwayLocation(myLocation, nextEnemyLocation), 0, 0, 0);
+			if (rc.canFireSingleShot()
+					&& rc.senseNearbyRobots(Util.halfwayLocation(myLocation, nextEnemyLocation), 
+						(myLocation.distanceTo(nextEnemyLocation) / 2) - 0.1f, rc.getTeam()).length == 0) {
 				Direction dir = new Direction(myLocation, nextEnemyLocation);
 				rc.fireSingleShot(dir);
 			}

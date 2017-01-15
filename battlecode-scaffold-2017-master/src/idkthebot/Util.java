@@ -4,7 +4,7 @@ import battlecode.common.*;
 
 public class Util {
 
-	static final int enemyLocationsCacheSize = 10;
+	static final int enemyLocationsCacheSize = 5;
 	static MapLocation[] enemyLocationsCached = new MapLocation[enemyLocationsCacheSize];
 	static int enemyIDCached = -1;
 
@@ -54,7 +54,7 @@ public class Util {
 			if (i == 0) return enemyLocationsCached[0];
 			System.out.format("Bytecodes left: %d\n", Clock.getBytecodesLeft());
 			deltaDirectionRads /= i;
-			Direction nextMove = moveDirections[i-1].rotateLeftRads((float)Math.PI/2f - deltaDirectionRads);
+			Direction nextMove = moveDirections[i-1].rotateLeftRads(deltaDirectionRads);
 			
 			float distToEnemy = myLocation.distanceTo(enemyLocationsCached[0]);
 			float turnsToImpact = 0.7f * distToEnemy / RobotType.SCOUT.bulletSpeed ;
@@ -70,6 +70,10 @@ public class Util {
 			pushEnemyLocation(enemyTarget.getLocation());
 			return enemyTarget.getLocation();
 		}
+	}
+	
+	public static MapLocation halfwayLocation(MapLocation loc1, MapLocation loc2) {
+		return loc1.add(new Direction(loc1, loc2), loc1.distanceTo(loc2) / 2);
 	}
 	
 }
