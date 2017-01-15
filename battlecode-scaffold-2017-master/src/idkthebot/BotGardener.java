@@ -23,21 +23,35 @@ public class BotGardener {
     
     public static void turn(RobotController rc) throws GameActionException {
     	BotGardener.rc = rc;
+    	Util.reportDeath(rc);
+    	
+    	int scoutsBuilt = Comms.readNumRobots(rc, RobotType.SCOUT);
+    	int gardenersBuilt = Comms.readNumRobots(rc, RobotType.GARDENER);
     	
     	foundEnemy = Comms.readFoundEnemy(rc);
-    	
-    	if(!reportedDeath && rc.getHealth() < 10f) {
-    		Comms.writeNumRobots(rc, RobotType.GARDENER, Comms.readNumRobots(rc, RobotType.GARDENER) - 1);
-    		reportedDeath = true;
-    	}
     	
     	MapLocation myLocation = rc.getLocation();
     	RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
     	// Action
     	boolean actioned = false;
+    	
+    	if(scoutsBuilt < 2) {
+    		actioned = tryToBuild(RobotType.SCOUT);
+    	}
+    	
+    	if(!actioned && rc.getTeamBullets() > 80 && scoutsBuilt < 1 + rc.getTreeCount()/7) {
+    		actioned = tryToBuild(RobotType.SCOUT);
+    	}
+    	
+    	if(!actioned && rc.getTeamBullets() > 50 && rc.getTreeCount() < gardenersBuilt*9) {
+    		plantTrees(myLocation);
+    	}
+    	
+    	
     	// If we aren't trying to build anything,
     	// pop the next unit to build
     	// If there are no units to build, plant trees
+    	/*
     	if(typeToBuild != null) System.out.println(typeToBuild);
     	if(typeToBuild == null) {
     		int[] buildQueue = Comms.popBuildStack(rc);
@@ -68,6 +82,7 @@ public class BotGardener {
 			actioned = plantTrees(myLocation);
 		if(!actioned) 
 			actioned = waterTrees();
+    	*/
     	
     	// Movement
     	boolean moved = false;
@@ -88,12 +103,13 @@ public class BotGardener {
     	}
     }
     
-    private static boolean tryToBuild(RobotType typeToBuild, int num) throws GameActionException {
+    private static boolean tryToBuild(RobotType typeToBuild) throws GameActionException {
 		
     	Direction buildDirection = new Direction(0);
 		for (int i = 0; i < 8; i++) {
 			if (rc.canBuildRobot(typeToBuild, buildDirection) && rc.onTheMap(rc.getLocation().add(buildDirection, 5f))) {
 				rc.buildRobot(typeToBuild, buildDirection);
+				Comms.writeNumRobots(rc, typeToBuild, Comms.readNumRobots(rc, typeToBuild) + 1);
 				return true;
 			}
 			buildDirection = buildDirection.rotateLeftRads((float) Math.PI * 0.25f);

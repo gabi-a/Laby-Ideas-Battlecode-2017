@@ -7,7 +7,15 @@ public class Util {
 	static final int enemyLocationsCacheSize = 5;
 	static MapLocation[] enemyLocationsCached = new MapLocation[enemyLocationsCacheSize];
 	static int enemyIDCached = -1;
-
+	static boolean reportedDeath = false;
+	
+	static void reportDeath(RobotController rc) throws GameActionException {
+    	if(!reportedDeath && rc.getHealth() < 10f) {
+    		Comms.writeNumRobots(rc, rc.getType(), Comms.readNumRobots(rc, rc.getType()) - 1);
+    		reportedDeath = true;
+    	}
+	}
+	
 	private static void pushEnemyLocation(MapLocation enemyLocation) {
 		int i = 0;
 		MapLocation[] tempenemyLocationsCached = new MapLocation[enemyLocationsCacheSize];

@@ -25,11 +25,15 @@ public class BotArchon {
 		
 		MapLocation selfLoc = rc.getLocation();
 		
-		// Only one archon should set the spawn list
-		if(rc.getRoundNum() == 1 && selfLoc == rc.getInitialArchonLocations(rc.getTeam())[0]) {
-			Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
-			Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
+		if(rc.getTeamBullets() > 100 && gardenersBuilt < 1 + rc.getTreeCount()/7) {
+			tryHireGardener(gardenersBuilt);
 		}
+		
+		// Only one archon should set the spawn list
+		//if(rc.getRoundNum() == 1 && selfLoc == rc.getInitialArchonLocations(rc.getTeam())[0]) {
+		//	Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
+		//	Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
+		//}
 		
 		//if(gardenersBuilt > 1) {
 		//	Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
@@ -81,20 +85,21 @@ public class BotArchon {
 		}
 		*/
 		
-		if(gardenersBuilt <= (rc.getRoundNum() / 100)) {
-			gardenersBuilt += tryHireGardener() ? 1 : 0;
-			Comms.writeNumRobots(rc, RobotType.GARDENER, gardenersBuilt);
-		}
+		//if(gardenersBuilt <= (rc.getRoundNum() / 100)) {
+		//	gardenersBuilt += tryHireGardener() ? 1 : 0;
+		//	Comms.writeNumRobots(rc, RobotType.GARDENER, gardenersBuilt);
+		//}
 		
 		while(checkUnassignedScout()) {}
 
 	}
 
-	public static boolean tryHireGardener() throws GameActionException {
+	public static boolean tryHireGardener(int gardenersBuilt) throws GameActionException {
 		Direction hireDirection = new Direction(0);
 		for (int i = 0; i < 8; i++) {
 			if (rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection, 5f))) {
 				rc.hireGardener(hireDirection);
+				Comms.writeNumRobots(rc, RobotType.GARDENER, gardenersBuilt + 1);
 				return true;
 			}
 			hireDirection = hireDirection.rotateLeftRads((float) Math.PI * 0.25f);

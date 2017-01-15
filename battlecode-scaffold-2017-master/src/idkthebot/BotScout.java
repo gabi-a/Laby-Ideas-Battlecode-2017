@@ -12,6 +12,7 @@ public class BotScout {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotScout.rc = rc;
+    	Util.reportDeath(rc);
 		
 		MapLocation myLocation = rc.getLocation();
 		
