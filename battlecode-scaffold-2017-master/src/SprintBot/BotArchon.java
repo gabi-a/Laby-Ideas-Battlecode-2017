@@ -19,7 +19,7 @@ public class BotArchon {
 	static Team myTeam;
 	static MapLocation myLocation;
 	
-	public static void turn(RobotController rc) {
+	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		
 		// CACHE COSTLY VARIABLE CALLS
@@ -47,6 +47,9 @@ public class BotArchon {
 							System.out.println("Shouldn't get here!");
 					}
 				}
+			}
+			if(archonDesignation == Archon.FIRST) {
+				rc.hireGardener(Direction.EAST);
 			}
 		}
 	}
