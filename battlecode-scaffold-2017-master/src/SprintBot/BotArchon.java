@@ -12,6 +12,9 @@ public class BotArchon {
 		Util.updateBotCount(rc);
 		Util.reportDeath(rc);
 		
+		if(rc.getTeamBullets() >= 100 && Util.getNumBots(RobotType.GARDENER) < 1 + rc.getTreeCount()/Util.G) {
+			tryHireGardener();
+		}
 		
 	}
 	
