@@ -79,7 +79,7 @@ public class BotLumberjack {
 					} else {
 						TreeInfo[] nearbyTrees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 						if(nearbyTrees.length > 0) {
-							TreeInfo nearbyTree = Util.getClosestTree(rc, nearbyTrees);
+							TreeInfo nearbyTree = nearbyTrees[0];
 							moved = Nav.pathTo(rc, nearbyTree.getLocation());
 							System.out.format("\n3 moved: %b", moved);
 						}

@@ -268,4 +268,41 @@ public class Comms {
 	public static boolean readFoundEnemy(RobotController rc) throws GameActionException {
 		return rc.readBroadcast(FOUND_ENEMY) == 1 ? true : false;
 	}
+	
+	public static void pushQueue(RobotController rc, int queueStart, int queueEnd, int data) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+        int head = (queueData & 0xFF00) >> 8;
+        int tail = queueData & 0x00FF;
+
+		int newTail = tail + 1;
+		if(tail == queueEnd){
+			newTail = queueStart + 1;
+		}
+
+		if(newTail == head){
+			System.out.println("error: queue overflow");
+			return;
+		}
+
+		rc.broadcast(queueStart + 1 + tail, data);
+
+        rc.broadcast(queueStart, (head << 8) | (newTail));
+	}
+
+    public static int popQueue(RobotController rc, int queueStart, int queueEnd) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+        int head = (queueData & 0xFF00) >> 8;
+        int tail = queueData & 0x00FF;
+
+		int newHead = head + 1;
+		if(head == queueEnd){
+			newHead = queueStart + 1;
+		}
+		if(tail == head) return -1; // empty queue
+
+		int data = rc.readBroadcast(queueStart + 1 + head);
+
+        rc.broadcast(queueStart, (newHead << 8) | (tail));
+		return data;
+	}
 }

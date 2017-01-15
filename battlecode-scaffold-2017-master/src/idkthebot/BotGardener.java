@@ -19,6 +19,8 @@ public class BotGardener {
     static RobotType typeToBuild = null;
     static int prio = 0;
     
+    //static boolean alternate = false;
+    
     public static void turn(RobotController rc) throws GameActionException {
     	BotGardener.rc = rc;
     	
@@ -30,15 +32,13 @@ public class BotGardener {
     	}
     	
     	MapLocation myLocation = rc.getLocation();
-    	
+    	RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
     	// Action
-
     	boolean actioned = false;
     	// If we aren't trying to build anything,
     	// pop the next unit to build
     	// If there are no units to build, plant trees
     	if(typeToBuild != null) System.out.println(typeToBuild);
-    	System.out.format("\n1 Actioned: %b\n", actioned);
     	if(typeToBuild == null) {
     		int[] buildQueue = Comms.popBuildStack(rc);
     		if(buildQueue != null) {
@@ -46,21 +46,25 @@ public class BotGardener {
         		prio = buildQueue[1];
         		if((rc.getTeamBullets() > typeToBuild.bulletCost)) {
         			actioned = tryToBuild(typeToBuild, Comms.readNumRobots(rc, typeToBuild));
-        	    	System.out.format("\n2 Actioned: %b\n", actioned);
         			if(actioned) {
         				typeToBuild = null;
         			}
         		}
     		}
-    	} else if((rc.getTeamBullets() > typeToBuild.bulletCost)){
+    	} else if((rc.getTeamBullets() > typeToBuild.bulletCost) && nearbyEnemies.length>0){
     		actioned = tryToBuild(typeToBuild, Comms.readNumRobots(rc, typeToBuild));
-        	System.out.format("\n3 Actioned: %b\n", actioned);
     		if(actioned) {
     			typeToBuild = null;
     		}
     	}
-    	System.out.format("\n4 Actioned: %b\n", actioned);
-		if(!actioned && !(typeToBuild != null && prio > 5))
+    	
+    	if(rc.getTreeCount() > 5) {
+    		typeToBuild = RobotType.SCOUT;
+    		prio = 10;
+    	}
+    	
+    	
+		if(!actioned && (!(typeToBuild != null && prio > 5)))
 			actioned = plantTrees(myLocation);
 		if(!actioned) 
 			actioned = waterTrees();
@@ -69,7 +73,7 @@ public class BotGardener {
     	boolean moved = false;
     	moved = Nav.avoidBullets(rc, myLocation);
     	if(!moved) {
-	    	RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+	    	
 	    	if(nearbyEnemies.length > 0) {
 	    			TreeInfo[] nearbyTrees = rc.senseNearbyTrees(2f);
 	    			moved = Nav.simpleRunAway(rc, myLocation, nearbyEnemies, nearbyTrees);
@@ -140,7 +144,7 @@ public class BotGardener {
     	int occupied = 0;
     	for (int i = 0; i < 5; i++) {
     		//rc.setIndicatorDot(myLocation.add(plantDirection, 2f), 255, 0, 0);
-    		if(rc.isCircleOccupiedExceptByThisRobot(myLocation.add(plantDirection, 2f), 2f)) {
+    		if(rc.isCircleOccupiedExceptByThisRobot(myLocation.add(plantDirection, 2f), 2f) || !rc.onTheMap(myLocation.add(plantDirection, 2f))) {
     			occupied++;
     		}
     		plantDirection = plantDirection.rotateLeftRads((float) Math.PI * 0.3333333f);

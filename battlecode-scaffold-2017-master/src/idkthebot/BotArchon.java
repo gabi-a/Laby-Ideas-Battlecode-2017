@@ -31,9 +31,9 @@ public class BotArchon {
 			Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
 		}
 		
-		if(gardenersBuilt > 1) {
-			Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
-		}
+		//if(gardenersBuilt > 1) {
+		//	Comms.writeBuildStack(rc, RobotType.SCOUT, 10);
+		//}
 
 		TreeInfo[] allTrees = rc.senseNearbyTrees(-1);
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
