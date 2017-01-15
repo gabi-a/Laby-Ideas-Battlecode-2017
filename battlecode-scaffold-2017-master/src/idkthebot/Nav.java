@@ -298,7 +298,13 @@ public class Nav {
 				new RobotType[]{RobotType.LUMBERJACK}, rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent()), myLocation, 2.5f ) 
 				|| !scoutAttack(rc, myLocation, enemy)) {
 			treeCache = null;
-			pathTo(rc, enemy.location, new RobotType[]{RobotType.LUMBERJACK}, 1.5f);
+			if(!Nav.avoidBullets(rc, myLocation)) {
+				boolean moved = false;
+				if(myLocation.distanceTo(enemy.location) < 3f) {
+					moved = Nav.tryMove(rc, myLocation.directionTo(enemy.location).opposite());
+				}
+				if (!moved) pathTo(rc, enemy.location, new RobotType[]{RobotType.LUMBERJACK}, 1.5f);
+			}
 		}
 	}
 	
