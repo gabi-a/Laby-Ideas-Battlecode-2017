@@ -31,6 +31,9 @@ public class Nav {
     public static boolean tryMove(RobotController rc, Direction dir) throws GameActionException {
         return tryMove(rc, dir,5,10);
     }
+    public static boolean tryBugMove(RobotController rc, Direction dir) throws GameActionException {
+        return tryBugMove(rc, dir,5,10);
+    }
     
     public static boolean tryPrecisionMove(RobotController rc, Direction dir, float stride) throws GameActionException {
         return tryPrecisionMove(rc, dir,5,10, stride);
@@ -76,6 +79,41 @@ public class Nav {
         //System.out.println("I'm stuck! :( I have "+ Clock.getBytecodesLeft()+" bytecodes left");
         return false;
     }
+	static boolean tryBugMove(RobotController rc, Direction dir, float degreeOffset, int checksPerSide)
+			throws GameActionException {
+
+		// First, try intended direction
+		if (rc.canMove(dir)) {
+			rc.move(dir);
+			return true;
+		}
+
+		// Now try a bunch of similar angles
+		boolean moved = false;
+		int currentCheck = 1;
+
+		while (currentCheck <= checksPerSide) {
+			// Try the offset of the left side
+			if (rc.canMove(dir.rotateLeftDegrees(degreeOffset * currentCheck))) {
+				rc.move(dir.rotateLeftDegrees(degreeOffset * currentCheck));
+				treeBugHeading = dir;
+				return true;
+			}
+			// Try the offset on the right side
+			if (rc.canMove(dir.rotateRightDegrees(degreeOffset * currentCheck))) {
+				rc.move(dir.rotateRightDegrees(degreeOffset * currentCheck));
+				treeBugHeading = dir;
+				return true;
+			}
+			// No move performed, try slightly further
+			currentCheck++;
+		}
+
+		// A move never happened, so return false.
+		// System.out.println("I'm stuck! :( I have "+
+		// Clock.getBytecodesLeft()+" bytecodes left");
+		return false;
+	}
     
     static boolean tryPrecisionMove(RobotController rc, Direction dir, float degreeOffset, int checksPerSide, float stride) throws GameActionException {
 
@@ -110,7 +148,7 @@ public class Nav {
     }
     
     public static Direction randomDirection() {
-        return new Direction((float)Math.random() * 2 * (float)Math.PI);
+        return new Direction((float) Math.random() * 2 * (float) Math.PI);
     }
     
     public static boolean explore(RobotController rc) throws GameActionException {

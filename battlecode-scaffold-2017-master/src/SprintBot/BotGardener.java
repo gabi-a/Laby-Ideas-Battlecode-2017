@@ -1,5 +1,4 @@
 package SprintBot;
-
 import battlecode.common.*;
 
 public class BotGardener {
@@ -7,8 +6,14 @@ public class BotGardener {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
-		if(rc.canBuildRobot(RobotType.LUMBERJACK, Direction.getNorth())){
-			rc.buildRobot(RobotType.LUMBERJACK, Direction.getNorth());
+		Util.updateBotCount(rc);
+		Util.reportDeath(rc);
+		
+		MapLocation myLocation = rc.getLocation();
+		Nav.treeBug(rc);
+		waterTrees();
+		if(rc.getTeamBullets() > 50 && rc.getTreeCount() < Util.getNumBots(RobotType.GARDENER)*Util.T) {
+			plantTrees(myLocation);
 		}
 	}
 }

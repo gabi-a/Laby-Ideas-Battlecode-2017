@@ -1,15 +1,25 @@
 package SprintBot;
-
 import battlecode.common.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class BotArchon {
 	static RobotController rc;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
-		if(rc.canHireGardener(Direction.getNorth())) rc.hireGardener(Direction.getNorth());
+		
+		Util.updateBotCount(rc);
+		Util.reportDeath(rc);
+		
+		if(rc.getTeamBullets() > 10000) {
+			rc.donate(10000);
+		}
+		
+		if(rc.getTeamBullets() >= 100 && Util.getNumBots(RobotType.GARDENER) < 1 + 0.7f * rc.getTreeCount()/Util.G) {
+			tryHireGardener();
+		}
+		
+		Nav.treeBug(rc);
+		
 	}
 	
 }
