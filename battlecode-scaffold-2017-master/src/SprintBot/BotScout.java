@@ -3,8 +3,6 @@ import battlecode.common.*;
 
 public class BotScout {
 	static RobotController rc;
-	
-	static RobotController rc;	
 	static Team myTeam = RobotPlayer.rc.getTeam();
 	static Team enemyTeam = myTeam.opponent();
 	static MapLocation[] initialEnemyArchonLocations = RobotPlayer.rc.getInitialArchonLocations(enemyTeam);
