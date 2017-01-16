@@ -61,6 +61,8 @@ class CommsTree {
 	}
 
 	public static TreeInfo unpackTree(RobotController rc, int data){
+		if(data == -1) return null;
+
 		int id = data/(int)Math.pow(2, 20);
 		MapLocation loc = Comms.unpackLocation(rc, data - id*(int)Math.pow(2,20));
 		if(loc == null) return null;
@@ -100,6 +102,8 @@ public class Comms {
 	}
 
 	public static MapLocation unpackLocation(RobotController rc, int packedLocation) {
+		if(packedLocation == -1) return null;
+
 		int mapZoneX = (packedLocation & 0xFF00) >> 8;
 		int mapZoneY = packedLocation & 0x00FF;
 		
