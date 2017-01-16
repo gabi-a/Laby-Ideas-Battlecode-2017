@@ -27,6 +27,10 @@ public class Util {
 	public static int getNumBots(RobotType type) {
 		return botsBuilt[type.ordinal()];
 	}
+	public static void increaseNumBotsByOne(RobotController rc, RobotType type) throws GameActionException {
+		botsBuilt[type.ordinal()] = botsBuilt[type.ordinal()] + 1;
+		Comms.writeNumRobots(rc, type, botsBuilt[type.ordinal()]);
+	}
 	
 	
 }

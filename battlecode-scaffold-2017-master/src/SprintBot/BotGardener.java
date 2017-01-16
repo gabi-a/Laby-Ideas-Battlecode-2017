@@ -10,10 +10,11 @@ public class BotGardener {
 		Util.reportDeath(rc);
 		
 		MapLocation myLocation = rc.getLocation();
-		
 		Nav.treeBug(rc);
 		waterTrees();
-		plantTrees(myLocation);
+		if(rc.getTeamBullets() > 50 && rc.getTreeCount() < Util.getNumBots(RobotType.GARDENER)*Util.T) {
+			plantTrees(myLocation);
+		}
 	}
 	
 	public static boolean waterTrees() throws GameActionException {
@@ -44,7 +45,7 @@ public class BotGardener {
     	
     	Direction plantDirection = new Direction(0);
 		for (int i = 0; i < 8; i++) {
-			if (rc.canPlantTree(plantDirection) && checkIcanEscape(myLocation, plantDirection)) {
+			if (rc.canPlantTree(plantDirection) && checkIcanEscape(myLocation, plantDirection) && rc.onTheMap(myLocation, 3f)) {
 				rc.plantTree(plantDirection);
 				return true;
 			}

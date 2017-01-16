@@ -21,11 +21,25 @@ public class Nav {
 
 	static TreeBugHands treeBugHand = TreeBugHands.LEFT;
 	static Direction treeBugHeading = Direction.getNorth();
-
+	static int treeBugstuckCount = 0;
+	static final int treeBugRotAngle = 15;
+	
 	static boolean treeBug(RobotController rc) throws GameActionException {
 
 		MapLocation myLocation = rc.getLocation();
+		rc.setIndicatorLine(rc.getLocation(), rc.getLocation().add(treeBugHeading,5), 255, 0, 0);
 
+		/*
+		if(treeBugstuckCount < 10) {
+			TreeInfo[] myTreesAhead = rc.senseNearbyTrees(myLocation.add(treeBugHeading), 2f, rc.getTeam());
+			if(myTreesAhead.length > 0) {
+				TreeInfo treeAhead = myTreesAhead[0];
+				if(treeAhead.health < 0.8f * treeAhead.maxHealth && Nav.tryMove(rc, myLocation.directionTo(treeAhead.location))) {
+					return true;
+				}
+			}
+		}
+		*/
 		switch (treeBugHand) {
 
 		case LEFT:
@@ -33,15 +47,16 @@ public class Nav {
 			// Uses 100 bytecodes
 			TreeInfo[] leftTrees = rc.senseNearbyTrees(myLocation.add(treeBugHeading.rotateLeftDegrees(90), 2f), 1f,
 					null);
+			rc.setIndicatorLine(rc.getLocation(), myLocation.add(treeBugHeading.rotateLeftDegrees(90), 5f), 0, 0, 255);
 
 			if (leftTrees.length > 0) {
 				if (Nav.tryMove(rc, treeBugHeading)) {
 					return true;
 				} else {
-					treeBugHeading = treeBugHeading.rotateRightDegrees(90);
+					treeBugHeading = treeBugHeading.rotateRightDegrees(treeBugRotAngle);
 				}
 			} else {
-				treeBugHeading = treeBugHeading.rotateLeftDegrees(90);
+				treeBugHeading = treeBugHeading.rotateLeftDegrees(treeBugRotAngle);
 			}
 			break;
 
@@ -50,15 +65,16 @@ public class Nav {
 			// Uses 100 bytecodes
 			TreeInfo[] rightTrees = rc.senseNearbyTrees(myLocation.add(treeBugHeading.rotateRightDegrees(90), 2f), 1f,
 					null);
+			rc.setIndicatorLine(rc.getLocation(), myLocation.add(treeBugHeading.rotateRightDegrees(90), 5f), 0, 0, 255);
 
 			if (rightTrees.length > 0) {
 				if (Nav.tryMove(rc, treeBugHeading)) {
 					return true;
 				} else {
-					treeBugHeading = treeBugHeading.rotateLeftDegrees(90);
+					treeBugHeading = treeBugHeading.rotateLeftDegrees(treeBugRotAngle);
 				}
 			} else {
-				treeBugHeading = treeBugHeading.rotateRightDegrees(90);
+				treeBugHeading = treeBugHeading.rotateRightDegrees(treeBugRotAngle);
 			}
 
 			break;
@@ -66,10 +82,12 @@ public class Nav {
 		}
 
 		if (Nav.tryMove(rc, treeBugHeading)) {
+			treeBugstuckCount--;
 			return true;
 		} else {
-			if(!Nav.explore(rc)) {
-				treeBugHand = (treeBugHand == TreeBugHands.RIGHT) ? TreeBugHands.LEFT : TreeBugHands.RIGHT;
+			treeBugstuckCount++;
+			if(!Nav.explore(rc) && treeBugstuckCount > 10) {
+				treeBugHand = (treeBugHand == TreeBugHands.RIGHT) ? TreeBugHands.LEFT : TreeBugHands.RIGHT;	
 			}
 		}
 
