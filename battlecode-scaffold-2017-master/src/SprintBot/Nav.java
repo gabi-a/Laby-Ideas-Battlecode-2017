@@ -128,8 +128,12 @@ public class Nav {
     	}
     	return false;
     }
+	
+	public static boolean avoidBullets(RobotController rc, MapLocation myLocation) throws GameActionException {
+		return avoidBullets(rc, myLocation, rc.getType().strideRadius);
+	}
     
-    public static boolean avoidBullets(RobotController rc, MapLocation myLocation) throws GameActionException {
+    public static boolean avoidBullets(RobotController rc, MapLocation myLocation, float stride) throws GameActionException {
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		BulletInfo bullet;
@@ -146,7 +150,7 @@ public class Nav {
 		if(goalLoc == myLocation) {
 			return false;
 		}
-		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
+		return Nav.tryPrecisionMove(rc, myLocation.directionTo(goalLoc), stride);
 		
 	}	
 	
@@ -295,10 +299,9 @@ public class Nav {
 	
 	public static void scoutAttackMove(RobotController rc, MapLocation myLocation, RobotInfo enemy) throws GameActionException {
 		
-			RobotType[] scaryRobots = new RobotType[]{RobotType.LUMBERJACK, RobotType.SCOUT, RobotType.SOLDIER, RobotType.TANK};
+			RobotType[] scaryRobots = new RobotType[]{RobotType.LUMBERJACK, RobotType.SOLDIER, RobotType.TANK};
 
-			if(inEnemySight(rc, new Direction(myLocation, enemy.location), scaryRobots, rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent()), myLocation, 2.5f ) 
-					|| 	!scoutAttack(rc, myLocation, enemy) && !Nav.avoidBullets(rc, myLocation)) {
+			if(inEnemySight(rc, Direction.NORTH, scaryRobots, rc.senseNearbyRobots(10f, rc.getTeam().opponent()), myLocation, 0f) || !scoutAttack(rc, myLocation, enemy)) {
 				treeCache = null;
 				pathTo(rc, enemy.location, scaryRobots, 1.5f);
 			}
@@ -311,44 +314,54 @@ public class Nav {
 		rc.setIndicatorDot(myLocation, 255, 255, 255);
 		// Chase the enemy if they are escaping
 		if(myLocation.distanceTo(enemy.location) <= scoutSightRadius - enemy.getType().strideRadius) {
-			float bodyRadius = rc.getType().bodyRadius;
-			TreeInfo[] treeList = rc.senseNearbyTrees(myLocation.distanceTo(enemy.location));
-			if(treeList.length == 0) {
-				return false;
-			}
-			float closestTreeDist = 10000f;
-			TreeInfo closestTree = null;
-			// Find the tree that minimises d(myLoc, tree) + d(tree,enemyLoc)
-			if (treeCache == null || treeInfoCache != treeList) {
-				treeInfoCache = treeList;
-				for(TreeInfo tree : treeList) {
-					if(tree.radius < 1) {
-						continue;
+			if(enemy.type != RobotType.SCOUT) {
+				
+				float bodyRadius = rc.getType().bodyRadius;
+				TreeInfo[] treeList = rc.senseNearbyTrees(myLocation.distanceTo(enemy.location));
+				if(treeList.length == 0) {
+					return false;
+				}
+				float closestTreeDist = 10000f;
+				TreeInfo closestTree = null;
+				// Find the tree that minimises d(myLoc, tree) + d(tree,enemyLoc)
+				if (treeCache == null || treeInfoCache != treeList) {
+					treeInfoCache = treeList;
+					for(TreeInfo tree : treeList) {
+						if(tree.radius < 1) {
+							continue;
+						}
+						float d = myLocation.distanceTo(tree.location) + tree.location.distanceTo(enemy.location);			
+						if(d < closestTreeDist) {
+							closestTreeDist = d;
+							closestTree = tree;
+							treeCache = tree;
+						}
 					}
-					float d = myLocation.distanceTo(tree.location) + tree.location.distanceTo(enemy.location);			
-					if(d < closestTreeDist) {
-						closestTreeDist = d;
-						closestTree = tree;
-						treeCache = tree;
-					}
+				}
+				else {
+					closestTree = treeCache;
+				}
+				if(closestTree == null) {
+					return false;
+				}
+				if(rc.canShake(closestTree.ID)) {
+					rc.shake(closestTree.ID);
+				}
+				// Head to the edge of that tree closest to the enemy location
+				MapLocation targetPosition = closestTree.location.add(new Direction(closestTree.location, enemy.location), closestTree.radius - 1f);
+				Direction heading =  new Direction(myLocation, targetPosition);
+				float stride = Math.min(myLocation.distanceTo(targetPosition), 1.5f);
+				if(rc.canMove(heading, stride)) {
+					rc.move(heading, stride);
+					return true;
 				}
 			}
 			else {
-				closestTree = treeCache;
-			}
-			if(closestTree == null) {
-				return false;
-			}
-			if(rc.canShake(closestTree.ID)) {
-				rc.shake(closestTree.ID);
-			}
-			// Head to the edge of that tree closest to the enemy location
-			MapLocation targetPosition = closestTree.location.add(new Direction(closestTree.location, enemy.location), closestTree.radius - 1f);
-			Direction heading =  new Direction(myLocation, targetPosition);
-			float stride = Math.min(myLocation.distanceTo(targetPosition), 1.5f);
-			if(rc.canMove(heading, stride)) {
-				rc.move(heading, stride);
-				return true;
+				Direction heading =  new Direction(myLocation, enemy.location);
+				if(rc.canMove(heading)) {
+					rc.move(heading);
+					return true;
+				}
 			}
 		}
 		return false;

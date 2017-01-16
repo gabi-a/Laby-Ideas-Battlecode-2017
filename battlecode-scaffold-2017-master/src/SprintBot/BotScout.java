@@ -25,7 +25,7 @@ public class BotScout {
 		double enemyScore = -1000d;
 
 		for (RobotInfo enemy : enemies) {
-			if(enemy.type != RobotType.GARDENER) {
+			if(enemy.type != RobotType.GARDENER && enemy.type != RobotType.SCOUT) {
 				continue;
 			}
 			double curEnemyScore = 0d;
@@ -41,23 +41,27 @@ public class BotScout {
 		}
 		
 		if(enemyTarget != null) {
+			rc.setIndicatorDot(enemyTarget.location, 0, 255, 0);
 			
-			Nav.scoutAttackMove(rc, myLocation, enemyTarget);
+			if(!Nav.avoidBullets(rc, myLocation, 1.5f)) {
+				Nav.scoutAttackMove(rc, myLocation, enemyTarget);
+			}
 			
-			if (rc.canFireSingleShot() && myLocation.distanceTo(enemyTarget.location) <= 1.01f) {
-				Direction dir = new Direction(myLocation, enemyTarget.location);
+			// we can't use our cached location
+			Direction dir = new Direction(rc.getLocation(), enemyTarget.location);
+			if (rc.canFireSingleShot()) {
 				rc.fireSingleShot(dir);
 			}
 		}
 		else {
-			if(myLocation.distanceTo(initialArchonLocations[0]) < 4f) {
+			if(myLocation.distanceTo(initialArchonLocations[0]) < 1f) {
 				exploreFlag = true;
 			}
 			if(exploreFlag) {
 				Nav.explore(rc);
 			}
 			else {
-				Nav.pathTo(rc, initialArchonLocations[0], new RobotType[]{RobotType.SOLDIER, RobotType.LUMBERJACK, RobotType.TANK, RobotType.SCOUT});
+				Nav.pathTo(rc, initialArchonLocations[0], new RobotType[]{RobotType.SOLDIER, RobotType.LUMBERJACK, RobotType.TANK});
 			}
 		}
 	}
