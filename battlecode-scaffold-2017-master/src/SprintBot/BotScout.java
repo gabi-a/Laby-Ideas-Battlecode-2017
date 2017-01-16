@@ -1,10 +1,8 @@
 package SprintBot;
-
 import battlecode.common.*;
 
 public class BotScout {
-	
-	static RobotController rc;	
+	static RobotController rc;
 	static Team myTeam = RobotPlayer.rc.getTeam();
 	static Team enemyTeam = myTeam.opponent();
 	static MapLocation[] initialEnemyArchonLocations = RobotPlayer.rc.getInitialArchonLocations(enemyTeam);
@@ -14,6 +12,7 @@ public class BotScout {
     
 	public static void turn(RobotController rc) throws GameActionException {
 		BotScout.rc = rc;
+		Util.reportDeath(rc);
 		
 		MapLocation myLocation = rc.getLocation();
 	
@@ -34,14 +33,17 @@ public class BotScout {
 
 		RobotInfo closestEnemy = null;
 		moved = Nav.avoidBullets(rc, myLocation);
-		if(!moved && nearbyEnemies.length > 0) {
+		
+		if(nearbyEnemies.length > 0) {
 			for(int i = 0; i<nearbyEnemies.length; i++) {
 				if(nearbyEnemies[i].getType() != RobotType.ARCHON) {
 					closestEnemy = nearbyEnemies[i];
 					break;
 				}
 			}
-			if(closestEnemy == null) closestEnemy = nearbyEnemies[0];
+		}
+		
+		if(!moved && closestEnemy != null) {
 			
 			MapLocation enemyLocation = closestEnemy.getLocation();
 			
@@ -108,5 +110,4 @@ public class BotScout {
 		}
 	
 	}
-		
 }
