@@ -6,7 +6,6 @@ public class BotGardener {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
-<<<<<<< HEAD
 		Util.updateBotCount(rc);
 		Util.reportDeath(rc);
 		
@@ -15,11 +14,6 @@ public class BotGardener {
 		waterTrees();
 		if(rc.getTeamBullets() > 50 && rc.getTreeCount() < Util.getNumBots(RobotType.GARDENER)*Util.T) {
 			plantTrees(myLocation);
-=======
-		
-		if(rc.getRoundNum() == 2) {
-			rc.buildRobot(RobotType.SCOUT, Direction.getNorth());
->>>>>>> refs/heads/SprintScout
 		}
 	}
 	

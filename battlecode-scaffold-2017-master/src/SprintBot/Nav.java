@@ -86,7 +86,7 @@ public class Nav {
 			return true;
 		} else {
 			treeBugstuckCount++;
-			if(!Nav.explore(rc) && treeBugstuckCount > 10) {
+			if(!Nav.bugExplore(rc) && treeBugstuckCount > 10) {
 				treeBugHand = (treeBugHand == TreeBugHands.RIGHT) ? TreeBugHands.LEFT : TreeBugHands.RIGHT;	
 			}
 		}
@@ -135,7 +135,7 @@ public class Nav {
 		return false;
 	}
 
-	public static boolean explore(RobotController rc) throws GameActionException {
+	public static boolean bugExplore(RobotController rc) throws GameActionException {
 		MapLocation myLocation = rc.getLocation();
 		int moveAttemptCount = 0;
 		while (moveAttemptCount < 30) {
@@ -147,10 +147,6 @@ public class Nav {
 			moveAttemptCount++;
 		}
 		return false;
-	}
-
-	public static Direction randomDirection() {
-		return new Direction((float) Math.random() * 2 * (float) Math.PI);
 	}
 
 	public static enum MoveState {
