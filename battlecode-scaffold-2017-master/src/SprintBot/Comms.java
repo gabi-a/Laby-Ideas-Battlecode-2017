@@ -104,12 +104,8 @@ class CommsTree {
 }
 
 public class Comms {
-<<<<<<< HEAD
-=======
-	
 	public static final int ROBOT_NUMS_START = 703; // End is 709
 	
->>>>>>> SprintSubmission
 	public static final CommsTree neutralTrees;
 	public static final CommsTree enemyTrees;
 
