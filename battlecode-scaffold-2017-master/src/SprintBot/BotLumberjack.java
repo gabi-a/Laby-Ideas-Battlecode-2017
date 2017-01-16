@@ -16,7 +16,7 @@ public class BotLumberjack {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotLumberjack.rc = rc;
-		Util.updateBotCount(rc);
+		Util.reportDeath(rc);
 
 		if(strat == null){
 			float randStrat = (float)Math.random();
