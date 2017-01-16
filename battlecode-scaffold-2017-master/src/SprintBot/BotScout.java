@@ -63,7 +63,7 @@ public class BotScout {
 					}
 				}
 				
-				float inside = Util.willGetHit(rc, myLocation) ? 0.5f : 1.1f;
+				float inside = closestTreeToHideIn.getRadius() != 1f || Util.willGetHit(rc, myLocation) ? 0.5f : 1.01f;
 				
 				MapLocation desiredPosition = closestTreeToHideIn.getLocation().add(closestTreeToHideIn.getLocation().directionTo(enemyLocation), inside);
 
