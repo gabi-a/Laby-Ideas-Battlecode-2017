@@ -41,6 +41,38 @@ class CommsStack {
 	}
 }
 
+class CommsArray {
+	public int arrayStart;
+	public int arrayEnd;
+	public int[] array;
+	public int[] lastUpdated;
+
+	public void write(RobotController rc, int index, int data) throws GameActionException {
+		if(index > arrayEnd - arrayStart){
+			System.out.println("error: out of comms array bounds");
+			return;
+		}
+
+		rc.broadcast(arrayStart + index, data);
+		array[index] = data;
+		lastUpdated[index] = rc.getRoundNum();
+	}
+
+	public int read(RobotController rc, int index) throws GameActionException {
+		if(index > arrayEnd - arrayStart){
+			System.out.println("error: out of comms array bounds");
+			return -1;
+		}
+
+		if(lastUpdated[index] != rc.getRoundNum()){
+			array[index] = rc.readBroadcast(arrayStart + index);
+			lastUpdated[index] = rc.getRoundNum();
+		}
+
+		return array[index];
+	}
+}
+
 class CommsTree {
 	CommsStack trees;
 
