@@ -48,6 +48,14 @@ class CommsTree {
 		trees = new CommsStack(start, end);
 	}
 
+	public void push(RobotController rc, TreeInfo tree) throws GameActionException {
+		trees.push(rc, packTree(rc, tree));
+	}
+
+	public TreeInfo pop(RobotController rc) throws GameActionException {
+		return unpackTree(rc, trees.pop(rc));
+	}
+
 	public static int packTree(RobotController rc, TreeInfo tree){
 		return Comms.packLocation(rc, tree.getLocation()) + tree.getID()*(int)Math.pow(2,20);
 	}
@@ -66,8 +74,8 @@ public class Comms {
 	public static final CommsTree enemyTrees;
 
 	/* Example usage:
-	 * Comms.neutralTrees.push(TreeInfo stuff);
-	 * TreeInfo stuff = Comms.neutralTrees.pop();
+	 * Comms.neutralTrees.push(RobotController rc, TreeInfo stuff);
+	 * TreeInfo stuff = Comms.neutralTrees.pop(RobotController rc);
 	 */
 
 	static {
