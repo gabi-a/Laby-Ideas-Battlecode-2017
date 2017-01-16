@@ -6,7 +6,6 @@ public class BotArchon {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
-		
 		Util.updateBotCount(rc);
 		Util.reportDeath(rc);
 		
@@ -20,6 +19,19 @@ public class BotArchon {
 		
 		Nav.treeBug(rc);
 		
+	}
+	
+	public static boolean tryHireGardener() throws GameActionException {
+		Direction hireDirection = new Direction(0);
+		for (int i = 0; i < 8; i++) {
+			if (rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection, 5f))) {
+				rc.hireGardener(hireDirection);
+				Util.increaseNumBotsByOne(rc, RobotType.GARDENER);
+				return true;
+			}
+			hireDirection = hireDirection.rotateLeftRads((float) Math.PI * 0.25f);
+		}
+		return false;
 	}
 	
 }
