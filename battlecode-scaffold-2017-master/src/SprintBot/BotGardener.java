@@ -13,10 +13,6 @@ public class BotGardener {
 		Nav.treeBug(rc);
 		waterTrees();
 		
-		if(rc.getTeamBullets() >= 80 && Util.getNumBots(RobotType.SCOUT) < 1 + rc.getTreeCount()/Util.S) {
-			tryToBuild(RobotType.SCOUT);
-		}
-		
 		if(rc.getTeamBullets() > 50 && rc.getTreeCount() < Util.getNumBots(RobotType.GARDENER)*Util.T) {
 			plantTrees(myLocation);
 		}
