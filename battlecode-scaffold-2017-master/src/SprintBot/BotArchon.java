@@ -9,7 +9,7 @@ public class BotArchon {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
-		if(rc.canHireGardener(Direction.NORTH)) rc.hireGardener(Direction.NORTH);
+		if(rc.canHireGardener(Direction.getNorth())) rc.hireGardener(Direction.getNorth());
 	}
 	
 }
