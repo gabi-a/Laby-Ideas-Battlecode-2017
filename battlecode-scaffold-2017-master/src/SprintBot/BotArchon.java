@@ -12,13 +12,13 @@ public class BotArchon {
 		if(rc.getTeamBullets() > 10000) {
 			rc.donate(10000);
 		}
-		
-		if(rc.getTeamBullets() >= 100 && Util.getNumBots(RobotType.GARDENER) < 1 + 0.7f * rc.getTreeCount()/Util.G) {
+		System.out.format("\nGardeners %d, Trees %d\n",Util.getNumBots(RobotType.GARDENER),rc.getTreeCount());
+		if(rc.getTeamBullets() >= 100 && Util.getNumBots(RobotType.GARDENER) <= Math.min(7, rc.getTreeCount()/Util.G)) {
 			tryHireGardener();
 		}
 		
-		Nav.treeBug(rc);
-		
+		//Nav.treeBug(rc);
+		Nav.explore(rc);
 	}
 	
 	public static boolean tryHireGardener() throws GameActionException {

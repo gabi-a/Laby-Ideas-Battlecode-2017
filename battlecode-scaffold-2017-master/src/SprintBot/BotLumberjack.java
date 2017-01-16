@@ -18,10 +18,19 @@ public class BotLumberjack {
 		BotLumberjack.rc = rc;
 		Util.reportDeath(rc);
 
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		
+		if(enemies.length > 0) {
+			strat = Strategy.OFFENSE;
+		} else {
+			strat = Strategy.LUMBERJACK;
+		}
+		
 		if(strat == null){
-			float randStrat = (float)Math.random();
-			if(randStrat < 0.0) strat = Strategy.LUMBERJACK;
-			else strat = Strategy.OFFENSE;
+			strat = Strategy.LUMBERJACK;
+			//float randStrat = (float)Math.random();
+			//if(randStrat < 0.0) strat = Strategy.LUMBERJACK;
+			//else strat = Strategy.OFFENSE;
 		}
 
 		if(strat == Strategy.OFFENSE) {
@@ -33,7 +42,7 @@ public class BotLumberjack {
 
 			// Find target
 			if(enemyTarget == null){
-				RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+				//RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 				if(enemies.length == 0){
 					Nav.explore(rc);
 					return;

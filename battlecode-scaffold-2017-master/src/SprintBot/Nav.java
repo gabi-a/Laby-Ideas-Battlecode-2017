@@ -3,6 +3,18 @@ package SprintBot;
 import battlecode.common.*;
 
 public class Nav {
+	
+	public static boolean simpleRunAway(RobotController rc, MapLocation myLocation, RobotInfo[] nearbyEnemies, TreeInfo[] nearbyTrees) throws GameActionException {
+		MapLocation goalLoc = myLocation;
+		for(int i = nearbyEnemies.length;i-->0;) {
+			goalLoc = goalLoc.add(myLocation.directionTo(nearbyEnemies[i].getLocation()).opposite());
+		}
+		for(int i = nearbyTrees.length;i-->0;) {
+			goalLoc = goalLoc.add(myLocation.directionTo(nearbyTrees[i].getLocation()).opposite());
+		}
+		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
+	}
+	
 
 	/*
 	 * Tree Bug
@@ -22,13 +34,33 @@ public class Nav {
 	static TreeBugHands treeBugHand = TreeBugHands.LEFT;
 	static Direction treeBugHeading = Direction.getNorth();
 	static int treeBugstuckCount = 0;
-	static final int treeBugRotAngle = 15;
+	static int treeBugRotAngle = 45;
 	
 	static boolean treeBug(RobotController rc) throws GameActionException {
 
 		MapLocation myLocation = rc.getLocation();
-		rc.setIndicatorLine(rc.getLocation(), rc.getLocation().add(treeBugHeading,5), 255, 0, 0);
-
+		rc.setIndicatorLine(rc.getLocation(), rc.getLocation().add(treeBugHeading,3), 255, 0, 0);
+		TreeInfo[] trees = rc.senseNearbyTrees();
+		if(trees.length > 0) {
+			for(float tries = 1;(tries+=0.4f) < 4f;) {
+				treeBugHeading = myLocation.directionTo(trees[0].location).rotateLeftDegrees(treeBugRotAngle*tries);
+				rc.setIndicatorLine(rc.getLocation(), rc.getLocation().add(treeBugHeading,3), 0, 0, 255);
+				if(Nav.tryMove(rc, treeBugHeading)) break;
+				//if(rc.canMove(treeBugHeading)) {rc.move(treeBugHeading);break;}
+				
+			}
+			if(!rc.hasMoved()) {
+				treeBugRotAngle = -treeBugRotAngle;
+				for(float tries = 1;(tries+=0.4f) < 4f;) {
+					treeBugHeading = myLocation.directionTo(trees[0].location).rotateLeftDegrees(treeBugRotAngle*tries);
+					rc.setIndicatorLine(rc.getLocation(), rc.getLocation().add(treeBugHeading,3), 0, 0, 255);
+					if(Nav.tryMove(rc, treeBugHeading)) break;
+					//if(rc.canMove(treeBugHeading)) {rc.move(treeBugHeading);break;}
+				}
+			}
+		}
+		if(!rc.hasMoved()) Nav.explore(rc);
+		return true;
 		/*
 		if(treeBugstuckCount < 10) {
 			TreeInfo[] myTreesAhead = rc.senseNearbyTrees(myLocation.add(treeBugHeading), 2f, rc.getTeam());
@@ -40,6 +72,7 @@ public class Nav {
 			}
 		}
 		*/
+		/*
 		switch (treeBugHand) {
 
 		case LEFT:
@@ -78,9 +111,9 @@ public class Nav {
 			}
 
 			break;
-
 		}
-
+		*/
+		/*
 		if (Nav.tryMove(rc, treeBugHeading)) {
 			treeBugstuckCount--;
 			return true;
@@ -90,8 +123,9 @@ public class Nav {
 				treeBugHand = (treeBugHand == TreeBugHands.RIGHT) ? TreeBugHands.LEFT : TreeBugHands.RIGHT;	
 			}
 		}
+		*/
 
-		return false;
+		//return false;
 
 	}
 
