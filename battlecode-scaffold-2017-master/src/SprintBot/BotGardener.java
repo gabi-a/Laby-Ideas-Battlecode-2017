@@ -13,6 +13,10 @@ public class BotGardener {
 		Nav.treeBug(rc);
 		waterTrees();
 		
+		if(rc.getTeamBullets() >= 80 && Util.getNumBots(RobotType.SCOUT) < 1 + rc.getTreeCount()/Util.S) {
+			tryToBuild(RobotType.SCOUT);
+		}
+		
 		if(rc.getTeamBullets() > 50 && rc.getTreeCount() < Util.getNumBots(RobotType.GARDENER)*Util.T) {
 			plantTrees(myLocation);
 		}
@@ -54,4 +58,16 @@ public class BotGardener {
 		}
 		return false;
     }
+	static boolean tryToBuild(RobotType typeToBuild) throws GameActionException {
+		
+    	Direction buildDirection = new Direction(0);
+		for (int i = 0; i < 8; i++) {
+			if (rc.canBuildRobot(typeToBuild, buildDirection) && rc.onTheMap(rc.getLocation().add(buildDirection, 5f))) {
+				rc.buildRobot(typeToBuild, buildDirection);
+				return true;
+			}
+			buildDirection = buildDirection.rotateLeftRads((float) Math.PI * 0.25f);
+		}
+		return false;
+	}
 }
