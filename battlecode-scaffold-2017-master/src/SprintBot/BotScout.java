@@ -33,14 +33,17 @@ public class BotScout {
 
 		RobotInfo closestEnemy = null;
 		moved = Nav.avoidBullets(rc, myLocation);
-		if(!moved && nearbyEnemies.length > 0) {
+		
+		if(nearbyEnemies.length > 0) {
 			for(int i = 0; i<nearbyEnemies.length; i++) {
 				if(nearbyEnemies[i].getType() != RobotType.ARCHON) {
 					closestEnemy = nearbyEnemies[i];
 					break;
 				}
 			}
-			if(closestEnemy == null) closestEnemy = nearbyEnemies[0];
+		}
+		
+		if(!moved && closestEnemy != null) {
 			
 			MapLocation enemyLocation = closestEnemy.getLocation();
 			
