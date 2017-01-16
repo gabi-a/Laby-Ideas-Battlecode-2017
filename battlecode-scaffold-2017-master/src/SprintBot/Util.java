@@ -57,7 +57,7 @@ public class Util {
 			Direction nextMove = moveDirections[i-1].rotateLeftRads(deltaDirectionRads);
 			
 			float distToEnemy = myLocation.distanceTo(enemyLocationsCached[0]);
-			float turnsToImpact = 0.7f * distToEnemy / RobotType.SCOUT.bulletSpeed ;
+			float turnsToImpact = distToEnemy / RobotType.SCOUT.bulletSpeed ;
 			
 			return enemyLocationsCached[0].add(nextMove,strideDist*turnsToImpact);
 			
@@ -75,5 +75,48 @@ public class Util {
 	public static MapLocation halfwayLocation(MapLocation loc1, MapLocation loc2) {
 		return loc1.add(new Direction(loc1, loc2), loc1.distanceTo(loc2) / 2);
 	}
+	
+	
+	public static boolean willGetHit(RobotController rc, MapLocation myLocation) throws GameActionException {
+		
+		BulletInfo[] bullets = rc.senseNearbyBullets();
+		BulletInfo bullet;
+		if(bullets.length == 0) {
+			return false;
+		}
+		for(int i = bullets.length;i-->0;) {
+			bullet = bullets[i];
+			if(willCollideWithMe(rc, bullet, myLocation)) {
+				return true;
+			}
+		}
+		return false;
+	}	
+	
+	static boolean willCollideWithMe(RobotController rc, BulletInfo bullet, MapLocation loc) {
+
+        // Get relevant bullet information
+        Direction propagationDirection = bullet.dir;
+        MapLocation bulletLocation = bullet.location;
+
+        // Calculate bullet relations to this robot
+        Direction directionToRobot = bulletLocation.directionTo(loc);
+        float distToRobot = bulletLocation.distanceTo(loc);
+        float theta = propagationDirection.radiansBetween(directionToRobot);
+
+        // If theta > 90 degrees, then the bullet is traveling away from us and we can break early
+        if (Math.abs(theta) > Math.PI/2) {
+            return false;
+        }
+
+        // distToRobot is our hypotenuse, theta is our angle, and we want to know this length of the opposite leg.
+        // This is the distance of a line that goes from myLocation and intersects perpendicularly with propagationDirection.
+        // This corresponds to the smallest radius circle centered at our location that would intersect with the
+        // line that is the path of the bullet.
+        float perpendicularDist = (float)Math.abs(distToRobot * Math.sin(theta)); // soh cah toa :)
+
+        return (perpendicularDist <= rc.getType().bodyRadius);
+    }
+	
 	
 }

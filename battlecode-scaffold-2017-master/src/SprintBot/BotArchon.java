@@ -49,7 +49,7 @@ public class BotArchon {
 				}
 			}
 			if(archonDesignation == Archon.FIRST) {
-				rc.hireGardener(Direction.EAST);
+				rc.hireGardener(Direction.getEast());
 			}
 		}
 	}

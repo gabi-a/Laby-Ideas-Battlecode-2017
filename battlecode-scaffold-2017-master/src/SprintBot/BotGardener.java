@@ -9,7 +9,7 @@ public class BotGardener {
 		BotGardener.rc = rc;
 		
 		if(rc.getRoundNum() == 2) {
-			rc.buildRobot(RobotType.SCOUT, Direction.NORTH);
+			rc.buildRobot(RobotType.SCOUT, Direction.getNorth());
 		}
 	}
 }
