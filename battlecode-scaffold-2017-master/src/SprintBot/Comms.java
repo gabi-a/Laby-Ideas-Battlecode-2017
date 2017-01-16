@@ -41,6 +41,38 @@ class CommsStack {
 	}
 }
 
+class CommsArray {
+	public int arrayStart;
+	public int arrayEnd;
+	public int[] array;
+	public int[] lastUpdated;
+
+	public void write(RobotController rc, int index, int data) throws GameActionException {
+		if(index > arrayEnd - arrayStart){
+			System.out.println("error: out of comms array bounds");
+			return;
+		}
+
+		rc.broadcast(arrayStart + index, data);
+		array[index] = data;
+		lastUpdated[index] = rc.getRoundNum();
+	}
+
+	public int read(RobotController rc, int index) throws GameActionException {
+		if(index > arrayEnd - arrayStart){
+			System.out.println("error: out of comms array bounds");
+			return -1;
+		}
+
+		if(lastUpdated[index] != rc.getRoundNum()){
+			array[index] = rc.readBroadcast(arrayStart + index);
+			lastUpdated[index] = rc.getRoundNum();
+		}
+
+		return array[index];
+	}
+}
+
 class CommsTree {
 	CommsStack trees;
 
@@ -72,6 +104,12 @@ class CommsTree {
 }
 
 public class Comms {
+<<<<<<< HEAD
+=======
+	
+	public static final int ROBOT_NUMS_START = 703; // End is 709
+	
+>>>>>>> SprintSubmission
 	public static final CommsTree neutralTrees;
 	public static final CommsTree enemyTrees;
 
@@ -111,7 +149,14 @@ public class Comms {
 		MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
 		MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, -100);
 		
-		
 		return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
+	}
+	
+	public static void writeNumRobots(RobotController rc, RobotType type, int num) throws GameActionException {
+		rc.broadcast(ROBOT_NUMS_START-1+type.ordinal(), num);
+	}
+	
+	public static int readNumRobots(RobotController rc, RobotType type) throws GameActionException {
+		return rc.readBroadcast(ROBOT_NUMS_START-1+type.ordinal());
 	}
 }
