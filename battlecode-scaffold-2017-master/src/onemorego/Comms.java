@@ -1,13 +1,19 @@
 package onemorego;
 import battlecode.common.*;
 
+enum AttackGroup {
+	A, B, C, D, E, F
+}
+
 public class Comms {
 	
 	public static final int ROBOT_NUMS_START = 700; // End is 706
 	public static final int	GARDENER_PLANTING = 0;
 	public static final int	HOLD_TREE_PRODUCTION = 1;
-	public static final int ATTACK_LOCATION = 2;
-	public static final int ATTACK_ID = 3;
+	
+	// Up to 6 enemies to focus on attacking at once
+	// Each enemy is stored in two channels: one for MapLocation and one for ID
+	public static final int ATTACK_START = 2; // Goes to channel 12
 	
 	public static final CommsStack buildStack;
 	
@@ -25,25 +31,25 @@ public class Comms {
 		buildStack = new CommsStack(50, 100);
 	}
 
-	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id) throws GameActionException {
-		rc.broadcast(ATTACK_LOCATION, Comms.packLocation(rc, loc));
-		rc.broadcast(ATTACK_ID, id);
+	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id, AttackGroup group) throws GameActionException {
+		rc.broadcast(ATTACK_START+group.ordinal(), Comms.packLocation(rc, loc));
+		rc.broadcast(ATTACK_START+group.ordinal()+1, id);
 	}
 	
-	public static void clearAttackEnemy(RobotController rc) throws GameActionException {
-		rc.broadcast(ATTACK_LOCATION, 0);
-		rc.broadcast(ATTACK_ID, 0);
+	public static void clearAttackEnemy(RobotController rc, AttackGroup group) throws GameActionException {
+		rc.broadcast(ATTACK_START+group.ordinal(), 0);
+		rc.broadcast(ATTACK_START+group.ordinal()+1, 0);
 	}
 	
-	public static MapLocation readAttackLocation(RobotController rc) throws GameActionException {
-		int data = rc.readBroadcast(ATTACK_LOCATION);
+	public static MapLocation readAttackLocation(RobotController rc, AttackGroup group) throws GameActionException {
+		int data = rc.readBroadcast(ATTACK_START+group.ordinal());
 		if(data == 0)
 			return null;
 		return Comms.unpackLocation(rc, data);
 	}
 	
-	public static int readAttackID(RobotController rc) throws GameActionException {
-		return rc.readBroadcast(ATTACK_ID);
+	public static int readAttackID(RobotController rc, AttackGroup group) throws GameActionException {
+		return rc.readBroadcast(ATTACK_START+group.ordinal()+1);
 	}
 	
 	public static void writeHoldTreeProduction(RobotController rc, int hold) throws GameActionException {

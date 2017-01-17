@@ -1,6 +1,10 @@
 package onemorego;
 import battlecode.common.*;
 
+enum Strategy {
+	OFFENSE, DEFENSE, LUMBERJACK
+}
+
 public class Util {
 	static boolean reportedDeath = false;
 	static int[] botsBuilt = new int[6];
@@ -121,7 +125,7 @@ public class Util {
 		return bestTree;
 	}
 	
-	public static RobotInfo getClosestEnemy(RobotController rc, RobotInfo[] enemies) throws GameActionException {
+	public static RobotInfo getClosestEnemyExceptArchon(RobotController rc, RobotInfo[] enemies) throws GameActionException {
 		
 		RobotInfo closestEnemy = null;
 		
@@ -130,11 +134,13 @@ public class Util {
 		}
 
 		for(int i = 0; i<enemies.length; i++) {
-			if(enemies[i].getType() == RobotType.GARDENER || enemies[i].getType() == RobotType.ARCHON) {
-				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID());
+			if(enemies[i].getType() == RobotType.GARDENER) {
+				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.A);
+			} else if (enemies[i].getType() == RobotType.ARCHON) {
+				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.B);
 			}
-			if(enemies[i].getID() == Comms.readAttackID(rc) && enemies[i].getHealth() < 20f) {
-					Comms.clearAttackEnemy(rc);
+			if(enemies[i].getID() == Comms.readAttackID(rc, AttackGroup.A) && enemies[i].getHealth() < 20f) {
+					Comms.clearAttackEnemy(rc, AttackGroup.A);
 			}
 			if(enemies[i].getType() != RobotType.ARCHON) {
 				closestEnemy = enemies[i];
@@ -144,6 +150,26 @@ public class Util {
 		
 		return closestEnemy;
 	}
+	
+	public static RobotInfo getClosestEnemy(RobotController rc, RobotInfo[] enemies) throws GameActionException {
+		
+		if(enemies.length == 0) {
+			return null;
+		}
+
+		for(int i = 0; i<enemies.length; i++) {
+			if(enemies[i].getType() == RobotType.GARDENER) {
+				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.A);
+			} else if (enemies[i].getType() == RobotType.ARCHON) {
+				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.B);
+			}
+			if(enemies[i].getID() == Comms.readAttackID(rc, AttackGroup.A) && enemies[i].getHealth() < 20f) {
+					Comms.clearAttackEnemy(rc, AttackGroup.A);
+			}
+		}
+		return enemies[0];
+	}
+	
 	static boolean doesLineIntersectWithCircle(MapLocation lineStart, MapLocation lineEnd, MapLocation circleLocation, float circleRadius) {
 		
 		float theta = lineStart.directionTo(lineEnd).radiansBetween(lineStart.directionTo(circleLocation));
@@ -154,5 +180,8 @@ public class Util {
 		
 	}
 	
+	public static MapLocation halfwayLocation(MapLocation loc1, MapLocation loc2) {
+		return loc1.add(new Direction(loc1, loc2), loc1.distanceTo(loc2) / 2);
+	}
 	
 }
