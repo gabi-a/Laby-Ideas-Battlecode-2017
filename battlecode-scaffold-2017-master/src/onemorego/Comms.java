@@ -6,6 +6,8 @@ public class Comms {
 	public static final int ROBOT_NUMS_START = 700; // End is 706
 	public static final int	GARDENER_PLANTING = 0;
 	public static final int	HOLD_TREE_PRODUCTION = 1;
+	public static final int ATTACK_LOCATION = 2;
+	public static final int ATTACK_ID = 3;
 	
 	public static final CommsStack buildStack;
 	
@@ -21,6 +23,27 @@ public class Comms {
 		neutralTrees = new CommsTree(101,120);
 		//enemyTrees = new CommsTree(11,21);
 		buildStack = new CommsStack(50, 100);
+	}
+
+	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id) throws GameActionException {
+		rc.broadcast(ATTACK_LOCATION, Comms.packLocation(rc, loc));
+		rc.broadcast(ATTACK_ID, id);
+	}
+	
+	public static void clearAttackEnemy(RobotController rc) throws GameActionException {
+		rc.broadcast(ATTACK_LOCATION, 0);
+		rc.broadcast(ATTACK_ID, 0);
+	}
+	
+	public static MapLocation readAttackLocation(RobotController rc) throws GameActionException {
+		int data = rc.readBroadcast(ATTACK_LOCATION);
+		if(data == 0)
+			return null;
+		return Comms.unpackLocation(rc, data);
+	}
+	
+	public static int readAttackID(RobotController rc) throws GameActionException {
+		return rc.readBroadcast(ATTACK_ID);
 	}
 	
 	public static void writeHoldTreeProduction(RobotController rc, int hold) throws GameActionException {
