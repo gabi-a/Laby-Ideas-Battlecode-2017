@@ -28,7 +28,7 @@ public class BotScout {
 			targetLocation = commsTarget;
 		}
 
-		BulletInfo[] bullets = rc.senseNearbyBullets(10f);
+		BulletInfo[] bullets = rc.senseNearbyBullets(6f);
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		
 		MapLocation myLocation = rc.getLocation();
@@ -91,13 +91,16 @@ public class BotScout {
 					
 					// If in the best tree already then move to attack pos if not there already
 					boolean inAttackLocation = false;
+					
 					if(myLocation.distanceTo(bestTree.location) < RobotType.SCOUT.strideRadius) {
 						MapLocation attackLocation = (bestTree.radius > RobotType.SCOUT.bodyRadius) ? bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius) : bestTree.location;
 						rc.setIndicatorDot(attackLocation, 0, 0, 255);
-						if(myLocation.directionTo(attackLocation) == null) {
+						Direction attackDirection = myLocation.directionTo(attackLocation);
+						float attackDistance = myLocation.distanceTo(attackLocation);
+						if(myLocation == attackLocation) {
 							inAttackLocation = true; 
-						} else if(rc.canMove(myLocation.directionTo(attackLocation),  1.00f * myLocation.distanceTo(attackLocation))){
-							rc.move(myLocation.directionTo(attackLocation),  1.00f * myLocation.distanceTo(attackLocation));
+						} else if(rc.canMove(attackDirection,  attackDistance)){
+							rc.move(attackDirection,  attackDistance);
 						}
 					}
 				
