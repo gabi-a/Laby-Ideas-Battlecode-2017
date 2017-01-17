@@ -121,4 +121,27 @@ public class Util {
 		return bestTree;
 	}
 	
+	public static RobotInfo getClosestEnemy(RobotController rc, RobotInfo[] enemies) throws GameActionException {
+		
+		RobotInfo closestEnemy = null;
+		
+		if(enemies.length == 0) {
+			return null;
+		}
+
+		for(int i = 0; i<enemies.length; i++) {
+			if(enemies[i].getType() == RobotType.GARDENER || enemies[i].getType() == RobotType.ARCHON) {
+				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID());
+			}
+			if(enemies[i].getID() == Comms.readAttackID(rc) && enemies[i].getHealth() < 20f) {
+					Comms.clearAttackEnemy(rc);
+			}
+			if(enemies[i].getType() != RobotType.ARCHON) {
+				closestEnemy = enemies[i];
+				break;
+			}
+		}
+		
+		return closestEnemy;
+	}
 }
