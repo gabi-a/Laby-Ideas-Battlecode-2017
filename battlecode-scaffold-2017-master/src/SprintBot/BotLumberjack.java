@@ -20,7 +20,7 @@ public class BotLumberjack {
 
 		if(strat == null){
 			float randStrat = (float)Math.random();
-			if(randStrat < 0.0) strat = Strategy.LUMBERJACK;
+			if(randStrat < 0.3) strat = Strategy.LUMBERJACK;
 			else strat = Strategy.OFFENSE;
 		}
 
@@ -66,7 +66,7 @@ public class BotLumberjack {
 				treeTarget = Comms.neutralTrees.pop(rc);
 			}
 			if(treeTarget == null) {
-				TreeInfo[] trees = rc.senseNearbyTrees();
+				TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 				if(trees.length == 0){
 					Nav.explore(rc);
 					return;

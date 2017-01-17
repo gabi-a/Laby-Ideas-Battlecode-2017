@@ -14,7 +14,7 @@ class CommsStack {
 	public void push(RobotController rc, int data) throws GameActionException {
 		int stackPointer = rc.readBroadcast(stackStart);
 		
-		if (stackStart + stackPointer + 1 > stackEnd) {
+		if (stackStart + offset + stackPointer > stackEnd) {
 			System.out.println("Oops! Exceeded stack limit.");
 			return;
 		}
@@ -37,6 +37,52 @@ class CommsStack {
 		rc.broadcast(stackStart + offset + stackPointer, 0);
 		rc.broadcast(stackStart, stackPointer);
 		
+		return data;
+	}
+}
+
+class CommsQueue {
+	public int queueStart;
+	public int queueEnd;
+	public int offset = 1;
+
+	public CommsQueue(int start, int end){
+		queueStart = start;
+		queueEnd = end;
+	}
+
+	public void push(RobotController rc, int data) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+		int head = (queueData & 0xFF00) >> 8;
+		int tail = queueData & 0x00FF;
+
+		int newTail = tail + 1;
+		if(newTail > queueEnd) newTail = queueStart + offset;
+		// add check for wrapping around
+
+		rc.broadcast(queueStart + offset + tail, data);
+
+		queueData = (head << 8) | (tail);
+		rc.broadcast(queueStart, queueData);
+	}
+
+	public int pop(RobotController rc) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+		int head = (queueData & 0xFF00) >> 8;
+		int tail = queueData & 0x00FF;
+
+		int newHead = head + 1;
+		if(newHead > queueEnd) newHead = queueStart + offset;
+
+		if(tail == head) {
+			return -1;	// queue is empty
+		}
+
+		int data = rc.readBroadcast(queueStart + offset + tail);
+
+		queueData = (head << 8) | (tail);
+		rc.broadcast(queueStart, queueData);
+
 		return data;
 	}
 }
@@ -74,10 +120,10 @@ class CommsArray {
 }
 
 class CommsTree {
-	CommsStack trees;
+	CommsQueue trees;
 
 	public CommsTree(int start, int end) {
-		trees = new CommsStack(start, end);
+		trees = new CommsQueue(start, end);
 	}
 
 	public void push(RobotController rc, TreeInfo tree) throws GameActionException {
