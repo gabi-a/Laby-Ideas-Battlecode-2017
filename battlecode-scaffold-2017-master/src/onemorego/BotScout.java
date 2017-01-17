@@ -47,14 +47,14 @@ public class BotScout {
 			rc.setIndicatorLine(myLocation,enemies[0].location, 100, 0, 100);
 			TreeInfo bestTree = Util.findBestTree(rc, trees, closestEnemy);
 
-			if(myLocation.distanceTo(closestEnemy.location) <= 2.1f) {
+			if(myLocation.distanceTo(closestEnemy.location) <= 2.1f && closestEnemy.type != RobotType.GARDENER) {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location).opposite(), bullets);
 			}
 			else if(bestTree != null) {
 
 				rc.setIndicatorDot(bestTree.location, 255, 0, 0);
 
-				MapLocation attackLocation = (bestTree.radius > RobotType.SCOUT.bodyRadius) ? bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius) : bestTree.location;
+				MapLocation attackLocation = bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius);
 				rc.setIndicatorDot(attackLocation, 0, 0, 255);
 				Direction attackDirection = myLocation.directionTo(attackLocation);
 				float attackDistance = myLocation.distanceTo(attackLocation);
