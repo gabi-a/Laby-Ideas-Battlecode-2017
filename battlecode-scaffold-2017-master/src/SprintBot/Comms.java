@@ -58,7 +58,11 @@ class CommsQueue {
 
 		int newTail = tail + 1;
 		if(newTail > queueEnd) newTail = queueStart + offset;
-		// add check for wrapping around
+
+		if(newTail == head){
+			System.out.println("queue overflow");
+			return;
+		}
 
 		rc.broadcast(queueStart + offset + tail, data);
 
