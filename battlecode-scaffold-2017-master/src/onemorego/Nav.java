@@ -236,7 +236,7 @@ public class Nav {
 	}
 
 	static boolean pathTo(RobotController rc, MapLocation goal, RobotType[] avoid, float stride, BulletInfo[] bullets) throws GameActionException {
-
+		
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
 		
@@ -247,11 +247,11 @@ public class Nav {
 			moveState = MoveState.TOWARD_LEFT;
 		}
 
-		float degreeOffset = 15f;
+		float degreeOffset = 30f;
 		Direction trial;
 
 		// Idea: if we can go closer to the goal than we ever have before, do so.
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < 3; i++) {
 			trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 			if (rc.canMove(trial, stride) && myLocation.add(trial, stride).distanceTo(goal) < dMin
 					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride) && Nav.isSafeLocation(rc, goal, bullets)) {
@@ -279,7 +279,7 @@ public class Nav {
 
 		switch (moveState) {
 			case LEFT:
-				for (int i = 0; i < 12; i++) {
+				for (int i = 0; i < 6; i++) {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride) && Nav.isSafeLocation(rc, goal, bullets)) {
 						rc.move(trial, stride);
@@ -289,7 +289,7 @@ public class Nav {
 				}
 				break;
 			case RIGHT:
-				for (int i = 0; i < 12; i++) {
+				for (int i = 0; i < 6; i++) {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
 					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride) && Nav.isSafeLocation(rc, goal, bullets)) {
 						rc.move(trial, stride);
@@ -367,10 +367,6 @@ public static MapLocation[] getSafeMoveLocations(RobotController rc, BulletInfo[
 		}
 		
 		if(!rc.onTheMap(location)) {
-			return false;
-		}
-		RobotInfo[] robotsInStrikeRange = rc.senseNearbyRobots(location, 2f, rc.getTeam().opponent());
-		if(robotsInStrikeRange.length > 0) {
 			return false;
 		}
 		for(int i = bullets.length; i-->0;) {
