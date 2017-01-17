@@ -23,8 +23,11 @@ public class BotScout {
 		 * 
 		 */
 		
-		MapLocation commsTarget = Comms.readAttackLocation(rc);
+		MapLocation commsTarget = Comms.readAttackLocation(rc, AttackGroup.A);
 		if(commsTarget != null) {
+			if(commsTarget != targetLocation) {
+				exploreFlag = false;
+			}
 			targetLocation = commsTarget;
 		}
 
@@ -36,9 +39,10 @@ public class BotScout {
 		MapLocation[] safeMoveLocations = Nav.getSafeMoveLocations(rc, bullets);
 
 		TreeInfo[] trees = rc.senseNearbyTrees();
-		RobotInfo closestEnemy = Util.getClosestEnemy(rc, enemies);
+		RobotInfo closestEnemy = Util.getClosestEnemyExceptArchon(rc, enemies);
 		
 		if(closestEnemy != null) {
+			
 			
 			rc.setIndicatorLine(myLocation,enemies[0].location, 100, 0, 100);
 			TreeInfo bestTree = Util.findBestTree(rc, trees, closestEnemy);

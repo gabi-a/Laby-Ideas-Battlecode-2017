@@ -2,10 +2,6 @@ package onemorego;
 
 import battlecode.common.*;
 
-enum Strategy {
-	OFFENSE, DEFENSE, LUMBERJACK
-}
-
 public class BotLumberjack {
 	static RobotController rc;
 
