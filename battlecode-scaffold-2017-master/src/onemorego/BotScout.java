@@ -61,6 +61,9 @@ public class BotScout {
 				if(myLocation.directionTo(attackLocation) != null && rc.canMove(attackDirection,  attackDistance)) {
 					rc.move(attackDirection,  attackDistance);
 				}
+				if(rc.canShake(bestTree.ID)) {
+					rc.shake(bestTree.ID);
+				}
 
 			} 
 			else {

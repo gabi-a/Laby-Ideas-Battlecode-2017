@@ -72,6 +72,7 @@ public class BotGardener {
 		for(int i = 6; i-->0;) {
 			if(rc.canBuildRobot(typeToBuild, buildDirection)) {
 				rc.buildRobot(typeToBuild, buildDirection);
+				Util.increaseNumBotsByOne(rc, typeToBuild);
 				return true;
 			}
 			buildDirection = buildDirection.rotateLeftDegrees(60);
