@@ -95,6 +95,32 @@ public class Util {
 		}
 	}
 	
+	public static TreeInfo findBestTree(RobotController rc, TreeInfo[] trees, RobotInfo closestEnemy) {
+		TreeInfo bestTree = null;
+		
+		if(trees.length == 0) {
+			return null;
+		}
+
+		// Find best tree
+		float shortestDistanceToEnemy = 1000f;
+		for(int i = trees.length;i-->0;) {
+			if(trees[i].radius < 1f) {
+				continue;
+			}
+			if(rc.senseNearbyRobots(trees[i].location, trees[i].radius, null).length != 0) {
+				continue;
+			}
+			float distanceToEnemy = trees[i].location.distanceTo(closestEnemy.location);
+			if(distanceToEnemy < shortestDistanceToEnemy) {
+				shortestDistanceToEnemy = distanceToEnemy;
+				bestTree = trees[i];
+			}
+		}
+		
+		return bestTree;
+	}
+	
 	static boolean doesLineItersectWithCircle(MapLocation lineStart, MapLocation lineEnd, MapLocation circleLocation, float circleRadius) {
 		
 		float theta = lineStart.directionTo(lineEnd).radiansBetween(lineStart.directionTo(circleLocation));

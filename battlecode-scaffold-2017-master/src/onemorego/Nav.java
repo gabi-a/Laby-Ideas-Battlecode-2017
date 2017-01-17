@@ -389,13 +389,14 @@ public static MapLocation[] getSafeMoveLocations(RobotController rc, BulletInfo[
 
         // Calculate bullet relations to this robot
         Direction directionToRobot = bulletLocation.directionTo(loc);
-        float distToRobot = bulletLocation.distanceTo(loc);
         float theta = propagationDirection.radiansBetween(directionToRobot);
 
         // If theta > 90 degrees, then the bullet is traveling away from us and we can break early
         if (Math.abs(theta) > Math.PI/2) {
             return false;
         }
+		
+		float distToRobot = bulletLocation.distanceTo(loc);
 
         // distToRobot is our hypotenuse, theta is our angle, and we want to know this length of the opposite leg.
         // This is the distance of a line that goes from myLocation and intersects perpendicularly with propagationDirection.
