@@ -32,9 +32,9 @@ public class BotScout {
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		
 		MapLocation myLocation = rc.getLocation();
-		System.out.format("1 Bytecodes used: %d\n", Clock.getBytecodeNum());
+
 		MapLocation[] safeMoveLocations = Nav.getSafeMoveLocations(rc, bullets);
-		System.out.format("2 Bytecodes used: %d\n", Clock.getBytecodeNum());
+
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		RobotInfo closestEnemy = Util.getClosestEnemy(rc, enemies);
 		
@@ -70,10 +70,9 @@ public class BotScout {
 					break;
 				}
 				if(safeMoveLocation != null) {
-					if(!Nav.pathTo(rc, safeMoveLocation, bullets)) {
-						Nav.tryMove(rc, myLocation.directionTo(safeMoveLocation), bullets);
-					}
-				} else {
+					Nav.pathTo(rc, safeMoveLocation, bullets);
+				} 
+				else {
 					Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location).opposite(), bullets);
 				}
 			}
