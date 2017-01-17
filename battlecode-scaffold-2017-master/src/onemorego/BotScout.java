@@ -74,6 +74,9 @@ public class BotScout {
 					// Find best tree
 					float shortestDistanceToEnemy = 1000f;
 					for(int i = trees.length;i-->0;) {
+						if(trees[i].radius < 1f) {
+							continue;
+						}
 						if(rc.senseNearbyRobots(trees[i].location, trees[i].radius, null).length != 0) {
 							continue;
 						}
