@@ -95,4 +95,15 @@ public class Util {
 		}
 	}
 	
+	static boolean doesLineItersectWithCircle(MapLocation lineStart, MapLocation lineEnd, MapLocation circleLocation, float circleRadius) {
+		
+		float theta = lineStart.directionTo(lineEnd).radiansBetween(lineStart.directionTo(circleLocation));
+		float hypotenuse = lineStart.distanceTo(circleLocation);
+		float perpendicularDist = (float) (hypotenuse * Math.sin(theta));
+		
+		return perpendicularDist < circleRadius;
+		
+	}
+	
+	
 }
