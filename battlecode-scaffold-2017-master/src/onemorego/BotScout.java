@@ -14,6 +14,7 @@ public class BotScout {
 		BotScout.rc = rc;
 		Util.reportDeath(rc);
 		
+		//TODO: Don't shoot into trees (waste of bullets)
 			
 		/*
 		 * 
@@ -21,8 +22,13 @@ public class BotScout {
 		 * 
 		 * 
 		 */
+		
+		MapLocation commsTarget = Comms.readAttackLocation(rc);
+		if(commsTarget != null) {
+			targetLocation = commsTarget;
+		}
 
-		BulletInfo[] bullets = rc.senseNearbyBullets();
+		BulletInfo[] bullets = rc.senseNearbyBullets(10f);
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		
 		MapLocation myLocation = rc.getLocation();
@@ -38,6 +44,17 @@ public class BotScout {
 			RobotInfo closestEnemy = null;
 			
 			for(int i = 0; i<enemies.length; i++) {
+				
+				if(enemies[i].getType() == RobotType.GARDENER || enemies[i].getType() == RobotType.ARCHON) {
+					Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID());
+				}
+				
+				if(enemies[i].getID() == Comms.readAttackID(rc)) {
+					if(enemies[i].getHealth() < 20f) {
+						Comms.clearAttackEnemy(rc);
+					}
+				}
+				
 				if(enemies[i].getType() != RobotType.ARCHON) {
 					closestEnemy = enemies[i];
 					break;
@@ -150,67 +167,6 @@ public class BotScout {
 				Nav.explore(rc, bullets);
 			}
 		}
-		/*
-		if(enemies.length > 0) {
-			if(trees.length > 0) {
-				
-				for(int i = trees.length;i-->0;) {
-					if(rc.senseNearbyRobots(trees[i].location, trees[i].radius, rc.getTeam()).length == 0) {
-						closestTree = trees[i];
-					}
-				}
-				
-				if(closestTree == null) {
-					closestTree = trees[0];
-				}
-				
-				if(myLocation.distanceTo(closestTree.location) > closestTree.radius - 2f*RobotType.SCOUT.bodyRadius) {
-					rc.setIndicatorLine(myLocation, closestTree.location, 100, 0, 0);
-					
-					
-					MapLocation moveLocation = null;
-					float shortestDistanceToTree = 1000;
-					
-					RobotInfo enemyToAttack = null;
-					
-					for(int i = safeMoveLocations.length;i-->0;) {
-						for(int j = enemies.length; j-->0;) {
-							if(safeMoveLocations[i] == null) continue;
-							
-							MapLocation safeMoveLocation = safeMoveLocations[i];
-							float distanceToTree = safeMoveLocation.distanceTo(closestTree.location) + safeMoveLocation.distanceTo(enemies[j].location);
-							if(distanceToTree < shortestDistanceToTree) {
-								shortestDistanceToTree = distanceToTree;
-								moveLocation = safeMoveLocation;
-								enemyToAttack = enemies[j];
-							}
-						}
-						
-					}
-					rc.setIndicatorLine(myLocation, moveLocation, 0, 100, 0);
-					
-
-					if(myLocation.distanceTo(closestTree.location) < RobotType.SCOUT.strideRadius) {
-						MapLocation attackLocation = closestTree.location.add(closestTree.location.directionTo(enemyToAttack.location));
-						Nav.tryPrecisionMove(rc, myLocation.directionTo(attackLocation), Math.min(RobotType.SCOUT.strideRadius, myLocation.distanceTo(attackLocation)));
-					} else if (moveLocation != null) {
-						Nav.tryPrecisionMove(rc, myLocation.directionTo(moveLocation), Math.min(RobotType.SCOUT.strideRadius, shortestDistanceToTree));
-					}
-				}
-			}
-			if(rc.canFireSingleShot()) {
-				rc.fireSingleShot(myLocation.directionTo(enemies[0].location));
-			}
-			
-		} else {
-			if(!exploreFlag) {
-				Nav.pathTo(rc, targetLocation);
-				if(myLocation.distanceTo(targetLocation) < 5f) exploreFlag = true;
-			} else {
-				Nav.explore(rc);
-			}
-		}
-		*/
 		
 	}
 }
