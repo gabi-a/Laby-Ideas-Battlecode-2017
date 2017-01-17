@@ -144,7 +144,7 @@ public class Util {
 		
 		return closestEnemy;
 	}
-	static boolean doesLineItersectWithCircle(MapLocation lineStart, MapLocation lineEnd, MapLocation circleLocation, float circleRadius) {
+	static boolean doesLineIntersectWithCircle(MapLocation lineStart, MapLocation lineEnd, MapLocation circleLocation, float circleRadius) {
 		
 		float theta = lineStart.directionTo(lineEnd).radiansBetween(lineStart.directionTo(circleLocation));
 		float hypotenuse = lineStart.distanceTo(circleLocation);
