@@ -45,6 +45,7 @@ public class Util {
 	
 	public static MapLocation predictNextEnemyLocation(RobotInfo enemyTarget) throws GameActionException {
 		if(enemyTarget.getID() == enemyIDCached) {
+			
 			// Add current location to cache
 			// Run prediction
 			pushEnemyLocation(enemyTarget.getLocation());
@@ -52,9 +53,9 @@ public class Util {
 			float strideDist = 0;
 			int i = 0;
 			Direction[] moveDirections = new Direction[enemyLocationsCacheSize-1];
-			System.out.format("Bytecodes left: %d\n", Clock.getBytecodesLeft());
+			//System.out.format("Bytecodes left: %d\n", Clock.getBytecodesLeft());
 			while(i<enemyLocationsCacheSize-1) {
-				System.out.format("%d Bytecodes left: %d\n",i, Clock.getBytecodesLeft());
+				//System.out.format("%d Bytecodes left: %d\n",i, Clock.getBytecodesLeft());
 				MapLocation afterLoc = enemyLocationsCached[i];
 				MapLocation beforeLoc = enemyLocationsCached[i+1];
 				if(beforeLoc == null || beforeLoc == afterLoc) break;
@@ -74,7 +75,7 @@ public class Util {
 				i++;
 			}
 			if (i == 0) return enemyLocationsCached[0];
-			System.out.format("Bytecodes left: %d\n", Clock.getBytecodesLeft());
+			//System.out.format("Bytecodes left: %d\n", Clock.getBytecodesLeft());
 			deltaDirectionRads /= i;
 			Direction nextMove = moveDirections[i-1].rotateLeftRads(deltaDirectionRads);
 			

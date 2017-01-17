@@ -42,6 +42,13 @@ public class BotArchon {
 			buildState = 2;
 		}
 		
+		if(rc.getTreeCount() > 8 && buildState == 2) {
+			Comms.writeHoldTreeProduction(rc, 1);
+			for(int i = 10;i-->0;) {
+				Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
+			}
+		}
+		
 		
 		Nav.explore(rc, bullets);
 		System.out.println(Comms.readGardenerFinishedPlanting(rc)+"\n");

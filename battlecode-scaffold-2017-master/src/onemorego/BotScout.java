@@ -26,7 +26,9 @@ public class BotScout {
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		
 		MapLocation myLocation = rc.getLocation();
+		System.out.format("1 Bytecodes used: %d\n", Clock.getBytecodeNum());
 		MapLocation[] safeMoveLocations = Nav.getSafeMoveLocations(rc, bullets);
+		System.out.format("2 Bytecodes used: %d\n", Clock.getBytecodeNum());
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		
 		if(enemies.length > 0) {

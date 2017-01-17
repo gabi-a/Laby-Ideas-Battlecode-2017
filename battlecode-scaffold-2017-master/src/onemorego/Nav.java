@@ -369,6 +369,10 @@ public static MapLocation[] getSafeMoveLocations(RobotController rc, BulletInfo[
 		if(!rc.onTheMap(location)) {
 			return false;
 		}
+		RobotInfo[] robotsInStrikeRange = rc.senseNearbyRobots(location, 2f, rc.getTeam().opponent());
+		if(robotsInStrikeRange.length > 0) {
+			return false;
+		}
 		for(int i = bullets.length; i-->0;) {
 			if(willCollideWithMe(rc, bullets[i], location)) {
 				return false;
@@ -376,10 +380,6 @@ public static MapLocation[] getSafeMoveLocations(RobotController rc, BulletInfo[
 			if(bullets[i].location.distanceTo(location) < 2f) {
 				return false;
 			}
-		}
-		RobotInfo[] robotsInStrikeRange = rc.senseNearbyRobots(location, 2f, rc.getTeam().opponent());
-		if(robotsInStrikeRange.length > 0) {
-			return false;
 		}
 		
 		return true;
