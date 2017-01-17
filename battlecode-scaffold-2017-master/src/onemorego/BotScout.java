@@ -62,70 +62,27 @@ public class BotScout {
 			}
 			
 			if(closestEnemy != null) {
+				
 				rc.setIndicatorLine(myLocation,enemies[0].location, 100, 0, 100);
+				TreeInfo bestTree = Util.findBestTree(rc, trees, closestEnemy);
 				
 				if(myLocation.distanceTo(closestEnemy.location) <= 2.1f) {
 					Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location).opposite(), bullets);
 				}
-				
-				else if(trees.length > 0) {
-					TreeInfo bestTree = trees[0];
-		
-					// Find best tree
-					float shortestDistanceToEnemy = 1000f;
-					for(int i = trees.length;i-->0;) {
-						if(trees[i].radius < 1f) {
-							continue;
-						}
-						if(rc.senseNearbyRobots(trees[i].location, trees[i].radius, null).length != 0) {
-							continue;
-						}
-						float distanceToEnemy = trees[i].location.distanceTo(closestEnemy.location);
-						if(distanceToEnemy < shortestDistanceToEnemy) {
-							shortestDistanceToEnemy = distanceToEnemy;
-							bestTree = trees[i];
-						}
-					}
+				else if(bestTree != null) {
 					
 					rc.setIndicatorDot(bestTree.location, 255, 0, 0);
-					
-					// If in the best tree already then move to attack pos if not there already
-					boolean inAttackLocation = false;
-					
-					if(myLocation.distanceTo(bestTree.location) < RobotType.SCOUT.strideRadius) {
-						MapLocation attackLocation = (bestTree.radius > RobotType.SCOUT.bodyRadius) ? bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius) : bestTree.location;
-						rc.setIndicatorDot(attackLocation, 0, 0, 255);
-						Direction attackDirection = myLocation.directionTo(attackLocation);
-						float attackDistance = myLocation.distanceTo(attackLocation);
-						if(myLocation == attackLocation) {
-							inAttackLocation = true; 
-						} else if(rc.canMove(attackDirection,  attackDistance)){
-							rc.move(attackDirection,  attackDistance);
-						}
+
+					MapLocation attackLocation = (bestTree.radius > RobotType.SCOUT.bodyRadius) ? bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius) : bestTree.location;
+					rc.setIndicatorDot(attackLocation, 0, 0, 255);
+					Direction attackDirection = myLocation.directionTo(attackLocation);
+					float attackDistance = myLocation.distanceTo(attackLocation);
+					if(myLocation.directionTo(attackLocation) != null && rc.canMove(attackDirection,  attackDistance)) {
+						rc.move(attackDirection,  attackDistance);
 					}
-				
-					// If not in tree, go to it
-					else {
-						float shortestDistanceToTree = 1000f;
-						MapLocation moveLocation = null;
-						for(int i = safeMoveLocations.length;i-->0;) {
-							if(safeMoveLocations[i] == null) continue;
-							MapLocation safeMoveLocation = safeMoveLocations[i];
-							float distanceToTree = safeMoveLocation.distanceTo(bestTree.location);
-							if(distanceToTree < shortestDistanceToTree) {
-								shortestDistanceToTree = distanceToTree;
-								moveLocation = safeMoveLocation;
-							}
-						}
-						if(moveLocation != null) {
-							if(!Nav.pathTo(rc, moveLocation, bullets)) {
-								Nav.tryMove(rc, myLocation.directionTo(moveLocation), bullets);
-							}
-						} else {
-							Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location).opposite(), bullets);
-						}
-					}
-				} else {
+						
+				} 
+				else {
 					rc.setIndicatorDot(myLocation, 0, 255, 0);
 					
 					// Do safe moves
