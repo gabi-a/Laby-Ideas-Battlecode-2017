@@ -1,9 +1,10 @@
-package SprintBot;
-
+package onemorego;
 import battlecode.common.*;
 
 public class Nav {
-
+	
+	static Direction heading = Direction.getNorth();
+	
 	/*
 	 * Tree Bug
 	 * 
@@ -24,22 +25,10 @@ public class Nav {
 	static int treeBugstuckCount = 0;
 	static final int treeBugRotAngle = 15;
 	
-	static boolean treeBug(RobotController rc) throws GameActionException {
+	static boolean treeBug(RobotController rc, BulletInfo[] bullets) throws GameActionException {
 
 		MapLocation myLocation = rc.getLocation();
-		rc.setIndicatorLine(rc.getLocation(), rc.getLocation().add(treeBugHeading,5), 255, 0, 0);
 
-		/*
-		if(treeBugstuckCount < 10) {
-			TreeInfo[] myTreesAhead = rc.senseNearbyTrees(myLocation.add(treeBugHeading), 2f, rc.getTeam());
-			if(myTreesAhead.length > 0) {
-				TreeInfo treeAhead = myTreesAhead[0];
-				if(treeAhead.health < 0.8f * treeAhead.maxHealth && Nav.tryMove(rc, myLocation.directionTo(treeAhead.location))) {
-					return true;
-				}
-			}
-		}
-		*/
 		switch (treeBugHand) {
 
 		case LEFT:
@@ -47,10 +36,8 @@ public class Nav {
 			// Uses 100 bytecodes
 			TreeInfo[] leftTrees = rc.senseNearbyTrees(myLocation.add(treeBugHeading.rotateLeftDegrees(90), 2f), 1f,
 					null);
-			rc.setIndicatorLine(rc.getLocation(), myLocation.add(treeBugHeading.rotateLeftDegrees(90), 5f), 0, 0, 255);
-
 			if (leftTrees.length > 0) {
-				if (Nav.tryMove(rc, treeBugHeading)) {
+				if (Nav.tryMove(rc, treeBugHeading, bullets)) {
 					return true;
 				} else {
 					treeBugHeading = treeBugHeading.rotateRightDegrees(treeBugRotAngle);
@@ -65,10 +52,8 @@ public class Nav {
 			// Uses 100 bytecodes
 			TreeInfo[] rightTrees = rc.senseNearbyTrees(myLocation.add(treeBugHeading.rotateRightDegrees(90), 2f), 1f,
 					null);
-			rc.setIndicatorLine(rc.getLocation(), myLocation.add(treeBugHeading.rotateRightDegrees(90), 5f), 0, 0, 255);
-
 			if (rightTrees.length > 0) {
-				if (Nav.tryMove(rc, treeBugHeading)) {
+				if (Nav.tryMove(rc, treeBugHeading, bullets)) {
 					return true;
 				} else {
 					treeBugHeading = treeBugHeading.rotateLeftDegrees(treeBugRotAngle);
@@ -81,12 +66,12 @@ public class Nav {
 
 		}
 
-		if (Nav.tryMove(rc, treeBugHeading)) {
+		if (Nav.tryMove(rc, treeBugHeading, bullets)) {
 			treeBugstuckCount--;
 			return true;
 		} else {
 			treeBugstuckCount++;
-			if(!Nav.bugExplore(rc) && treeBugstuckCount > 10) {
+			if(!Nav.bugExplore(rc, bullets) && treeBugstuckCount > 10) {
 				treeBugHand = (treeBugHand == TreeBugHands.RIGHT) ? TreeBugHands.LEFT : TreeBugHands.RIGHT;	
 			}
 		}
@@ -94,16 +79,24 @@ public class Nav {
 		return false;
 
 	}
-
-	public static boolean tryMove(RobotController rc, Direction dir) throws GameActionException {
-		return tryMove(rc, dir, 5, 10);
+	
+	public static boolean tryMove(RobotController rc, Direction dir, BulletInfo[] bullets) throws GameActionException {
+		return tryMove(rc, dir, 5, 10, bullets);
+	}
+	
+	public static boolean tryPrecisionMove(RobotController rc, Direction dir, float stride, BulletInfo[] bullets) throws GameActionException {
+		return tryPrecisionMove(rc, dir, 5, 10, stride, bullets);
 	}
 
-	static boolean tryMove(RobotController rc, Direction dir, float degreeOffset, int checksPerSide)
+	static boolean tryMove(RobotController rc, Direction dir, float degreeOffset, int checksPerSide, BulletInfo[] bullets)
 			throws GameActionException {
 
+		MapLocation myLocation = rc.getLocation();
+		MapLocation moveLocation;
+		
 		// First, try intended direction
-		if (rc.canMove(dir)) {
+		moveLocation = myLocation.add(dir,rc.getType().strideRadius);
+		if (rc.canMove(dir) && isSafeLocation(rc, moveLocation, bullets)) {
 			rc.move(dir);
 			return true;
 		}
@@ -114,13 +107,15 @@ public class Nav {
 
 		while (currentCheck <= checksPerSide) {
 			// Try the offset of the left side
-			if (rc.canMove(dir.rotateLeftDegrees(degreeOffset * currentCheck))) {
+			moveLocation = myLocation.add(dir.rotateLeftDegrees(degreeOffset * currentCheck),rc.getType().strideRadius);
+			if (rc.canMove(dir.rotateLeftDegrees(degreeOffset * currentCheck)) && Nav.isSafeLocation(rc, moveLocation, bullets)) {
 				rc.move(dir.rotateLeftDegrees(degreeOffset * currentCheck));
 				treeBugHeading = dir;
 				return true;
 			}
 			// Try the offset on the right side
-			if (rc.canMove(dir.rotateRightDegrees(degreeOffset * currentCheck))) {
+			moveLocation = myLocation.add(dir.rotateRightDegrees(degreeOffset * currentCheck),rc.getType().strideRadius);
+			if (rc.canMove(dir.rotateRightDegrees(degreeOffset * currentCheck)) && Nav.isSafeLocation(rc, moveLocation, bullets)) {
 				rc.move(dir.rotateRightDegrees(degreeOffset * currentCheck));
 				treeBugHeading = dir;
 				return true;
@@ -134,13 +129,55 @@ public class Nav {
 		// Clock.getBytecodesLeft()+" bytecodes left");
 		return false;
 	}
+	
+	static boolean tryPrecisionMove(RobotController rc, Direction dir, float degreeOffset, int checksPerSide, float stride, BulletInfo[] bullets)
+			throws GameActionException {
 
-	public static boolean bugExplore(RobotController rc) throws GameActionException {
+		MapLocation myLocation = rc.getLocation();
+		MapLocation moveLocation;
+		
+		// First, try intended direction
+		moveLocation = myLocation.add(dir,rc.getType().strideRadius);
+		if (rc.canMove(dir,stride) && isSafeLocation(rc, moveLocation, bullets)) {
+			rc.move(dir);
+			return true;
+		}
+
+		// Now try a bunch of similar angles
+		boolean moved = false;
+		int currentCheck = 1;
+
+		while (currentCheck <= checksPerSide) {
+			// Try the offset of the left side
+			moveLocation = myLocation.add(dir.rotateLeftDegrees(degreeOffset * currentCheck),stride);
+			if (rc.canMove(dir.rotateLeftDegrees(degreeOffset * currentCheck),stride) && Nav.isSafeLocation(rc, moveLocation, bullets)) {
+				rc.move(dir.rotateLeftDegrees(degreeOffset * currentCheck),stride);
+				treeBugHeading = dir;
+				return true;
+			}
+			// Try the offset on the right side
+			moveLocation = myLocation.add(dir.rotateRightDegrees(degreeOffset * currentCheck),stride);
+			if (rc.canMove(dir.rotateRightDegrees(degreeOffset * currentCheck),stride) && Nav.isSafeLocation(rc, moveLocation, bullets)) {
+				rc.move(dir.rotateRightDegrees(degreeOffset * currentCheck),stride);
+				treeBugHeading = dir;
+				return true;
+			}
+			// No move performed, try slightly further
+			currentCheck++;
+		}
+
+		// A move never happened, so return false.
+		// System.out.println("I'm stuck! :( I have "+
+		// Clock.getBytecodesLeft()+" bytecodes left");
+		return false;
+	}
+	
+	public static boolean bugExplore(RobotController rc, BulletInfo bullets[]) throws GameActionException {
 		MapLocation myLocation = rc.getLocation();
 		int moveAttemptCount = 0;
 		while (moveAttemptCount < 30) {
 			if (rc.onTheMap(myLocation.add(treeBugHeading, rc.getType().strideRadius + rc.getType().bodyRadius),
-					rc.getType().bodyRadius + 2f) && Nav.tryMove(rc, treeBugHeading)) {
+					rc.getType().bodyRadius + 2f) && Nav.tryMove(rc, treeBugHeading, bullets)) {
 				return true;
 			}
 			treeBugHeading = Nav.randomDirection();
@@ -148,7 +185,40 @@ public class Nav {
 		}
 		return false;
 	}
+	
+	public static Direction randomDirection() {
+        return new Direction((float)Math.random() * 2 * (float)Math.PI);
+    }
+	
+	public static boolean explore(RobotController rc, BulletInfo[] bullets) throws GameActionException {
+    	MapLocation myLocation = rc.getLocation();
+    	int moveAttemptCount = 0;
+    	while(moveAttemptCount < 30) {
+    		if(rc.onTheMap(myLocation.add(heading,rc.getType().strideRadius + rc.getType().bodyRadius ),rc.getType().bodyRadius+2f) 
+					&& Nav.tryMove(rc, heading, bullets)) {
+    				return true;
+    		}
+    		heading = Nav.randomDirection();
+    		moveAttemptCount++;
+    	}
+    	return false;
+    }
+	
+	
+	/*
+	 * 
+	 *  Magic pathing
+	 * 
+	 * 
+	 * 
+	 */
+	
+	static MoveState moveState = MoveState.TOWARD_LEFT;
+	static float dMin = 10000f;
+	static MapLocation goalCache = new MapLocation(-1, -1);
 
+	static Team myTeam = RobotPlayer.rc.getTeam();
+	
 	public static enum MoveState {
 		LEFT,
 		RIGHT,
@@ -156,65 +226,16 @@ public class Nav {
 		TOWARD_RIGHT
 	}
 	
-	// NAVIGATION VARIABLES
-	static MoveState moveState = MoveState.TOWARD_LEFT;
-	static float dMin = 10000f;
-	static MapLocation goalCache = new MapLocation(-1, -1);
-
-	static Team myTeam = RobotPlayer.rc.getTeam();
-    static Direction heading = Nav.randomDirection();
-
-    
-	public static boolean tryPrecisionMove(RobotController rc, Direction dir, float stride) throws GameActionException {
-        return tryPrecisionMove(rc, dir,5,10, stride);
-    }
-	
-	static boolean tryPrecisionMove(RobotController rc, Direction dir, float degreeOffset, int checksPerSide, float stride) throws GameActionException {
-		MapLocation myLocation = rc.getLocation();
-        // First, try intended direction
-        if (rc.canMove(dir,stride) && rc.senseNearbyBullets(myLocation.add(dir,stride), rc.getType().bodyRadius).length == 0) {
-            rc.move(dir,stride);
-            return true;
-        }
-
-        // Now try a bunch of similar angles
-        boolean moved = false;
-        int currentCheck = 1;
-
-        while(currentCheck<=checksPerSide) {
-            // Try the offset of the left side
-            if(rc.canMove(dir.rotateLeftDegrees(degreeOffset*currentCheck),stride) && rc.senseNearbyBullets(myLocation.add(dir,stride), rc.getType().bodyRadius).length == 0) {
-                rc.move(dir.rotateLeftDegrees(degreeOffset*currentCheck),stride);
-                return true;
-            }
-            // Try the offset on the right side
-            if(rc.canMove(dir.rotateRightDegrees(degreeOffset*currentCheck),stride) && rc.senseNearbyBullets(myLocation.add(dir,stride), rc.getType().bodyRadius).length == 0) {
-                rc.move(dir.rotateRightDegrees(degreeOffset*currentCheck),stride);
-                return true;
-            }
-            // No move performed, try slightly further
-            currentCheck++;
-        }
-
-        // A move never happened, so return false.
-        //System.out.println("I'm stuck! :( I have "+ Clock.getBytecodesLeft()+" bytecodes left");
-        return false;
-    }
-    
-    public static Direction randomDirection() {
-        return new Direction((float)Math.random() * 2 * (float)Math.PI);
-    }
-    
-    static boolean pathTo(RobotController rc, MapLocation goal) throws GameActionException {
+	static boolean pathTo(RobotController rc, MapLocation goal, BulletInfo[] bullets) throws GameActionException {
 		RobotType[] avoid = new RobotType[0];
-		return pathTo(rc, goal, avoid, rc.getType().strideRadius); 
+		return pathTo(rc, goal, avoid, rc.getType().strideRadius, bullets); 
 	}
 	
-	static boolean pathTo(RobotController rc, MapLocation goal, RobotType[] avoid) throws GameActionException {
-		return pathTo(rc, goal, avoid, rc.getType().strideRadius); 
+	static boolean pathTo(RobotController rc, MapLocation goal, RobotType[] avoid, BulletInfo[] bullets) throws GameActionException {
+		return pathTo(rc, goal, avoid, rc.getType().strideRadius, bullets); 
 	}
 
-	static boolean pathTo(RobotController rc, MapLocation goal, RobotType[] avoid, float stride) throws GameActionException {
+	static boolean pathTo(RobotController rc, MapLocation goal, RobotType[] avoid, float stride, BulletInfo[] bullets) throws GameActionException {
 
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
@@ -233,7 +254,7 @@ public class Nav {
 		for (int i = 0; i < 7; i++) {
 			trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 			if (rc.canMove(trial, stride) && myLocation.add(trial, stride).distanceTo(goal) < dMin
-					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride) && Nav.isSafeLocation(rc, goal, bullets)) {
 				rc.move(trial, stride);
 				dMin = myLocation.add(trial, stride).distanceTo(goal);
 				moveState = chooseMoveState();
@@ -241,7 +262,7 @@ public class Nav {
 			}
 			trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
 			if (rc.canMove(trial, stride) && myLocation.add(trial, stride).distanceTo(goal) < dMin
-					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride) && Nav.isSafeLocation(rc, goal, bullets)) {
 				rc.move(trial, stride);
 				dMin = myLocation.add(trial, stride).distanceTo(goal);
 				moveState = chooseMoveState();
@@ -260,7 +281,7 @@ public class Nav {
 			case LEFT:
 				for (int i = 0; i < 12; i++) {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
-					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride) && Nav.isSafeLocation(rc, goal, bullets)) {
 						rc.move(trial, stride);
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
 						return true;
@@ -270,7 +291,7 @@ public class Nav {
 			case RIGHT:
 				for (int i = 0; i < 12; i++) {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
-					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride) && Nav.isSafeLocation(rc, goal, bullets)) {
 						rc.move(trial, stride);
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
 						return true;
@@ -312,67 +333,57 @@ public class Nav {
 		return false;
 	}
 	
-	
-	
-	/*
-	public static boolean avoidBullets(RobotController rc, MapLocation myLocation) throws GameActionException {
+public static MapLocation[] getSafeMoveLocations(RobotController rc, BulletInfo[] bullets) throws GameActionException {
 		
-		BulletInfo[] bullets = rc.senseNearbyBullets();
-		BulletInfo bullet;
-		MapLocation goalLoc = myLocation;
-		if(bullets.length == 0) {
-			return false;
-		}
-		for(int i = bullets.length;i-->0;) {
-			bullet = bullets[i];
-			if(willCollideWithMe(rc, bullet, myLocation)) {
-				goalLoc = goalLoc.add(bullet.dir.rotateLeftDegrees(90));
+		MapLocation myLocation = rc.getLocation();
+		
+		MapLocation[] possibleLocations = new MapLocation[]{
+				myLocation,
+				myLocation.add(0f, 2f), 
+				myLocation.add(1.0472f, 2f),
+				myLocation.add(2.0944f, 2f),
+				myLocation.add(3.1416f, 2f),
+				myLocation.add(4.1888f, 2f),
+				myLocation.add(5.2360f, 2f),
+		};
+		
+		MapLocation[] safeLocations = new MapLocation[possibleLocations.length];
+		
+		for(int i = possibleLocations.length;i-->0;) {
+			if(isSafeLocation(rc, possibleLocations[i], bullets)) {
+				rc.setIndicatorDot(possibleLocations[i], 0, 50, 0);
+				safeLocations[i] = possibleLocations[i];
 			}
 		}
-		if(goalLoc == myLocation) {
+		
+		return safeLocations;
+		
+	}
+	
+	public static boolean isSafeLocation(RobotController rc, MapLocation location, BulletInfo[] bullets) throws GameActionException {
+
+		if(!rc.canSenseLocation(location)) {
+			location = rc.getLocation().add(rc.getLocation().directionTo(location), rc.getType().strideRadius);
+		}
+		
+		if(!rc.onTheMap(location)) {
 			return false;
 		}
-		return Nav.tryPrecisionMove(rc, myLocation.directionTo(goalLoc), rc.getType().strideRadius);
-		
-	}	
-	*/
-	
-	
-	
-	public static boolean explore(RobotController rc) throws GameActionException {
-    	MapLocation myLocation = rc.getLocation();
-    	int moveAttemptCount = 0;
-    	while(moveAttemptCount < 30) {
-    		if(rc.onTheMap(myLocation.add(heading,rc.getType().strideRadius + rc.getType().bodyRadius ),rc.getType().bodyRadius+2f) 
-					&& Nav.tryPrecisionMove(rc, heading, rc.getType().strideRadius)) {
-    				return true;
-    		}
-    		heading = Nav.randomDirection();
-    		moveAttemptCount++;
-    	}
-    	return false;
-    }
-	
-public static boolean avoidBullets(RobotController rc, MapLocation myLocation) throws GameActionException {
-		
-		BulletInfo[] bullets = rc.senseNearbyBullets();
-		BulletInfo bullet;
-		MapLocation goalLoc = myLocation;
-		if(bullets.length == 0) {
-			return false;
-		}
-		for(int i = bullets.length;i-->0;) {
-			bullet = bullets[i];
-			if(willCollideWithMe(rc, bullet, myLocation)) {
-				goalLoc = goalLoc.add(bullet.dir.rotateLeftDegrees(90));
+		for(int i = bullets.length; i-->0;) {
+			if(willCollideWithMe(rc, bullets[i], location)) {
+				return false;
+			}
+			if(bullets[i].location.distanceTo(location) < 2f) {
+				return false;
 			}
 		}
-		if(goalLoc == myLocation) {
+		RobotInfo[] robotsInStrikeRange = rc.senseNearbyRobots(location, 2f, rc.getTeam().opponent());
+		if(robotsInStrikeRange.length > 0) {
 			return false;
 		}
-		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
 		
-	}	
+		return true;
+	}
 	
 	static boolean willCollideWithMe(RobotController rc, BulletInfo bullet, MapLocation loc) {
 
