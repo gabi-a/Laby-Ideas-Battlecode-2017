@@ -6,6 +6,7 @@ public class BotLumberjack {
 	static RobotController rc;
 
 	static TreeInfo treeTarget;
+	static TreeInfo tempTreeTarget;
 	static RobotInfo enemyTarget;
 	static MapLocation home;
 	static Strategy strat;
@@ -74,22 +75,23 @@ public class BotLumberjack {
 				if(!Nav.pathTo(rc, enemyTarget.getLocation(), bullets)) {
 					
 					// Can't move, so do what a lumberjack does best
-					
-					TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
-					if(trees.length == 0){
-						Nav.explore(rc, bullets);
-						return;
+					if(tempTreeTarget == null) {
+						TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
+						if(trees.length == 0){
+							Nav.explore(rc, bullets);
+							return;
+						}
+						tempTreeTarget = trees[0];
 					}
-					treeTarget = trees[0];
 					
 					// Chop target
-					if(rc.canChop(treeTarget.getID())){
-						rc.chop(treeTarget.getID());
+					if(rc.canChop(tempTreeTarget.getID())){
+						rc.chop(tempTreeTarget.getID());
 					}
 
 					// Check if target is dead
-					if(rc.canSenseLocation(treeTarget.getLocation()) && !rc.canSenseTree(treeTarget.getID())) {
-						treeTarget = null;
+					if(rc.canSenseLocation(tempTreeTarget.getLocation()) && !rc.canSenseTree(tempTreeTarget.getID())) {
+						tempTreeTarget = null;
 					}
 					
 				}

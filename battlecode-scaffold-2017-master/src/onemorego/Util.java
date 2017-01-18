@@ -180,7 +180,7 @@ public class Util {
 
 		if(lineStart.directionTo(circleLocation) == null || lineEnd.directionTo(circleLocation) == null) return false;
 		
-		System.out.format("Line Start: %f,%f  Circle Loc: %f,%f\n", lineStart.x,lineStart.y,circleLocation.x,circleLocation.y);
+		//System.out.format("Line Start: %f,%f  Circle Loc: %f,%f\n", lineStart.x,lineStart.y,circleLocation.x,circleLocation.y);
 		float theta = lineStart.directionTo(lineEnd).radiansBetween(lineStart.directionTo(circleLocation));
 		float hypotenuse = lineStart.distanceTo(circleLocation);
 		float perpendicularDist = (float) (hypotenuse * Math.sin(theta));
