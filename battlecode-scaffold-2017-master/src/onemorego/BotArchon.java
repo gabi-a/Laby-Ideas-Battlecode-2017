@@ -74,14 +74,15 @@ public class BotArchon {
 				buildState = 2;
 			}
 
-			if(rc.getTreeCount() > 8 && buildState == 2) {
+			if(rc.getTreeCount() >= 8 && buildState == 2) {
+				System.out.println("WHATWHAT");
 				Comms.writeHoldTreeProduction(rc, 1);
 				for(int i = 10;i-->0;) {
 					Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
 				}
 				buildState = 3;
 			}
-			if(Util.getNumBots(RobotType.SCOUT) >= 10 && buildState == 3) {
+			if(Util.getNumBots(RobotType.SOLDIER) >= 10 && buildState == 3) {
 				Comms.writeHoldTreeProduction(rc, 0);
 				buildState = 4;
 			}
