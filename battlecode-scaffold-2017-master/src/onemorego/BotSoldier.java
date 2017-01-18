@@ -76,29 +76,45 @@ public class BotSoldier {
 			// Shooting
 			if(closestEnemy != null) {
 				
-				MapLocation halfwayLocation = Util.halfwayLocation(myLocation, closestEnemy.location);
-				float senseRadius = myLocation.distanceTo(closestEnemy.location) - RobotType.SOLDIER.bodyRadius - closestEnemy.getType().bodyRadius;
-				RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, rc.getTeam());
-				TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
-				boolean goodToShoot = true;
-				for(int i = botsBetweenUs.length; i-->0;) {
-					if(Util.doesLineIntersectWithCircle(myLocation, closestEnemy.location, botsBetweenUs[i].location, botsBetweenUs[i].getRadius())) {
-						goodToShoot = false;
-						break;
-					}
-				}
-				for(int i = treesBetweenUs.length; i-->0;) {
-					if(Util.doesLineIntersectWithCircle(myLocation, closestEnemy.location, treesBetweenUs[i].location, treesBetweenUs[i].getRadius())) {
-						goodToShoot = false;
-						break;
-					}
-				}
-				if(goodToShoot) {
-					if(rc.canFireSingleShot()) {
+				boolean alreadyShot = false;
+				
+				if(myLocation.distanceTo(closestEnemy.location) < RobotType.SOLDIER.bodyRadius + closestEnemy.type.bodyRadius + 0.3f) {
+					if(rc.canFirePentadShot()) {
+						rc.firePentadShot(myLocation.directionTo(closestEnemy.location));
+						alreadyShot = true;
+					} else if(rc.canFireTriadShot()) {
+						rc.fireTriadShot(myLocation.directionTo(closestEnemy.location));
+						alreadyShot = true;
+					} else if(rc.canFireSingleShot()) {
 						rc.fireSingleShot(myLocation.directionTo(closestEnemy.location));
+						alreadyShot = true;
 					}
 				}
 				
+				if(!alreadyShot) {
+					MapLocation halfwayLocation = Util.halfwayLocation(myLocation, closestEnemy.location);
+					float senseRadius = myLocation.distanceTo(closestEnemy.location) - RobotType.SOLDIER.bodyRadius - closestEnemy.getType().bodyRadius;
+					RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, rc.getTeam());
+					TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
+					boolean goodToShoot = true;
+					for(int i = botsBetweenUs.length; i-->0;) {
+						if(Util.doesLineIntersectWithCircle(myLocation, closestEnemy.location, botsBetweenUs[i].location, botsBetweenUs[i].getRadius())) {
+							goodToShoot = false;
+							break;
+						}
+					}
+					for(int i = treesBetweenUs.length; i-->0;) {
+						if(Util.doesLineIntersectWithCircle(myLocation, closestEnemy.location, treesBetweenUs[i].location, treesBetweenUs[i].getRadius())) {
+							goodToShoot = false;
+							break;
+						}
+					}
+					if(goodToShoot) {
+						if(rc.canFireSingleShot()) {
+							rc.fireSingleShot(myLocation.directionTo(closestEnemy.location));
+						}
+					}
+				}
 			}
 			
 			break;
