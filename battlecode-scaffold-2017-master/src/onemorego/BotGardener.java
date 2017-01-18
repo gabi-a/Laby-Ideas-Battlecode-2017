@@ -42,7 +42,7 @@ public class BotGardener {
 		}
 		
 		if(buildOrder == null) {
-			int data = Comms.buildStack.pop(rc);
+			int data = Comms.buildQueue.pop(rc);
 			if (data != -1) buildOrder = RobotType.values()[data];
 		}
 		
