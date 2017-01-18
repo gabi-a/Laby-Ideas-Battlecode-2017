@@ -48,7 +48,9 @@ public class BotGardener {
 			waterTrees();
 			
 			if(spawnDirection == null) {
-				setSpawnDirection();
+				if(!setSpawnDirection()) {
+					settled = false;
+				}
 			}
 			
 			if(spawnDirection != null && buildOrder != null) {
@@ -86,22 +88,29 @@ public class BotGardener {
 		TreeInfo[] closeTrees = rc.senseNearbyTrees(2f);
 		RobotInfo[] closeRobots = rc.senseNearbyRobots(2f);
 		
-		if(closeTrees.length < 2 && closeRobots.length == 0 && rc.onTheMap(rc.getLocation(), 3f)) {
+		int bigTrees = 0;
+		for(TreeInfo tree : closeTrees) {
+			if(tree.radius >= 1) {
+				bigTrees++;
+			}
+		}
+		
+		if(bigTrees < 2 && closeRobots.length == 0 && rc.onTheMap(rc.getLocation(), 3f)) {
 			return true;
 		}
 		
 		return false;
 	}
 	
-	public static void setSpawnDirection() throws GameActionException {
+	public static boolean setSpawnDirection() throws GameActionException {
 		
-		Direction testDirection = Direction.getNorth();
+		Direction testDirection = Direction.getEast();
 		for(int i = 72;i-->0;) {
 			
 			rc.setIndicatorDot(rc.getLocation().add(testDirection,2f), 0, 255, 0);
 			
 			if(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection, 2f), 1f) || rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection, 3f), 2f) || !rc.onTheMap(rc.getLocation().add(testDirection, 2f), 2f)) {
-				testDirection = testDirection.rotateLeftDegrees(5);
+				testDirection = testDirection.rotateLeftDegrees(5f);
 				continue;
 			} else {
 				spawnDirection = testDirection;
@@ -110,6 +119,7 @@ public class BotGardener {
 			}
 			
 		}
+		return (spawnDirection != null);
 		
 	}
 	
@@ -117,7 +127,7 @@ public class BotGardener {
 		Direction buildDirection = spawnDirection.rotateLeftDegrees(60);
 		for(int i = 5; i-->0;) {
 			
-			//rc.setIndicatorDot(rc.getLocation().add(buildDirection,2f), 255, 0, 0);
+			rc.setIndicatorDot(rc.getLocation().add(buildDirection,2f), 255, 0, 0);
 			
 			if(rc.canPlantTree(buildDirection)) {
 				rc.plantTree(buildDirection);
