@@ -91,14 +91,14 @@ public class BotArchon {
 			}
 			if(buildState == 4 && rc.getTreeCount() > 20) {
 				rc.setIndicatorDot(rc.getLocation(), 200, 200, 0);
-				Comms.writeHoldTreeProduction(rc, 1);
+				Comms.holdTreeProduction.write(rc, 1);
 				for(int i = 10;i-->0;) {
 					Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
 				}
 				buildState = 5;
 			}
 			if(buildState == 5 && Util.getNumBots(RobotType.LUMBERJACK) >= 10) {
-				Comms.writeHoldTreeProduction(rc, 0);
+				Comms.holdTreeProduction.write(rc, 0);
 				buildState = 6;
 			}
 		}
