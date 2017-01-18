@@ -51,6 +51,10 @@ public class BotGardener {
 			Comms.gardenerPlanting.write(rc, 1);
 		}
 		
+		if(spawnDirection != null && buildOrder != null) {
+			if (tryToBuild(buildOrder)) buildOrder = null;
+		}
+		
 		if(settled) {
 		
 			waterTrees();
@@ -60,10 +64,6 @@ public class BotGardener {
 					settled = false;
 					Nav.treeBug(rc, bullets);
 				}
-			}
-			
-			if(spawnDirection != null && buildOrder != null) {
-				if (tryToBuild(buildOrder)) buildOrder = null;
 			}
 			
 			if(spawnDirection != null && !holdTreeProduction) {
