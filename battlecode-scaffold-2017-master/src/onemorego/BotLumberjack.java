@@ -38,6 +38,7 @@ public class BotLumberjack {
 		//}
 
 		if(strat == Strategy.OFFENSE) {
+			rc.setIndicatorDot(rc.getLocation(), 255, 0, 0);
 			// let another lumberjack cut the tree
 			if(treeTarget != null) {
 				Comms.neutralTrees.push(rc, treeTarget);
@@ -55,34 +56,39 @@ public class BotLumberjack {
 				if(rc.getLocation().distanceTo(enemyTarget.getLocation()) <= strikeRadius && rc.senseNearbyRobots(strikeRadius, rc.getTeam()).length == 0){
 					rc.strike();
 				} 
-				else if(!Nav.pathTo(rc, enemyTarget.getLocation(), bullets)) {
-					// Can't move, so do what a lumberjack does best
-					if(tempTreeTarget == null) {
-						TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
-						if(trees.length == 0){
-							Nav.explore(rc, bullets);
-							return;
-						}
-						tempTreeTarget = trees[0];
-					}
-					// Chop target
-					if(rc.canChop(tempTreeTarget.getID())){
-						rc.chop(tempTreeTarget.getID());
-					}
-
-					// Check if target is dead
-					if(rc.canSenseLocation(tempTreeTarget.getLocation()) && !rc.canSenseTree(tempTreeTarget.getID())) {
-						tempTreeTarget = null;
-					}
+				else {
+					Nav.pathTo(rc, enemyTarget.getLocation(), bullets);
 				}
 			}
+			
+			// Do what a lumberjack does best
+			if(tempTreeTarget == null) {
+				TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
+				if(trees.length == 0){
+					Nav.explore(rc, bullets);
+					return;
+				}
+				tempTreeTarget = trees[0];
+			}
+			// Chop target
+			if(rc.canChop(tempTreeTarget.getID())){
+				rc.chop(tempTreeTarget.getID());
+			}
+
+			// Check if target is dead
+			if(rc.canSenseLocation(tempTreeTarget.getLocation()) && !rc.canSenseTree(tempTreeTarget.getID())) {
+				tempTreeTarget = null;
+			}
+			
 		}
 
 		if(strat == Strategy.DEFENSE) {
+			rc.setIndicatorDot(rc.getLocation(), 0, 0, 255);
 
 		}
 
 		if(strat == Strategy.LUMBERJACK){
+			rc.setIndicatorDot(rc.getLocation(), 0, 255, 0);
 			// Find a target
 			/*if(treeTarget == null) {
 				treeTarget = Comms.neutralTrees.pop(rc);
