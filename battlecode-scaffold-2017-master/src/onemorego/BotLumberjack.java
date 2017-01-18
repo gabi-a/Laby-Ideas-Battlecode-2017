@@ -47,7 +47,7 @@ public class BotLumberjack {
 			enemyTarget = enemies.length > 0 ? enemies[0] : null;
 			// Find target
 			if(enemyTarget == null) {
-				Nav.explore(rc, bullets);
+				Nav.pathTo(rc, rc.getInitialArchonLocations(rc.getTeam().opponent())[0], bullets);
 			}
 			else {
 				// get in range and kill

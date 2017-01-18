@@ -43,7 +43,6 @@ public class BotScout {
 		
 		if(closestEnemy != null) {
 			
-			
 			rc.setIndicatorLine(myLocation,closestEnemy.location, 100, 0, 100);
 			TreeInfo bestTree = Util.findBestTree(rc, trees, closestEnemy);
 
@@ -83,10 +82,10 @@ public class BotScout {
 			}
 
 			MapLocation predictedEnemyLocation = Util.predictNextEnemyLocation(closestEnemy);
-
+			myLocation = rc.getLocation();
 
 			if(rc.canFireSingleShot() && predictedEnemyLocation.distanceTo(closestEnemy.location) < 1.3f && Util.goodToShoot(rc, myLocation, closestEnemy)) {
-				rc.fireSingleShot(rc.getLocation().directionTo(closestEnemy.location));
+				rc.fireSingleShot(myLocation.directionTo(closestEnemy.location));
 			}
 
 		} 
