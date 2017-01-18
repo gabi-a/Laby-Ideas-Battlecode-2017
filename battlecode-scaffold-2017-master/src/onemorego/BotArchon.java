@@ -51,6 +51,7 @@ public class BotArchon {
 			for(int i = 10;i-->0;) {
 				Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
 			}
+			buildState = 3;
 		}
 		
 		if(myInitialLocation.distanceTo(rc.getLocation()) > 15f) {
