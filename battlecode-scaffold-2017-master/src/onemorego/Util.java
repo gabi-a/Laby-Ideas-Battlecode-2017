@@ -178,6 +178,9 @@ public class Util {
 	// Uses approx 40 bytecodes
 	static boolean doesLineIntersectWithCircle(MapLocation lineStart, MapLocation lineEnd, MapLocation circleLocation, float circleRadius) {
 
+		if(lineStart.directionTo(circleLocation) == null || lineEnd.directionTo(circleLocation) == null) return false;
+		
+		System.out.format("Line Start: %f,%f  Circle Loc: %f,%f\n", lineStart.x,lineStart.y,circleLocation.x,circleLocation.y);
 		float theta = lineStart.directionTo(lineEnd).radiansBetween(lineStart.directionTo(circleLocation));
 		float hypotenuse = lineStart.distanceTo(circleLocation);
 		float perpendicularDist = (float) (hypotenuse * Math.sin(theta));
@@ -193,8 +196,13 @@ public class Util {
 	}
 	
 	public static boolean goodToShoot(RobotController rc, MapLocation myLocation, RobotInfo enemyBot) {
+		
 		MapLocation halfwayLocation = Util.halfwayLocation(myLocation, enemyBot.location);
 		float senseRadius = myLocation.distanceTo(enemyBot.location) - RobotType.SOLDIER.bodyRadius - enemyBot.getType().bodyRadius;
+		
+		// There is no space in between us so no point continuing
+		if(senseRadius < 0.5f) return true;
+		
 		RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, rc.getTeam());
 		TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
 		boolean goodToShoot = true;
