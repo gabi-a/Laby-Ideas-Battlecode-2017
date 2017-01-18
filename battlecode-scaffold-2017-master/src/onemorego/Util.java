@@ -177,6 +177,18 @@ public class Util {
 		}
 		return enemies[0];
 	}
+
+	static RobotInfo getClosestArchon(RobotController rc, RobotInfo[] enemies) throws GameActionException {
+		if(enemies.length == 0) return null;
+
+		for(int i = 0; i < enemies.length; i++){
+			if(enemies[i].getType() == RobotType.ARCHON) {
+				return enemies[i];
+			}
+		}
+
+		return null;
+	}
 	
 	// Uses approx 40 bytecodes
 	static boolean doesLineIntersectWithCircle(MapLocation lineStart, MapLocation lineEnd, MapLocation circleLocation, float circleRadius) {

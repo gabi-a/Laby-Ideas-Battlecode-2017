@@ -7,6 +7,8 @@ public class BotScout {
 	static Team enemyTeam = RobotPlayer.rc.getTeam().opponent();
 	static MapLocation enemyArchonLocation = RobotPlayer.rc.getInitialArchonLocations(enemyTeam)[0];
 	static MapLocation targetLocation = enemyArchonLocation;
+	static RobotInfo archon = null;
+	static int archonID;
 	
 	static boolean exploreFlag = false;
 	
@@ -34,7 +36,30 @@ public class BotScout {
 		BulletInfo[] bullets = rc.senseNearbyBullets(6f);
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		
+		if(archon == null){
+			RobotInfo archons = Util.getClosestArchon(rc, enemies);
+			if(archons != null){
+				for(int i = 0; i < 3; i++){
+					if(Comms.enemyArchons.read(rc, i) == 0){
+						Comms.enemyArchons.write(rc, i, archons.getID());
+						archon = archons;
+						archonID = i;
+					}
+				}
+			}
+		}
+
 		MapLocation myLocation = rc.getLocation();
+
+		if(archon != null){
+			float dist = myLocation.distanceTo(archon.getLocation());
+			if(dist > 6){
+				Nav.pathTo(rc, archon.getLocation(), bullets);
+				archon = rc.senseRobot(archon.getID());
+				Comms.enemyArchons.write(rc, archonID, archon.getID());
+			}
+		}
+
 
 		MapLocation[] safeMoveLocations = Nav.getSafeMoveLocations(rc, bullets);
 
@@ -96,8 +121,7 @@ public class BotScout {
 				rc.fireSingleShot(rc.getLocation().directionTo(closestEnemy.location));
 			}
 
-		} 
-		else {
+		} else {
 			//rc.setIndicatorDot(myLocation, 0, 0, 255);
 			if(!exploreFlag) {
 				if(!Nav.pathTo(rc, targetLocation, bullets)) {

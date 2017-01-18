@@ -22,6 +22,8 @@ public class Comms {
 	public static final CommsTree neutralTrees;
 	//public static final CommsTree enemyTrees;
 
+	public static final CommsArray enemyArchons;
+
 	/* Example usage:
 	 * Comms.neutralTrees.push(RobotController rc, TreeInfo stuff);
 	 * TreeInfo stuff = Comms.neutralTrees.pop(RobotController rc);
@@ -35,6 +37,8 @@ public class Comms {
 
 		gardenerPlanting = new CommsInt(0);
 		holdTreeProduction = new CommsInt(1);
+
+		enemyArchons = new CommsArray(2, 4);
 	}
 
 	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id, AttackGroup group) throws GameActionException {
@@ -207,8 +211,11 @@ class CommsQueue {
 class CommsArray {
 	public int arrayStart;
 	public int arrayEnd;
-	public int[] array;
-	public int[] lastUpdated;
+
+	public CommsArray(int start, int end){
+		arrayStart = start;
+		arrayEnd = end;
+	}
 
 	public void write(RobotController rc, int index, int data) throws GameActionException {
 		if(index > arrayEnd - arrayStart){
@@ -217,8 +224,6 @@ class CommsArray {
 		}
 
 		rc.broadcast(arrayStart + index, data);
-		array[index] = data;
-		lastUpdated[index] = rc.getRoundNum();
 	}
 
 	public int read(RobotController rc, int index) throws GameActionException {
@@ -227,12 +232,7 @@ class CommsArray {
 			return -1;
 		}
 
-		if(lastUpdated[index] != rc.getRoundNum()){
-			array[index] = rc.readBroadcast(arrayStart + index);
-			lastUpdated[index] = rc.getRoundNum();
-		}
-
-		return array[index];
+		return rc.readBroadcast(arrayStart + index);
 	}
 }
 
