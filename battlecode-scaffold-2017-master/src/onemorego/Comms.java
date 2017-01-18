@@ -16,7 +16,7 @@ public class Comms {
 	public static final CommsInt gardenerPlanting;
 	public static final CommsInt holdTreeProduction;
 	
-	public static final CommsStack buildStack;
+	public static final CommsQueue buildQueue;
 	public static final CommsStack lumberjackStack;
 	
 	public static final CommsTree neutralTrees;
@@ -30,7 +30,7 @@ public class Comms {
 	static {
 		neutralTrees = new CommsTree(101,120);
 		//enemyTrees = new CommsTree(11,21);
-		buildStack = new CommsStack(50, 100);
+		buildQueue = new CommsQueue(50, 100);
 		lumberjackStack = new CommsStack(201,220);
 
 		gardenerPlanting = new CommsInt(0);
@@ -179,7 +179,7 @@ class CommsQueue {
 
 		rc.broadcast(queueStart + offset + tail, data);
 
-		queueData = (head << 8) | (tail);
+		queueData = (head << 8) | (newTail);
 		rc.broadcast(queueStart, queueData);
 	}
 
@@ -195,9 +195,9 @@ class CommsQueue {
 			return -1;	// queue is empty
 		}
 
-		int data = rc.readBroadcast(queueStart + offset + tail);
+		int data = rc.readBroadcast(queueStart + offset + head);
 
-		queueData = (head << 8) | (tail);
+		queueData = (newHead << 8) | (tail);
 		rc.broadcast(queueStart, queueData);
 
 		return data;
@@ -237,10 +237,10 @@ class CommsArray {
 }
 
 class CommsTree {
-	CommsStack trees;
+	CommsQueue trees;
 
 	public CommsTree(int start, int end) {
-		trees = new CommsStack(start, end);
+		trees = new CommsQueue(start, end);
 	}
 
 	public void push(RobotController rc, TreeInfo tree) throws GameActionException {

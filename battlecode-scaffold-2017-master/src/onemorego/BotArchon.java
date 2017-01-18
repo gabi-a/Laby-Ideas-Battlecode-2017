@@ -67,10 +67,10 @@ public class BotArchon {
 			
 			if(rc.getRoundNum() == 1) {
 				buildState = 1;
-				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
-				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
-				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
-				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
 				Comms.holdTreeProduction.write(rc, 1);
 			}
 
@@ -83,7 +83,7 @@ public class BotArchon {
 				System.out.format("I'm pushing 10 lumberjacks, buildState=%d\n",buildState);
 				Comms.holdTreeProduction.write(rc, 1);
 				for(int i = 10;i-->0;) {
-					Comms.buildStack.push(rc, RobotType.LUMBERJACK.ordinal());
+					Comms.buildQueue.push(rc, RobotType.LUMBERJACK.ordinal());
 					Comms.lumberjackStack.push(rc, 1);
 				}
 				buildState = 3;
@@ -96,7 +96,7 @@ public class BotArchon {
 				rc.setIndicatorDot(rc.getLocation(), 200, 200, 0);
 				Comms.holdTreeProduction.write(rc, 1);
 				for(int i = 10;i-->0;) {
-					Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
+					Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
 				}
 				buildState = 5;
 			}
