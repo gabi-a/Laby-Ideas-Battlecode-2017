@@ -41,7 +41,7 @@ public class BotArchon {
 			Comms.writeHoldTreeProduction(rc, 1);
 		}
 		
-		if(Util.getNumBots(RobotType.SCOUT) >= 2 && buildState == 1) {
+		if(Util.getNumBots(RobotType.SCOUT) >= 2 && buildState == 1 || rc.getRoundNum() > 30) {
 			Comms.writeHoldTreeProduction(rc, 0);
 			buildState = 2;
 		}

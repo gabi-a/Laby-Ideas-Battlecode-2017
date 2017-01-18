@@ -78,7 +78,7 @@ public class BotLumberjack {
 				treeTarget = Comms.neutralTrees.pop(rc);
 			}
 			if(treeTarget == null) {
-				TreeInfo[] trees = rc.senseNearbyTrees();
+				TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 				if(trees.length == 0){
 					Nav.explore(rc, bullets);
 					return;

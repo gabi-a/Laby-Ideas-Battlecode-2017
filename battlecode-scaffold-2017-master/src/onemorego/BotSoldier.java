@@ -40,7 +40,6 @@ public class BotSoldier {
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		
 		MapLocation myLocation = rc.getLocation();
-		MapLocation[] safeMoveLocations = Nav.getSafeMoveLocations(rc, bullets);
 		
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		RobotInfo closestEnemy = Util.getClosestEnemy(rc, enemies);
