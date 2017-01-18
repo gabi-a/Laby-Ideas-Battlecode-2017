@@ -36,7 +36,6 @@ public class BotGardener {
 		}
 		
 		TreeInfo[] treesPlanted = rc.senseNearbyTrees(2f, rc.getTeam());
-		System.out.println(maxTreesIcanPlant+","+treesPlanted.length+"\n");
 		if(treesPlanted.length >= maxTreesIcanPlant && !broadcastedFinished) {
 			rc.setIndicatorDot(rc.getLocation(), 0, 255, 0);
 			broadcastedFinished = true;
