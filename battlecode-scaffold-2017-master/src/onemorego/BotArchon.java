@@ -8,6 +8,15 @@ public class BotArchon {
 	static int buildState = 0;
 	static MapLocation myInitialLocation;
 	
+	static enum Archon {
+		FIRST,
+		SECOND,
+		THIRD
+	}
+
+	static int numArchonsAtStart = 0;
+	static Archon archonDesignation;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		Util.updateBotCount(rc);
@@ -17,6 +26,25 @@ public class BotArchon {
 		if(rc.getRoundNum() == 1) {
 			Comms.writeGardenerFinishedPlanting(rc, 1);
 			myInitialLocation = rc.getLocation();
+			MapLocation[] archonLocs = rc.getInitialArchonLocations(rc.getTeam()); 
+			numArchonsAtStart = archonLocs.length;
+			for(int i = 0; i < archonLocs.length; i++) {
+				if(archonLocs[i] == rc.getLocation()) {
+					switch (i) {
+						case 0:
+							archonDesignation = Archon.FIRST;
+							break;
+						case 1:
+							archonDesignation = Archon.SECOND;
+							break;
+						case 2:
+							archonDesignation = Archon.THIRD;
+							break;
+						default:
+							System.out.println("Shouldn't get here!");
+					}
+				}
+			}
 		}
 		
 		if(rc.getRoundNum() > rc.getRoundLimit() - 2) {
@@ -31,31 +59,32 @@ public class BotArchon {
 		// 1. Spawn 2 scouts 
 		// 2. Spawn lumberjacks if there's trees around
 		// 3. All going well, build up bullets and then send waves of soldiers
-		
-		if(rc.getRoundNum() == 1) {
-			buildState = 1;
-			Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
-			Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
-			Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
-			Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
-			Comms.writeHoldTreeProduction(rc, 1);
-		}
-		
-		if(Util.getNumBots(RobotType.SCOUT) >= 4 && buildState == 1 || rc.getRoundNum() > 60) {
-			Comms.writeHoldTreeProduction(rc, 0);
-			buildState = 2;
-		}
-		
-		if(rc.getTreeCount() > 8 && buildState == 2) {
-			Comms.writeHoldTreeProduction(rc, 1);
-			for(int i = 10;i-->0;) {
-				Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
+		if(archonDesignation == Archon.FIRST) {
+			if(rc.getRoundNum() == 1) {
+				buildState = 1;
+				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
+				Comms.writeHoldTreeProduction(rc, 1);
 			}
-			buildState = 3;
-		}
-		if(Util.getNumBots(RobotType.SCOUT) >= 10 && buildState == 3) {
-			Comms.writeHoldTreeProduction(rc, 0);
-			buildState = 4;
+
+			if(Util.getNumBots(RobotType.SCOUT) >= 4 && buildState == 1 || rc.getRoundNum() > 60) {
+				Comms.writeHoldTreeProduction(rc, 0);
+				buildState = 2;
+			}
+
+			if(rc.getTreeCount() > 8 && buildState == 2) {
+				Comms.writeHoldTreeProduction(rc, 1);
+				for(int i = 10;i-->0;) {
+					Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
+				}
+				buildState = 3;
+			}
+			if(Util.getNumBots(RobotType.SCOUT) >= 10 && buildState == 3) {
+				Comms.writeHoldTreeProduction(rc, 0);
+				buildState = 4;
+			}
 		}
 		
 		if(myInitialLocation.distanceTo(rc.getLocation()) > 15f) {
