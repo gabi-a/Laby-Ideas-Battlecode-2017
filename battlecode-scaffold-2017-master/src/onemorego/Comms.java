@@ -150,6 +150,88 @@ class CommsStack {
 	}
 }
 
+class CommsQueue {
+	public int queueStart;
+	public int queueEnd;
+	public int offset = 1;
+
+	public CommsQueue(int start, int end){
+		queueStart = start;
+		queueEnd = end;
+	}
+
+	public void push(RobotController rc, int data) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+		int head = (queueData & 0xFF00) >> 8;
+		int tail = queueData & 0x00FF;
+
+		int newTail = tail + 1;
+		if(newTail > queueEnd) newTail = queueStart + offset;
+
+		if(newTail == head){
+			System.out.println("queue overflow");
+			return;
+		}
+
+		rc.broadcast(queueStart + offset + tail, data);
+
+		queueData = (head << 8) | (tail);
+		rc.broadcast(queueStart, queueData);
+	}
+
+	public int pop(RobotController rc) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+		int head = (queueData & 0xFF00) >> 8;
+		int tail = queueData & 0x00FF;
+
+		int newHead = head + 1;
+		if(newHead > queueEnd) newHead = queueStart + offset;
+
+		if(tail == head) {
+			return -1;	// queue is empty
+		}
+
+		int data = rc.readBroadcast(queueStart + offset + tail);
+
+		queueData = (head << 8) | (tail);
+		rc.broadcast(queueStart, queueData);
+
+		return data;
+	}
+}
+
+class CommsArray {
+	public int arrayStart;
+	public int arrayEnd;
+	public int[] array;
+	public int[] lastUpdated;
+
+	public void write(RobotController rc, int index, int data) throws GameActionException {
+		if(index > arrayEnd - arrayStart){
+			System.out.println("error: out of comms array bounds");
+			return;
+		}
+
+		rc.broadcast(arrayStart + index, data);
+		array[index] = data;
+		lastUpdated[index] = rc.getRoundNum();
+	}
+
+	public int read(RobotController rc, int index) throws GameActionException {
+		if(index > arrayEnd - arrayStart){
+			System.out.println("error: out of comms array bounds");
+			return -1;
+		}
+
+		if(lastUpdated[index] != rc.getRoundNum()){
+			array[index] = rc.readBroadcast(arrayStart + index);
+			lastUpdated[index] = rc.getRoundNum();
+		}
+
+		return array[index];
+	}
+}
+
 class CommsTree {
 	CommsStack trees;
 
