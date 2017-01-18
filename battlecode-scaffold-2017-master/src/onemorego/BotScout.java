@@ -44,7 +44,7 @@ public class BotScout {
 		if(closestEnemy != null) {
 			
 			
-			rc.setIndicatorLine(myLocation,enemies[0].location, 100, 0, 100);
+			//rc.setIndicatorLine(myLocation,enemies[0].location, 100, 0, 100);
 			TreeInfo bestTree = Util.findBestTree(rc, trees, closestEnemy);
 
 			if(myLocation.distanceTo(closestEnemy.location) <= 2.1f) {
@@ -52,10 +52,10 @@ public class BotScout {
 			}
 			else if(bestTree != null) {
 
-				rc.setIndicatorDot(bestTree.location, 255, 0, 0);
+				//rc.setIndicatorDot(bestTree.location, 255, 0, 0);
 
 				MapLocation attackLocation = (bestTree.radius > RobotType.SCOUT.bodyRadius) ? bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius) : bestTree.location;
-				rc.setIndicatorDot(attackLocation, 0, 0, 255);
+				//rc.setIndicatorDot(attackLocation, 0, 0, 255);
 				Direction attackDirection = myLocation.directionTo(attackLocation);
 				float attackDistance = myLocation.distanceTo(attackLocation);
 				if(myLocation.directionTo(attackLocation) != null && rc.canMove(attackDirection,  attackDistance)) {
@@ -64,7 +64,7 @@ public class BotScout {
 
 			} 
 			else {
-				rc.setIndicatorDot(myLocation, 0, 255, 0);
+				//rc.setIndicatorDot(myLocation, 0, 255, 0);
 
 				// Do safe moves
 				MapLocation safeMoveLocation = null;
@@ -90,7 +90,7 @@ public class BotScout {
 
 		} 
 		else {
-			rc.setIndicatorDot(myLocation, 0, 0, 255);
+			//rc.setIndicatorDot(myLocation, 0, 0, 255);
 			if(!exploreFlag) {
 				if(!Nav.pathTo(rc, targetLocation, bullets)) {
 					Nav.explore(rc, bullets);

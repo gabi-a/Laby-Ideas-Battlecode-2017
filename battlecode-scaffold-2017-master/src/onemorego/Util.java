@@ -63,7 +63,7 @@ public class Util {
 				MapLocation afterLoc = enemyLocationsCached[i];
 				MapLocation beforeLoc = enemyLocationsCached[i+1];
 				if(beforeLoc == null || beforeLoc == afterLoc) break;
-				RobotPlayer.rc.setIndicatorLine(afterLoc, beforeLoc, 0, 0,255);
+				//RobotPlayer.rc.setIndicatorLine(afterLoc, beforeLoc, 0, 0,255);
 				moveDirections[i] = beforeLoc.directionTo(afterLoc);
 				strideDist += beforeLoc.distanceTo(afterLoc);
 				i++;
@@ -170,12 +170,15 @@ public class Util {
 		return enemies[0];
 	}
 	
+	// Uses approx 40 bytecodes
 	static boolean doesLineIntersectWithCircle(MapLocation lineStart, MapLocation lineEnd, MapLocation circleLocation, float circleRadius) {
-		
+
 		float theta = lineStart.directionTo(lineEnd).radiansBetween(lineStart.directionTo(circleLocation));
 		float hypotenuse = lineStart.distanceTo(circleLocation);
 		float perpendicularDist = (float) (hypotenuse * Math.sin(theta));
 		
+		RobotPlayer.rc.setIndicatorLine(lineStart,lineEnd, 100, 50, 0);
+		RobotPlayer.rc.setIndicatorDot(circleLocation, 0, 100, 50);
 		return perpendicularDist < circleRadius;
 		
 	}

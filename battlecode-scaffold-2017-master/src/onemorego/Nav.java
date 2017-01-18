@@ -351,7 +351,7 @@ public static MapLocation[] getSafeMoveLocations(RobotController rc, BulletInfo[
 		
 		for(int i = possibleLocations.length;i-->0;) {
 			if(isSafeLocation(rc, possibleLocations[i], bullets)) {
-				rc.setIndicatorDot(possibleLocations[i], 0, 50, 0);
+				//rc.setIndicatorDot(possibleLocations[i], 0, 50, 0);
 				safeLocations[i] = possibleLocations[i];
 			}
 		}

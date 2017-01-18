@@ -27,7 +27,7 @@ public class Nav {
 	static boolean treeBug(RobotController rc) throws GameActionException {
 
 		MapLocation myLocation = rc.getLocation();
-		rc.setIndicatorLine(rc.getLocation(), rc.getLocation().add(treeBugHeading,5), 255, 0, 0);
+		//rc.setIndicatorLine(rc.getLocation(), rc.getLocation().add(treeBugHeading,5), 255, 0, 0);
 
 		/*
 		if(treeBugstuckCount < 10) {
@@ -47,7 +47,7 @@ public class Nav {
 			// Uses 100 bytecodes
 			TreeInfo[] leftTrees = rc.senseNearbyTrees(myLocation.add(treeBugHeading.rotateLeftDegrees(90), 2f), 1f,
 					null);
-			rc.setIndicatorLine(rc.getLocation(), myLocation.add(treeBugHeading.rotateLeftDegrees(90), 5f), 0, 0, 255);
+			//rc.setIndicatorLine(rc.getLocation(), myLocation.add(treeBugHeading.rotateLeftDegrees(90), 5f), 0, 0, 255);
 
 			if (leftTrees.length > 0) {
 				if (Nav.tryMove(rc, treeBugHeading)) {
@@ -65,7 +65,7 @@ public class Nav {
 			// Uses 100 bytecodes
 			TreeInfo[] rightTrees = rc.senseNearbyTrees(myLocation.add(treeBugHeading.rotateRightDegrees(90), 2f), 1f,
 					null);
-			rc.setIndicatorLine(rc.getLocation(), myLocation.add(treeBugHeading.rotateRightDegrees(90), 5f), 0, 0, 255);
+			//rc.setIndicatorLine(rc.getLocation(), myLocation.add(treeBugHeading.rotateRightDegrees(90), 5f), 0, 0, 255);
 
 			if (rightTrees.length > 0) {
 				if (Nav.tryMove(rc, treeBugHeading)) {
