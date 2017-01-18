@@ -69,13 +69,13 @@ public class BotArchon {
 				Comms.writeHoldTreeProduction(rc, 1);
 			}
 
-			if(Util.getNumBots(RobotType.SCOUT) >= 4 && buildState == 1 || rc.getRoundNum() > 60) {
+			if((Util.getNumBots(RobotType.SCOUT) >= 4 || rc.getRoundNum() > 60) && buildState == 1) {
 				Comms.writeHoldTreeProduction(rc, 0);
 				buildState = 2;
 			}
 
 			if(rc.getTreeCount() >= 8 && buildState == 2) {
-				System.out.println("WHATWHAT");
+				System.out.format("I'm pushing 10 trees, buildState=%d\n",buildState);
 				Comms.writeHoldTreeProduction(rc, 1);
 				for(int i = 10;i-->0;) {
 					Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
