@@ -71,7 +71,7 @@ public class Util {
 			strideDist /= i;
 			i = 0;
 			while(i<enemyLocationsCacheSize-2) {
-				System.out.format("%d Bytecodes left: %d\n",i, Clock.getBytecodesLeft());
+				//System.out.format("%d Bytecodes left: %d\n",i, Clock.getBytecodesLeft());
 				Direction afterDir = moveDirections[i];
 				Direction beforeDir = moveDirections[i+1];
 				if(afterDir == null || beforeDir == null) break;
