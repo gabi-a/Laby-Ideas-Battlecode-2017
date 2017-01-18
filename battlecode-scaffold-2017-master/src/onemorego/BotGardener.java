@@ -68,10 +68,15 @@ public class BotGardener {
 	}
 	
 	public static boolean tryToBuild(RobotType typeToBuild) throws GameActionException {
-		if(rc.canBuildRobot(typeToBuild, spawnDirection)) {
-			rc.buildRobot(typeToBuild, spawnDirection);
-			Util.increaseNumBotsByOne(rc, typeToBuild);
-			return true;
+		Direction buildDirection = spawnDirection;
+		for(int i = 6; i-->0;) {
+			if(rc.canBuildRobot(typeToBuild, buildDirection)) {
+				rc.buildRobot(typeToBuild, buildDirection);
+				Util.increaseNumBotsByOne(rc, typeToBuild);
+				return true;
+			}
+			buildDirection = buildDirection.rotateLeftDegrees(60);
+			continue;
 		}
 		return false;
 	}
