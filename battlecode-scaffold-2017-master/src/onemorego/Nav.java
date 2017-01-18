@@ -279,7 +279,7 @@ public class Nav {
 
 		// If we're a lumberjack, stop thinking too hard and chop your way through
 		if(rc.getType() == RobotType.LUMBERJACK){
-			TreeInfo[] trees = rc.senseNearbyTrees(2, Team.NEUTRAL);
+			TreeInfo[] trees = rc.senseNearbyTrees(2f, Team.NEUTRAL);
 			if(trees.length > 0) rc.chop(trees[0].getID());
 			return false;
 		}

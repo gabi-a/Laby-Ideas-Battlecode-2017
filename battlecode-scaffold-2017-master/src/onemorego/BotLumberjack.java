@@ -43,6 +43,7 @@ public class BotLumberjack {
 		
 		if(strat == Strategy.OFFENSE) {
 			rc.setIndicatorDot(rc.getLocation(), 255, 0, 0);
+			rc.setIndicatorDot(targetLocation, 255, 179, 208);
 			// let another lumberjack cut the tree
 			if(treeTarget != null) {
 				Comms.neutralTrees.push(rc, treeTarget);
@@ -52,7 +53,6 @@ public class BotLumberjack {
 			enemyTarget = enemies.length > 0 ? enemies[0] : null;
 			// Find target
 			if(enemyTarget == null) {
-				rc.setIndicatorDot(targetLocation, 255, 179, 208);
 				if(!exploreFlag) {
 					if(!Nav.pathTo(rc, targetLocation, bullets)) {
 						Nav.explore(rc, bullets);
@@ -64,7 +64,7 @@ public class BotLumberjack {
 			}
 			else {
 				// get in range and kill
-				float strikeRadius = 2 + enemyTarget.getType().bodyRadius;
+				float strikeRadius = 1f + enemyTarget.getType().bodyRadius;
 				if(rc.getLocation().distanceTo(enemyTarget.getLocation()) <= strikeRadius && rc.senseNearbyRobots(strikeRadius, rc.getTeam()).length == 0){
 					rc.strike();
 				} 
@@ -105,7 +105,7 @@ public class BotLumberjack {
 			/*if(treeTarget == null) {
 				treeTarget = Comms.neutralTrees.pop(rc);
 			}*/
-			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
+			
 			if(treeTarget == null) {
 				TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 				if(trees.length == 0){
@@ -114,22 +114,21 @@ public class BotLumberjack {
 				}
 				treeTarget = trees[0];
 			}
-			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
+			
 			// Go to target
 			if(!rc.canInteractWithTree(treeTarget.getID())){
 				Nav.pathTo(rc, treeTarget.getLocation(), bullets);
 			}
-			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
+			
 			// Chop target
 			if(rc.canChop(treeTarget.getID())){
 				rc.chop(treeTarget.getID());
 			}
-			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
+			
 			// Check if target is dead
 			if(rc.canSenseLocation(treeTarget.getLocation()) && !rc.canSenseTree(treeTarget.getID())) {
 				treeTarget = null;
 			}
-			if(Clock.getBytecodesLeft() < 1000) if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 		}
 	}
 }
