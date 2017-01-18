@@ -92,23 +92,9 @@ public class BotSoldier {
 				}
 				
 				if(!alreadyShot) {
-					MapLocation halfwayLocation = Util.halfwayLocation(myLocation, closestEnemy.location);
-					float senseRadius = myLocation.distanceTo(closestEnemy.location) - RobotType.SOLDIER.bodyRadius - closestEnemy.getType().bodyRadius;
-					RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, rc.getTeam());
-					TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
-					boolean goodToShoot = true;
-					for(int i = botsBetweenUs.length; i-->0;) {
-						if(Util.doesLineIntersectWithCircle(myLocation, closestEnemy.location, botsBetweenUs[i].location, botsBetweenUs[i].getRadius())) {
-							goodToShoot = false;
-							break;
-						}
-					}
-					for(int i = treesBetweenUs.length; i-->0;) {
-						if(Util.doesLineIntersectWithCircle(myLocation, closestEnemy.location, treesBetweenUs[i].location, treesBetweenUs[i].getRadius())) {
-							goodToShoot = false;
-							break;
-						}
-					}
+					
+					boolean goodToShoot = Util.goodToShoot(rc, myLocation, closestEnemy);
+					
 					if(goodToShoot) {
 						if(rc.canFireSingleShot()) {
 							rc.fireSingleShot(myLocation.directionTo(closestEnemy.location));

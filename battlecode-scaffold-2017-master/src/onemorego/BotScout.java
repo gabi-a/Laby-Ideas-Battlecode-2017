@@ -85,7 +85,7 @@ public class BotScout {
 			MapLocation predictedEnemyLocation = Util.predictNextEnemyLocation(closestEnemy);
 
 
-			if(rc.canFireSingleShot() && predictedEnemyLocation.distanceTo(closestEnemy.location) < 1.3f) {
+			if(rc.canFireSingleShot() && predictedEnemyLocation.distanceTo(closestEnemy.location) < 1.3f && Util.goodToShoot(rc, myLocation, closestEnemy)) {
 				rc.fireSingleShot(rc.getLocation().directionTo(closestEnemy.location));
 			}
 

@@ -192,4 +192,25 @@ public class Util {
 		return loc1.add(new Direction(loc1, loc2), loc1.distanceTo(loc2) / 2);
 	}
 	
+	public static boolean goodToShoot(RobotController rc, MapLocation myLocation, RobotInfo enemyBot) {
+		MapLocation halfwayLocation = Util.halfwayLocation(myLocation, enemyBot.location);
+		float senseRadius = myLocation.distanceTo(enemyBot.location) - RobotType.SOLDIER.bodyRadius - enemyBot.getType().bodyRadius;
+		RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, rc.getTeam());
+		TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
+		boolean goodToShoot = true;
+		for(int i = botsBetweenUs.length; i-->0;) {
+			if(Util.doesLineIntersectWithCircle(myLocation, enemyBot.location, botsBetweenUs[i].location, botsBetweenUs[i].getRadius())) {
+				goodToShoot = false;
+				break;
+			}
+		}
+		for(int i = treesBetweenUs.length; i-->0;) {
+			if(Util.doesLineIntersectWithCircle(myLocation, enemyBot.location, treesBetweenUs[i].location, treesBetweenUs[i].getRadius())) {
+				goodToShoot = false;
+				break;
+			}
+		}
+		return goodToShoot;
+	}
+	
 }
