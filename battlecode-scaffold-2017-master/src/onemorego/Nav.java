@@ -196,7 +196,7 @@ public class Nav {
 			heading = randomDirection();
 		}
     	int moveAttemptCount = 0;
-    	while(moveAttemptCount < 30) {
+    	while(moveAttemptCount < 5) {
     		if(rc.onTheMap(myLocation.add(heading,rc.getType().strideRadius + rc.getType().bodyRadius ),rc.getType().bodyRadius+2f) 
 					&& Nav.tryMove(rc, heading, bullets)) {
     				return true;
