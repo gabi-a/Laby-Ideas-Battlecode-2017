@@ -138,9 +138,14 @@ public class Util {
 				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.A);
 			} else if (enemies[i].getType() == RobotType.ARCHON) {
 				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.B);
+			} else {
+				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.C);
 			}
 			if(enemies[i].getID() == Comms.readAttackID(rc, AttackGroup.A) && enemies[i].getHealth() < 20f) {
 					Comms.clearAttackEnemy(rc, AttackGroup.A);
+			}
+			if(enemies[i].getID() == Comms.readAttackID(rc, AttackGroup.B) && enemies[i].getHealth() < 20f) {
+				Comms.clearAttackEnemy(rc, AttackGroup.B);
 			}
 			if(enemies[i].getType() != RobotType.ARCHON) {
 				closestEnemy = enemies[i];

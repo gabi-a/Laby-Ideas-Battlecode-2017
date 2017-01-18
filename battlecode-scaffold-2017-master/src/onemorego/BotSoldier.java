@@ -6,12 +6,14 @@ public class BotSoldier {
 	
 	static Team enemyTeam = RobotPlayer.rc.getTeam().opponent();
 	static MapLocation enemyArchonLocation = RobotPlayer.rc.getInitialArchonLocations(enemyTeam)[0];
+	
 	static MapLocation targetLocation = enemyArchonLocation;
+	//static MapLocation secondaryTargetLocation = enemyArchonLocation;
 	
 	static boolean exploreFlag = false;
 	static Strategy strat = Strategy.OFFENSE;
 	
-	static final float attackRadius = 4f;
+	static final float attackRadius = 6f;
 	static final float attackRotAngle = (float) (2*Math.atan(RobotType.SOLDIER.bodyRadius/attackRadius));
 	
 	public static void turn(RobotController rc) throws GameActionException {
