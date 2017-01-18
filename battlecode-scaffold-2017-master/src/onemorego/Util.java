@@ -221,7 +221,7 @@ public class Util {
 			}
 		}
 		for(int i = treesBetweenUs.length; i-->0;) {
-			if(Util.doesLineIntersectWithCircle(myLocation, enemyBot.location, treesBetweenUs[i].location, treesBetweenUs[i].getRadius())) {
+			if(!(rc.getType() == RobotType.SCOUT && treesBetweenUs[i].location.distanceTo(myLocation) < 1f) && Util.doesLineIntersectWithCircle(myLocation, enemyBot.location, treesBetweenUs[i].location, treesBetweenUs[i].getRadius())) {
 				goodToShoot = false;
 				break;
 			}

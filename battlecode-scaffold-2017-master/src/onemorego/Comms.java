@@ -18,7 +18,8 @@ public class Comms {
 	
 	public static final CommsQueue buildQueue;
 	public static final CommsStack lumberjackStack;
-	
+	public static final CommsStack soldierStratStack;
+	public static final CommsStack soldierProtectionLocationStack;
 	public static final CommsTree neutralTrees;
 	//public static final CommsTree enemyTrees;
 
@@ -32,7 +33,8 @@ public class Comms {
 		//enemyTrees = new CommsTree(11,21);
 		buildQueue = new CommsQueue(300, 500);
 		lumberjackStack = new CommsStack(201,220);
-
+		soldierStratStack = new CommsStack(230,270);
+		soldierProtectionLocationStack = new CommsStack(510,540);
 		gardenerPlanting = new CommsInt(0);
 		holdTreeProduction = new CommsInt(1);
 	}

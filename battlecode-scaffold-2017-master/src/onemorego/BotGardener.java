@@ -13,11 +13,19 @@ public class BotGardener {
 	static RobotType buildOrder = null;
 	static boolean holdTreeProduction = false;
 	
+	static int turnsNotSettled = 0;
+	
 	static int treeIDIWantCut = 0;
+	static boolean startupFlag = true;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
 		Util.updateBotCount(rc);
+		
+		if(startupFlag) {
+			Comms.soldierProtectionLocationStack.push(rc, Comms.packLocation(rc, rc.getLocation()));
+			startupFlag = false;
+		}
 		
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		if(enemies.length > 0) {
@@ -37,7 +45,7 @@ public class BotGardener {
 			Comms.neutralTrees.push(rc, treesInTheWay[0]);
 		}
 		
-		if(Util.getNumBots(RobotType.SCOUT) < 2) {
+		if(Util.getNumBots(RobotType.SCOUT) < 2 && buildOrder == null) {
 			buildOrder = RobotType.SCOUT;
 		}
 		
@@ -75,6 +83,7 @@ public class BotGardener {
 			
 		} else {
 			Nav.treeBug(rc, bullets);
+			turnsNotSettled ++;
 			settled = settleHere();
 		}
 		
@@ -107,7 +116,7 @@ public class BotGardener {
 			}
 		}
 		
-		if(bigTrees < 2 && closeRobots.length == 0 && rc.onTheMap(rc.getLocation(), 3f)) {
+		if(bigTrees < 2 && closeRobots.length == 0 && (rc.onTheMap(rc.getLocation(), 3f)  || turnsNotSettled > 30 )) {
 			return true;
 		}
 		

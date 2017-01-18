@@ -63,7 +63,7 @@ public class BotScout {
 			}
 			else if(bestTree != null) {
 				//rc.setIndicatorDot(attackLocation, 0, 0, 255);
-				MapLocation attackLocation = bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius);
+				MapLocation attackLocation = (closestEnemy.attackCount == 0) ? bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius + 0.1f) : bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius - 0.01f);
 				rc.setIndicatorDot(attackLocation, 0, 0, 255);
 				Direction attackDirection = myLocation.directionTo(attackLocation);
 				float attackDistance = myLocation.distanceTo(attackLocation);

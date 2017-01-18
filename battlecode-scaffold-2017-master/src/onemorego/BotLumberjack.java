@@ -114,7 +114,8 @@ public class BotLumberjack {
 			if(treeTarget == null) {
 				TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 				if(trees.length == 0){
-					Nav.explore(rc, bullets);
+					if(!Nav.pathTo(rc, targetLocation, bullets))
+						Nav.explore(rc, bullets);
 					return;
 				}
 				treeTarget = trees[0];
@@ -133,6 +134,11 @@ public class BotLumberjack {
 			// Check if target is dead
 			if(rc.canSenseLocation(treeTarget.getLocation()) && !rc.canSenseTree(treeTarget.getID())) {
 				treeTarget = null;
+			}
+			
+			if(!rc.hasMoved() && !rc.hasAttacked()) {
+				if(!Nav.explore(rc, bullets))
+					Nav.pathTo(rc, targetLocation, bullets);
 			}
 		}
 	}

@@ -67,16 +67,18 @@ public class BotArchon {
 			
 			if(rc.getRoundNum() == 1) {
 				buildState = 1;
+				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.soldierStratStack.push(rc, Strategy.DEFENSE.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.soldierStratStack.push(rc, Strategy.DEFENSE.ordinal());
 				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
 				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
-				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
-				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
 				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
 				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
 				Comms.holdTreeProduction.write(rc, 1);
 			}
 
-			if((Util.getNumBots(RobotType.SCOUT) >= 4 || rc.getRoundNum() > 60) && buildState == 1) {
+			if(((Util.getNumBots(RobotType.SCOUT) >= 2 && Util.getNumBots(RobotType.SOLDIER) >= 1) || rc.getRoundNum() > 120) && buildState == 1) {
 				Comms.holdTreeProduction.write(rc, 0);
 				buildState = 2;
 			}
@@ -85,12 +87,11 @@ public class BotArchon {
 				System.out.format("I'm pushing 10 lumberjacks, buildState=%d\n",buildState);
 				Comms.holdTreeProduction.write(rc, 1);
 				for(int i = 10;i-->0;) {
-					Comms.buildQueue.push(rc, RobotType.LUMBERJACK.ordinal());
-					Comms.lumberjackStack.push(rc, 1);
+					Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
 				}
 				buildState = 3;
 			}
-			if(buildState == 3 && Util.getNumBots(RobotType.LUMBERJACK) >= 10) {
+			if(buildState == 3 && Util.getNumBots(RobotType.SOLDIER) >= 10) {
 				Comms.holdTreeProduction.write(rc, 0);
 				buildState = 4;
 			}
@@ -98,7 +99,8 @@ public class BotArchon {
 				rc.setIndicatorDot(rc.getLocation(), 200, 200, 0);
 				Comms.holdTreeProduction.write(rc, 1);
 				for(int i = 10;i-->0;) {
-					Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+					Comms.buildQueue.push(rc, RobotType.LUMBERJACK.ordinal());
+					Comms.lumberjackStack.push(rc, 1);
 				}
 				buildState = 5;
 			}
