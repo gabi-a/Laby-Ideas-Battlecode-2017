@@ -39,6 +39,12 @@ public class BotScout {
 		MapLocation[] safeMoveLocations = Nav.getSafeMoveLocations(rc, bullets);
 
 		TreeInfo[] trees = rc.senseNearbyTrees();
+		for(int i = 0; i < trees.length && rc.canInteractWithTree(trees[i].getID()); i++){
+			if(trees[i].getContainedBullets() > 0){
+				rc.shake(trees[i].getID());
+				return;
+			}
+		}
 		RobotInfo closestEnemy = Util.getClosestEnemyExceptArchon(rc, enemies);
 		
 		if(closestEnemy != null) {
@@ -56,9 +62,6 @@ public class BotScout {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location), bullets);
 			}
 			else if(bestTree != null) {
-				if(rc.canShake()) {
-					rc.shake(bestTree.getID());
-				}
 				//rc.setIndicatorDot(attackLocation, 0, 0, 255);
 				MapLocation attackLocation = bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius);
 				rc.setIndicatorDot(attackLocation, 0, 0, 255);
