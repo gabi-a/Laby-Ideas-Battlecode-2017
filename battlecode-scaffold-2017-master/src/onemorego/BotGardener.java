@@ -49,6 +49,7 @@ public class BotGardener {
 			if(spawnDirection == null) {
 				if(!setSpawnDirection()) {
 					settled = false;
+					Nav.treeBug(rc, bullets);
 				}
 			}
 			
