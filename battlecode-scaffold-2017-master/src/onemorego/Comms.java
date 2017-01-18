@@ -7,7 +7,7 @@ enum AttackGroup {
 
 public class Comms {
 	
-	public static final int ROBOT_NUMS_START = 700; // End is 706
+	public static final int ROBOT_NUMS_START = 750; // End is 706
 	
 	// Up to 6 enemies to focus on attacking at once
 	// Each enemy is stored in two channels: one for MapLocation and one for ID
@@ -30,7 +30,7 @@ public class Comms {
 	static {
 		neutralTrees = new CommsTree(101,120);
 		//enemyTrees = new CommsTree(11,21);
-		buildQueue = new CommsQueue(50, 100);
+		buildQueue = new CommsQueue(300, 500);
 		lumberjackStack = new CommsStack(201,220);
 
 		gardenerPlanting = new CommsInt(0);

@@ -69,10 +69,10 @@ public class BotArchon {
 				buildState = 1;
 				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
 				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
-				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
-				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
 				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
 				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
 				Comms.holdTreeProduction.write(rc, 1);
 			}
 
@@ -105,6 +105,16 @@ public class BotArchon {
 			if(buildState == 5 && Util.getNumBots(RobotType.LUMBERJACK) >= 10) {
 				Comms.holdTreeProduction.write(rc, 0);
 				buildState = 6;
+			}
+			if(buildState == 6) {
+				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
 			}
 		}
 		
