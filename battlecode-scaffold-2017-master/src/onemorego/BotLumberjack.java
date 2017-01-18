@@ -41,12 +41,6 @@ public class BotLumberjack {
 			strat = Strategy.LUMBERJACK;
 		}
 		
-		//if(strat == null){
-		//	float randStrat = (float)Math.random();
-		//	if(randStrat < 0.0) strat = Strategy.LUMBERJACK;
-		//	else strat = Strategy.OFFENSE;
-		//}
-
 		if(strat == Strategy.OFFENSE) {
 			rc.setIndicatorDot(rc.getLocation(), 255, 0, 0);
 			// let another lumberjack cut the tree

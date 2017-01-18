@@ -277,6 +277,12 @@ public class Nav {
 			}
 		}
 
+		// If we're a lumberjack, stop thinking too hard and chop your way through
+		if(rc.getType() == RobotType.LUMBERJACK){
+			TreeInfo[] trees = rc.senseNearbyTrees(3, Team.NEUTRAL);
+			if(trees.length > 0) rc.chop(trees[0].getID());
+		}
+
 		// Else, let's start following a wall.
 		if (moveState == MoveState.TOWARD_LEFT) {
 			moveState = moveState.LEFT;
