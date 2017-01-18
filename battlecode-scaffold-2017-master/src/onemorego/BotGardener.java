@@ -19,15 +19,24 @@ public class BotGardener {
 		BotGardener.rc = rc;
 		Util.updateBotCount(rc);
 		
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		if(enemies.length > 0) {
+			Comms.writeAttackEnemy(rc, enemies[0].location, enemies[0].getID(), AttackGroup.A);
+		}
+		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		
 		holdTreeProduction = Comms.readHoldTreeProduction(rc) == 1 ? true : false;
 		
 		TreeInfo[] treesInTheWay = rc.senseNearbyTrees(2f, Team.NEUTRAL);
-		if(Util.getNumBots(RobotType.SCOUT) >= 2 && buildOrder == null && treesInTheWay.length > 0 && treeIDIWantCut != treesInTheWay[0].ID) {
+		if(buildOrder == null && treesInTheWay.length > 0 && treeIDIWantCut != treesInTheWay[0].ID) {
 			buildOrder = RobotType.LUMBERJACK;
 			treeIDIWantCut = treesInTheWay[0].ID;
 			Comms.neutralTrees.push(rc, treesInTheWay[0]);
+		}
+		
+		if(Util.getNumBots(RobotType.SCOUT) < 2) {
+			buildOrder = RobotType.SCOUT;
 		}
 		
 		if(buildOrder == null) {
@@ -75,6 +84,7 @@ public class BotGardener {
 			if(rc.canBuildRobot(typeToBuild, buildDirection)) {
 				rc.buildRobot(typeToBuild, buildDirection);
 				Util.increaseNumBotsByOne(rc, typeToBuild);
+				buildOrder = null;
 				return true;
 			}
 			buildDirection = buildDirection.rotateLeftDegrees(60);

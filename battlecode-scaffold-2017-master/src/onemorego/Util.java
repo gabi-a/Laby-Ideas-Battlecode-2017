@@ -14,11 +14,13 @@ public class Util {
 	public static void updateBotCount(RobotController rc) throws GameActionException {
 		for(int i = 6;i-->0;) {
 			botsBuilt[i] = Comms.readNumRobots(rc, RobotType.values()[i]);
+			System.out.format("Scouts: %d\n", botsBuilt[RobotType.SCOUT.ordinal()]);
 		}
 	}
 	public static void reportDeath(RobotController rc) throws GameActionException {
-		if(!reportedDeath && rc.getHealth() < 10f) {
-    		Comms.writeNumRobots(rc, rc.getType(), botsBuilt[rc.getType().ordinal()]);
+		if(!reportedDeath && rc.getHealth() < 5f) {
+			updateBotCount(rc);
+    		Comms.writeNumRobots(rc, rc.getType(), botsBuilt[rc.getType().ordinal()] - 1);
     		reportedDeath = true;
     	}
 	}
@@ -26,6 +28,7 @@ public class Util {
 		return botsBuilt[type.ordinal()];
 	}
 	public static void increaseNumBotsByOne(RobotController rc, RobotType type) throws GameActionException {
+		updateBotCount(rc);
 		botsBuilt[type.ordinal()] = botsBuilt[type.ordinal()] + 1;
 		Comms.writeNumRobots(rc, type, botsBuilt[type.ordinal()]);
 	}
@@ -207,7 +210,7 @@ public class Util {
 		TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
 		boolean goodToShoot = true;
 		for(int i = botsBetweenUs.length; i-->0;) {
-			if(Util.doesLineIntersectWithCircle(myLocation, enemyBot.location, botsBetweenUs[i].location, botsBetweenUs[i].getRadius())) {
+			if(botsBetweenUs[i].getID() != enemyBot.getID() && botsBetweenUs[i].getID() != rc.getID() && Util.doesLineIntersectWithCircle(myLocation, enemyBot.location, botsBetweenUs[i].location, botsBetweenUs[i].getRadius())) {
 				goodToShoot = false;
 				break;
 			}

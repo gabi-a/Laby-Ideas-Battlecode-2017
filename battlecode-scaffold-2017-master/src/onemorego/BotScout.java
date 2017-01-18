@@ -50,7 +50,9 @@ public class BotScout {
 			if(myLocation.distanceTo(closestEnemy.location) <= 2.1f && closestEnemy.type != RobotType.GARDENER && closestEnemy.type != RobotType.SCOUT) {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location).opposite(), bullets);
 			}
-			else if(closestEnemy.type == RobotType.SCOUT || (closestEnemy.type == RobotType.GARDENER && (bestTree == null || bestTree.location.distanceTo(myLocation) > 2f))) {
+			else if(closestEnemy.type == RobotType.SCOUT) {
+				Nav.tryPrecisionMove(rc, myLocation.directionTo(closestEnemy.location),myLocation.distanceTo(closestEnemy.location), bullets);
+			} else if(closestEnemy.type == RobotType.GARDENER && (bestTree == null || bestTree.location.distanceTo(myLocation) > 2f)) {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location), bullets);
 			}
 			else if(bestTree != null) {
@@ -84,8 +86,7 @@ public class BotScout {
 
 			MapLocation predictedEnemyLocation = Util.predictNextEnemyLocation(closestEnemy);
 
-
-			if(rc.canFireSingleShot() && predictedEnemyLocation.distanceTo(closestEnemy.location) < 1.3f && Util.goodToShoot(rc, myLocation, closestEnemy)) {
+			if(rc.canFireSingleShot() && (myLocation.distanceTo(closestEnemy.location) < RobotType.SCOUT.bodyRadius + closestEnemy.type.bodyRadius + 0.3f || predictedEnemyLocation.distanceTo(closestEnemy.location) < 1.3f) && Util.goodToShoot(rc, myLocation, closestEnemy)) {
 				rc.fireSingleShot(rc.getLocation().directionTo(closestEnemy.location));
 			}
 

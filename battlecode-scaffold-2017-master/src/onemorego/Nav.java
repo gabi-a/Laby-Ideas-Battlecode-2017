@@ -133,13 +133,15 @@ public class Nav {
 	static boolean tryPrecisionMove(RobotController rc, Direction dir, float degreeOffset, int checksPerSide, float stride, BulletInfo[] bullets)
 			throws GameActionException {
 
+		if(rc.hasMoved()) return false;
+		
 		MapLocation myLocation = rc.getLocation();
 		MapLocation moveLocation;
 		
 		// First, try intended direction
 		moveLocation = myLocation.add(dir,rc.getType().strideRadius);
 		if (rc.canMove(dir,stride) && isSafeLocation(rc, moveLocation, bullets)) {
-			rc.move(dir);
+			rc.move(dir, stride);
 			return true;
 		}
 
@@ -374,6 +376,7 @@ public static MapLocation[] getSafeMoveLocations(RobotController rc, BulletInfo[
 		if(!rc.onTheMap(location)) {
 			return false;
 		}
+		
 		for(int i = bullets.length; i-->0;) {
 			if(willCollideWithMe(rc, bullets[i], location)) {
 				return false;

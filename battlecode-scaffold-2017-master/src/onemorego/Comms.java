@@ -71,11 +71,11 @@ public class Comms {
 	}
 	
 	public static void writeNumRobots(RobotController rc, RobotType type, int num) throws GameActionException {
-		rc.broadcast(ROBOT_NUMS_START-1+type.ordinal(), num);
+		rc.broadcast(ROBOT_NUMS_START+type.ordinal(), num);
 	}
 	
 	public static int readNumRobots(RobotController rc, RobotType type) throws GameActionException {
-		return rc.readBroadcast(ROBOT_NUMS_START-1+type.ordinal());
+		return rc.readBroadcast(ROBOT_NUMS_START+type.ordinal());
 	}
 
 	public static int packLocation(RobotController rc, MapLocation location) {

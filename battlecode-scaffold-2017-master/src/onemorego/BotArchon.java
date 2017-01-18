@@ -60,6 +60,8 @@ public class BotArchon {
 		// 2. Spawn lumberjacks if there's trees around
 		// 3. All going well, build up bullets and then send waves of soldiers
 		if(archonDesignation == Archon.FIRST) {
+			
+			
 			if(rc.getRoundNum() == 1) {
 				buildState = 1;
 				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
@@ -75,7 +77,7 @@ public class BotArchon {
 			}
 
 			if(rc.getTreeCount() >= 8 && buildState == 2) {
-				System.out.format("I'm pushing 10 trees, buildState=%d\n",buildState);
+				System.out.format("I'm pushing 10 lumberjacks, buildState=%d\n",buildState);
 				Comms.writeHoldTreeProduction(rc, 1);
 				for(int i = 10;i-->0;) {
 					Comms.buildStack.push(rc, RobotType.LUMBERJACK.ordinal());
