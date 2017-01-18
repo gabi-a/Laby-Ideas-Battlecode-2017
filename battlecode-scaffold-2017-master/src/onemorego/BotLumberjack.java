@@ -32,9 +32,7 @@ public class BotLumberjack {
 		
 		MapLocation commsTarget = Comms.readAttackLocation(rc, AttackGroup.B);
 		if(commsTarget != null) {
-			System.out.println("Before comms Target: "+targetLocation);
 			targetLocation = commsTarget;
-			System.out.println("After comms Target: "+targetLocation);
 		}
 		
 		if(enemies.length > 0 || delegation == 1) {
@@ -44,7 +42,6 @@ public class BotLumberjack {
 		}
 		
 		if(strat == Strategy.OFFENSE) {
-			System.out.println("Target: "+targetLocation);
 			rc.setIndicatorDot(rc.getLocation(), 255, 0, 0);
 			rc.setIndicatorDot(targetLocation, 255, 179, 208);
 			// let another lumberjack cut the tree

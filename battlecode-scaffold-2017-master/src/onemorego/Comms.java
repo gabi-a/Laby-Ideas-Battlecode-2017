@@ -40,14 +40,11 @@ public class Comms {
 	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id, AttackGroup group) throws GameActionException {
 		rc.broadcast(ATTACK_START+group.ordinal(), Comms.packLocation(rc, loc));
 		rc.broadcast(ATTACK_START+group.ordinal()+6, id);
-		System.out.println("loc "+loc+" unpacked "+Comms.unpackLocation(rc, Comms.packLocation(rc, loc)));
-		System.out.println("\nWriting attack enemy in group "+group+" at loc "+loc);
 	}
 	
 	public static void clearAttackEnemy(RobotController rc, AttackGroup group) throws GameActionException {
 		rc.broadcast(ATTACK_START+group.ordinal(), 0);
 		rc.broadcast(ATTACK_START+group.ordinal()+6, 0);
-		System.out.println("\nClearing attack enemy in group "+group);
 	}
 	
 	public static MapLocation readAttackLocation(RobotController rc, AttackGroup group) throws GameActionException {

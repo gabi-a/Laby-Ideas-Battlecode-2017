@@ -14,7 +14,6 @@ public class Util {
 	public static void updateBotCount(RobotController rc) throws GameActionException {
 		for(int i = 6;i-->0;) {
 			botsBuilt[i] = Comms.readNumRobots(rc, RobotType.values()[i]);
-			System.out.format("Scouts: %d\n", botsBuilt[RobotType.SCOUT.ordinal()]);
 		}
 	}
 	public static void reportDeath(RobotController rc) throws GameActionException {
