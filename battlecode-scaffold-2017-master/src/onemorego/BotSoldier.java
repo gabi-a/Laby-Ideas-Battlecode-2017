@@ -11,6 +11,9 @@ public class BotSoldier {
 	static boolean exploreFlag = false;
 	static Strategy strat = Strategy.OFFENSE;
 	
+	static final float attackRadius = 4f;
+	static final float attackRotAngle = (float) (2*Math.atan(RobotType.SOLDIER.bodyRadius/attackRadius));
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
 		Util.reportDeath(rc);
@@ -45,7 +48,18 @@ public class BotSoldier {
 			
 			// Moving
 			if(closestEnemy != null) {
-				Nav.pathTo(rc, closestEnemy.location.add(closestEnemy.location.directionTo(myLocation), 2f), bullets);
+				
+				MapLocation attackPosition = null;
+				for(int i = 12; i-->0;) {
+					attackPosition = closestEnemy.location.add(closestEnemy.location.directionTo(myLocation).rotateLeftRads(attackRotAngle*i), attackRadius);
+					if(rc.canSenseAllOfCircle(attackPosition, 1f) && !rc.isCircleOccupiedExceptByThisRobot(attackPosition, 1f)) {
+						break;
+					}
+				}
+				if(attackPosition != null) {
+					Nav.pathTo(rc, attackPosition, bullets);
+				}
+				
 			}
 			else {
 				if(!exploreFlag) {
@@ -62,9 +76,9 @@ public class BotSoldier {
 			if(closestEnemy != null) {
 				
 				MapLocation halfwayLocation = Util.halfwayLocation(myLocation, closestEnemy.location);
-				float halfwayDistance = myLocation.distanceTo(closestEnemy.location);
-				RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, halfwayDistance, rc.getTeam());
-				TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, halfwayDistance, null);
+				float senseRadius = myLocation.distanceTo(closestEnemy.location) - RobotType.SOLDIER.bodyRadius - closestEnemy.getType().bodyRadius;
+				RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, rc.getTeam());
+				TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
 				boolean goodToShoot = true;
 				for(int i = botsBetweenUs.length; i-->0;) {
 					if(Util.doesLineIntersectWithCircle(myLocation, closestEnemy.location, botsBetweenUs[i].location, botsBetweenUs[i].getRadius())) {
