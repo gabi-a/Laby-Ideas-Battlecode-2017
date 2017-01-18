@@ -71,7 +71,28 @@ public class BotLumberjack {
 			if(rc.getLocation().distanceTo(enemyTarget.getLocation()) <= strikeRadius && rc.senseNearbyRobots(strikeRadius, rc.getTeam()).length == 0){
 				rc.strike();
 			} else {
-				Nav.pathTo(rc, enemyTarget.getLocation(), bullets);
+				if(!Nav.pathTo(rc, enemyTarget.getLocation(), bullets)) {
+					
+					// Can't move, so do what a lumberjack does best
+					
+					TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
+					if(trees.length == 0){
+						Nav.explore(rc, bullets);
+						return;
+					}
+					treeTarget = trees[0];
+					
+					// Chop target
+					if(rc.canChop(treeTarget.getID())){
+						rc.chop(treeTarget.getID());
+					}
+
+					// Check if target is dead
+					if(rc.canSenseLocation(treeTarget.getLocation()) && !rc.canSenseTree(treeTarget.getID())) {
+						treeTarget = null;
+					}
+					
+				}
 			}
 		}
 
@@ -90,14 +111,7 @@ public class BotLumberjack {
 					Nav.explore(rc, bullets);
 					return;
 				}
-				float dist = 200;
-				for(int i = 0; i < trees.length; i++){
-					float newDist = trees[i].getLocation().distanceTo(rc.getLocation());
-					if(newDist < dist){
-						dist = newDist;
-						treeTarget = trees[i];
-					}
-				}
+				treeTarget = trees[0];
 			}
 
 			// Go to target

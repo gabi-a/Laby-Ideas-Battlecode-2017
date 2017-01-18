@@ -24,7 +24,7 @@ public class BotGardener {
 		holdTreeProduction = Comms.readHoldTreeProduction(rc) == 1 ? true : false;
 		
 		TreeInfo[] treesInTheWay = rc.senseNearbyTrees(2f, Team.NEUTRAL);
-		if(buildOrder == null && treesInTheWay.length > 0 && treeIDIWantCut != treesInTheWay[0].ID) {
+		if(Util.getNumBots(RobotType.SCOUT) >= 2 && buildOrder == null && treesInTheWay.length > 0 && treeIDIWantCut != treesInTheWay[0].ID) {
 			buildOrder = RobotType.LUMBERJACK;
 			treeIDIWantCut = treesInTheWay[0].ID;
 			Comms.neutralTrees.push(rc, treesInTheWay[0]);
