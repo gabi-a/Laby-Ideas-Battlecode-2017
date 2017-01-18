@@ -92,7 +92,7 @@ public class Util {
 			return enemyLocationsCached[0].add(nextMove,strideDist);
 			
 		} else {
-			System.out.format("IDs: %d %d\n", enemyIDCached, enemyTarget.getID());
+			//System.out.format("IDs: %d %d\n", enemyIDCached, enemyTarget.getID());
 			// Clear cached locations
 			// Add current location to cache
 			enemyIDCached = enemyTarget.getID();
