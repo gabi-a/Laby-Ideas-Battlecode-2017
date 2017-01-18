@@ -16,6 +16,7 @@ public class Comms {
 	public static final int ATTACK_START = 2; // Goes to channel 12
 	
 	public static final CommsStack buildStack;
+	public static final CommsStack lumberjackStack;
 	
 	public static final CommsTree neutralTrees;
 	//public static final CommsTree enemyTrees;
@@ -29,6 +30,7 @@ public class Comms {
 		neutralTrees = new CommsTree(101,120);
 		//enemyTrees = new CommsTree(11,21);
 		buildStack = new CommsStack(50, 100);
+		lumberjackStack = new CommsStack(201,220);
 	}
 
 	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id, AttackGroup group) throws GameActionException {

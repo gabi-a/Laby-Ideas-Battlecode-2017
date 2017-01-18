@@ -78,11 +78,12 @@ public class BotArchon {
 				System.out.format("I'm pushing 10 trees, buildState=%d\n",buildState);
 				Comms.writeHoldTreeProduction(rc, 1);
 				for(int i = 10;i-->0;) {
-					Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
+					Comms.buildStack.push(rc, RobotType.LUMBERJACK.ordinal());
+					Comms.lumberjackStack.push(rc, 1);
 				}
 				buildState = 3;
 			}
-			if(Util.getNumBots(RobotType.SOLDIER) >= 10 && buildState == 3) {
+			if(Util.getNumBots(RobotType.LUMBERJACK) >= 10 && buildState == 3) {
 				Comms.writeHoldTreeProduction(rc, 0);
 				buildState = 4;
 			}

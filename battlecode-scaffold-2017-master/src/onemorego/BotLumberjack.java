@@ -9,6 +9,8 @@ public class BotLumberjack {
 	static RobotInfo enemyTarget;
 	static MapLocation home;
 	static Strategy strat;
+	static boolean startupFlag = true;
+	static int delegation;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotLumberjack.rc = rc;
@@ -17,7 +19,12 @@ public class BotLumberjack {
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		
-		if(enemies.length > 0) {
+		if(startupFlag) {
+			delegation = Comms.lumberjackStack.pop(rc);
+			startupFlag = false;
+		}
+		
+		if(enemies.length > 0 || delegation == 1) {
 			strat = Strategy.OFFENSE;
 		} else {
 			strat = Strategy.LUMBERJACK;
