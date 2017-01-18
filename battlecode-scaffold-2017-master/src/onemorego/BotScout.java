@@ -54,16 +54,9 @@ public class BotScout {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location), bullets);
 			}
 			else if(bestTree != null) {
-
-				//rc.setIndicatorDot(bestTree.location, 255, 0, 0);
-
-<<<<<<< HEAD
-				MapLocation attackLocation = (bestTree.radius > RobotType.SCOUT.bodyRadius) ? bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius) : bestTree.location;
 				//rc.setIndicatorDot(attackLocation, 0, 0, 255);
-=======
 				MapLocation attackLocation = bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius);
 				rc.setIndicatorDot(attackLocation, 0, 0, 255);
->>>>>>> branch 'OneMoreGo' of https://github.com/gabi-a/Laby-Ideas-Battlecode-2017.git
 				Direction attackDirection = myLocation.directionTo(attackLocation);
 				float attackDistance = myLocation.distanceTo(attackLocation);
 				if(myLocation.directionTo(attackLocation) != null && rc.canMove(attackDirection,  attackDistance)) {
