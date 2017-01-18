@@ -56,6 +56,9 @@ public class BotScout {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location), bullets);
 			}
 			else if(bestTree != null) {
+				if(rc.canShake()) {
+					rc.shake(bestTree.getID());
+				}
 				//rc.setIndicatorDot(attackLocation, 0, 0, 255);
 				MapLocation attackLocation = bestTree.location.add(bestTree.location.directionTo(closestEnemy.location), bestTree.radius - RobotType.SCOUT.bodyRadius);
 				rc.setIndicatorDot(attackLocation, 0, 0, 255);
