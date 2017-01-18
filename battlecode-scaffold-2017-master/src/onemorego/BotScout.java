@@ -50,7 +50,7 @@ public class BotScout {
 			if(myLocation.distanceTo(closestEnemy.location) <= 2.1f) {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location).opposite(), bullets);
 			}
-			else if(closestEnemy.type == RobotType.SCOUT || (closestEnemy.type == RobotType.GARDENER && bestTree.location.distanceTo(myLocation) > 4f)) {
+			else if(closestEnemy.type == RobotType.SCOUT || (closestEnemy.type == RobotType.GARDENER && bestTree.location.distanceTo(myLocation) > 2f)) {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location), bullets);
 			}
 			else if(bestTree != null) {
