@@ -26,7 +26,7 @@ public class BotGardener {
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		
-		holdTreeProduction = Comms.readHoldTreeProduction(rc) == 1 ? true : false;
+		holdTreeProduction = Comms.holdTreeProduction.read(rc) == 1 ? true : false;
 		
 		TreeInfo[] treesInTheWay = rc.senseNearbyTrees(2f, Team.NEUTRAL);
 		if(buildOrder == null && treesInTheWay.length > 0 && treeIDIWantCut != treesInTheWay[0].ID) {
@@ -48,7 +48,7 @@ public class BotGardener {
 		if(treesPlanted.length >= maxTreesIcanPlant && !broadcastedFinished) {
 			rc.setIndicatorDot(rc.getLocation(), 0, 255, 0);
 			broadcastedFinished = true;
-			Comms.writeGardenerFinishedPlanting(rc, 1);
+			Comms.gardenerPlanting.write(rc, 1);
 		}
 		
 		if(settled) {
