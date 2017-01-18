@@ -3,7 +3,7 @@ import battlecode.common.*;
 
 public class Nav {
 	
-	static Direction heading = Direction.getNorth();
+	static Direction heading = null;
 	
 	/*
 	 * Tree Bug
@@ -192,6 +192,9 @@ public class Nav {
 	
 	public static boolean explore(RobotController rc, BulletInfo[] bullets) throws GameActionException {
     	MapLocation myLocation = rc.getLocation();
+		if(heading == null) {
+			heading = randomDirection();
+		}
     	int moveAttemptCount = 0;
     	while(moveAttemptCount < 30) {
     		if(rc.onTheMap(myLocation.add(heading,rc.getType().strideRadius + rc.getType().bodyRadius ),rc.getType().bodyRadius+2f) 
