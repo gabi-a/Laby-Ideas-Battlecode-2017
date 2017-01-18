@@ -38,7 +38,7 @@ public class BotLumberjack {
 		//}
 
 		if(strat == Strategy.OFFENSE) {
-			
+			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 			// let another lumberjack cut the tree
 			if(treeTarget != null) {
 				Comms.neutralTrees.push(rc, treeTarget);
@@ -50,13 +50,14 @@ public class BotLumberjack {
 				if(!rc.canSenseRobot(enemyTarget.getID())) enemyTarget = null;
 				else enemyTarget = rc.senseRobot(enemyTarget.getID());
 			}
-
+			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 			// Find target
 			if(enemyTarget == null){
 				if(enemies.length == 0){
 					Nav.explore(rc, bullets);
 					return;
 				}
+				if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 				float dist = 200;
 				for(int i = 0; i < enemies.length; i++){
 					float newDist = enemies[i].getLocation().distanceTo(rc.getLocation());
@@ -65,13 +66,16 @@ public class BotLumberjack {
 						enemyTarget = enemies[i];
 					}
 				}
+				if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 			}
-
+			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 			// get in range and kill
 			float strikeRadius = 2 + enemyTarget.getType().bodyRadius;
 			if(rc.getLocation().distanceTo(enemyTarget.getLocation()) <= strikeRadius && rc.senseNearbyRobots(strikeRadius, rc.getTeam()).length == 0){
 				rc.strike();
+				if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 			} else {
+				if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 				if(!Nav.pathTo(rc, enemyTarget.getLocation(), bullets)) {
 					
 					// Can't move, so do what a lumberjack does best
@@ -83,7 +87,7 @@ public class BotLumberjack {
 						}
 						tempTreeTarget = trees[0];
 					}
-					
+					if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 					// Chop target
 					if(rc.canChop(tempTreeTarget.getID())){
 						rc.chop(tempTreeTarget.getID());
@@ -93,7 +97,7 @@ public class BotLumberjack {
 					if(rc.canSenseLocation(tempTreeTarget.getLocation()) && !rc.canSenseTree(tempTreeTarget.getID())) {
 						tempTreeTarget = null;
 					}
-					
+					if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 				}
 			}
 		}
@@ -107,6 +111,7 @@ public class BotLumberjack {
 			/*if(treeTarget == null) {
 				treeTarget = Comms.neutralTrees.pop(rc);
 			}*/
+			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 			if(treeTarget == null) {
 				TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 				if(trees.length == 0){
@@ -115,21 +120,22 @@ public class BotLumberjack {
 				}
 				treeTarget = trees[0];
 			}
-
+			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 			// Go to target
 			if(!rc.canInteractWithTree(treeTarget.getID())){
 				Nav.pathTo(rc, treeTarget.getLocation(), bullets);
 			}
-
+			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 			// Chop target
 			if(rc.canChop(treeTarget.getID())){
 				rc.chop(treeTarget.getID());
 			}
-
+			if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 			// Check if target is dead
 			if(rc.canSenseLocation(treeTarget.getLocation()) && !rc.canSenseTree(treeTarget.getID())) {
 				treeTarget = null;
 			}
+			if(Clock.getBytecodesLeft() < 1000) if(Clock.getBytecodesLeft() < 1000) System.out.format("Line: %d Bytecodes Left: %d\n",new Throwable().getStackTrace()[0].getLineNumber(), Clock.getBytecodesLeft());
 		}
 	}
 }
