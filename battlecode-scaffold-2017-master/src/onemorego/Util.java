@@ -127,17 +127,11 @@ public class Util {
 		return bestTree;
 	}
 	
-	public static RobotInfo getClosestEnemyExceptArchon(RobotController rc, RobotInfo[] enemies) throws GameActionException {
-		
-		RobotInfo closestEnemy = null;
-		
-		if(enemies.length == 0) {
-			return null;
-		}
-
-		for(int i = 0; i<enemies.length; i++) {
+	public static void communicateNearbyEnemies(RobotController rc, RobotInfo[] enemies) throws GameActionException {
+		for(int i = enemies.length; i-->0;) {
 			if(enemies[i].getType() == RobotType.GARDENER) {
 				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.A);
+				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.B);
 			} else if (enemies[i].getType() == RobotType.ARCHON) {
 				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.B);
 			} else {
@@ -149,6 +143,18 @@ public class Util {
 			if(enemies[i].getID() == Comms.readAttackID(rc, AttackGroup.B) && enemies[i].getHealth() < 20f) {
 				Comms.clearAttackEnemy(rc, AttackGroup.B);
 			}
+		}
+	}
+	
+	public static RobotInfo getClosestEnemyExceptArchon(RobotController rc, RobotInfo[] enemies) throws GameActionException {
+		
+		RobotInfo closestEnemy = null;
+		
+		if(enemies.length == 0) {
+			return null;
+		}
+
+		for(int i = 0; i<enemies.length; i++) {
 			if(enemies[i].getType() != RobotType.ARCHON) {
 				closestEnemy = enemies[i];
 				break;

@@ -33,7 +33,7 @@ public class BotScout {
 
 		BulletInfo[] bullets = rc.senseNearbyBullets(6f);
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
-		
+		Util.communicateNearbyEnemies(rc, enemies);
 		MapLocation myLocation = rc.getLocation();
 
 		MapLocation[] safeMoveLocations = Nav.getSafeMoveLocations(rc, bullets);
@@ -103,7 +103,7 @@ public class BotScout {
 				if(!Nav.pathTo(rc, targetLocation, bullets)) {
 					Nav.explore(rc, bullets);
 				}
-				if(myLocation.distanceTo(targetLocation) < 5f) exploreFlag = true;
+				if(myLocation.distanceTo(targetLocation) < 9f) exploreFlag = true;
 			} else {
 				Nav.explore(rc, bullets);
 			}

@@ -21,6 +21,9 @@ public class BotArchon {
 		BotArchon.rc = rc;
 		Util.updateBotCount(rc);
 		
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		Util.communicateNearbyEnemies(rc, enemies);
+		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		
 		if(rc.getRoundNum() == 1) {

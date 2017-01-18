@@ -24,6 +24,7 @@ public class BotLumberjack {
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		Util.communicateNearbyEnemies(rc, enemies);
 		
 		if(startupFlag) {
 			delegation = Comms.lumberjackStack.pop(rc);

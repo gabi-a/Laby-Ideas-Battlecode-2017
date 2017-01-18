@@ -21,8 +21,10 @@ public class BotGardener {
 		
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		if(enemies.length > 0) {
-			Comms.writeAttackEnemy(rc, enemies[0].location, enemies[0].getID(), AttackGroup.A);
+			RobotInfo enemy = Util.getClosestEnemyExceptArchon(rc, enemies);
+			if(enemy != null) Comms.writeAttackEnemy(rc, enemies[0].location, enemies[0].getID(), AttackGroup.A);
 		}
+		Util.communicateNearbyEnemies(rc, enemies);
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		

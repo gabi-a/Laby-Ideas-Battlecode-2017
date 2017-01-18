@@ -38,7 +38,7 @@ public class BotSoldier {
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets(6f);
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
-		
+		Util.communicateNearbyEnemies(rc, enemies);
 		MapLocation myLocation = rc.getLocation();
 		
 		TreeInfo[] trees = rc.senseNearbyTrees();
