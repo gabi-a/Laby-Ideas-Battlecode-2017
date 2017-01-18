@@ -11,7 +11,7 @@ public class Comms {
 	
 	// Up to 6 enemies to focus on attacking at once
 	// Each enemy is stored in two channels: one for MapLocation and one for ID
-	public static final int ATTACK_START = 2; // Goes to channel 12
+	public static final int ATTACK_START = 900; // Goes to channel 12
 
 	public static final CommsInt gardenerPlanting;
 	public static final CommsInt holdTreeProduction;
@@ -39,12 +39,15 @@ public class Comms {
 
 	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id, AttackGroup group) throws GameActionException {
 		rc.broadcast(ATTACK_START+group.ordinal(), Comms.packLocation(rc, loc));
-		rc.broadcast(ATTACK_START+group.ordinal()+1, id);
+		rc.broadcast(ATTACK_START+group.ordinal()+6, id);
+		System.out.println("loc "+loc+" unpacked "+Comms.unpackLocation(rc, Comms.packLocation(rc, loc)));
+		System.out.println("\nWriting attack enemy in group "+group+" at loc "+loc);
 	}
 	
 	public static void clearAttackEnemy(RobotController rc, AttackGroup group) throws GameActionException {
 		rc.broadcast(ATTACK_START+group.ordinal(), 0);
-		rc.broadcast(ATTACK_START+group.ordinal()+1, 0);
+		rc.broadcast(ATTACK_START+group.ordinal()+6, 0);
+		System.out.println("\nClearing attack enemy in group "+group);
 	}
 	
 	public static MapLocation readAttackLocation(RobotController rc, AttackGroup group) throws GameActionException {
@@ -55,7 +58,7 @@ public class Comms {
 	}
 	
 	public static int readAttackID(RobotController rc, AttackGroup group) throws GameActionException {
-		return rc.readBroadcast(ATTACK_START+group.ordinal()+1);
+		return rc.readBroadcast(ATTACK_START+group.ordinal()+6);
 	}
 	
 	public static void writeNumRobots(RobotController rc, RobotType type, int num) throws GameActionException {
