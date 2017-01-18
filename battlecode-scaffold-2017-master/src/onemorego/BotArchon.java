@@ -41,7 +41,7 @@ public class BotArchon {
 			Comms.writeHoldTreeProduction(rc, 1);
 		}
 		
-		if(Util.getNumBots(RobotType.SCOUT) >= 2 && buildState == 1 || rc.getRoundNum() > 30) {
+		if(Util.getNumBots(RobotType.SCOUT) >= 4 && buildState == 1 || rc.getRoundNum() > 60) {
 			Comms.writeHoldTreeProduction(rc, 0);
 			buildState = 2;
 		}
@@ -53,6 +53,10 @@ public class BotArchon {
 			}
 			buildState = 3;
 		}
+		if(Util.getNumBots(RobotType.SCOUT) >= 10 && buildState == 3) {
+			Comms.writeHoldTreeProduction(rc, 0);
+			buildState = 4;
+		}
 		
 		if(myInitialLocation.distanceTo(rc.getLocation()) > 15f) {
 			Nav.tryMove(rc, rc.getLocation().directionTo(myInitialLocation), bullets);
@@ -61,7 +65,6 @@ public class BotArchon {
 		else {
 			Nav.explore(rc, bullets);
 		}
-		System.out.println(Comms.readGardenerFinishedPlanting(rc)+"\n");
 		if(Comms.readGardenerFinishedPlanting(rc) == 1) {
 			if (tryHireGardener()) Comms.writeGardenerFinishedPlanting(rc, 0);
 		}
