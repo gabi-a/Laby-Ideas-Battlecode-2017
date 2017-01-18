@@ -74,9 +74,9 @@ public class BotLumberjack {
 
 		if(strat == Strategy.LUMBERJACK){
 			// Find a target
-			if(treeTarget == null) {
+			/*if(treeTarget == null) {
 				treeTarget = Comms.neutralTrees.pop(rc);
-			}
+			}*/
 			if(treeTarget == null) {
 				TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 				if(trees.length == 0){
@@ -99,7 +99,7 @@ public class BotLumberjack {
 			}
 
 			// Chop target
-			if(rc.canInteractWithTree(treeTarget.getID())){
+			if(rc.canChop(treeTarget.getID())){
 				rc.chop(treeTarget.getID());
 			}
 

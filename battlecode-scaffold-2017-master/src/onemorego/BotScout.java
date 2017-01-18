@@ -44,13 +44,13 @@ public class BotScout {
 		if(closestEnemy != null) {
 			
 			
-			//rc.setIndicatorLine(myLocation,enemies[0].location, 100, 0, 100);
+			rc.setIndicatorLine(myLocation,closestEnemy.location, 100, 0, 100);
 			TreeInfo bestTree = Util.findBestTree(rc, trees, closestEnemy);
 
-			if(myLocation.distanceTo(closestEnemy.location) <= 2.1f && closestEnemy.type != RobotType.GARDENER) {
+			if(myLocation.distanceTo(closestEnemy.location) <= 2.1f && closestEnemy.type != RobotType.GARDENER && closestEnemy.type != RobotType.SCOUT) {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location).opposite(), bullets);
 			}
-			else if(closestEnemy.type == RobotType.SCOUT || (bestTree != null && closestEnemy.type == RobotType.GARDENER && bestTree.location.distanceTo(myLocation) > 2f)) {
+			else if(closestEnemy.type == RobotType.SCOUT || (closestEnemy.type == RobotType.GARDENER && (bestTree == null || bestTree.location.distanceTo(myLocation) > 2f))) {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location), bullets);
 			}
 			else if(bestTree != null) {
