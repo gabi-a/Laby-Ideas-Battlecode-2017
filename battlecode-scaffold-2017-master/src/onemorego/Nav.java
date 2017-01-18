@@ -244,11 +244,13 @@ public class Nav {
 		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
 		
 		// If this is the first time going here, clear our pathing memory
-		if (goal != goalCache) {
+		if (goal.distanceTo(goalCache) > 5f) {
 			goalCache = goal;
 			dMin = 10000f;
 			moveState = MoveState.TOWARD_LEFT;
 		}
+		
+		goalCache = goal;
 
 		float degreeOffset = 30f;
 		Direction trial;
