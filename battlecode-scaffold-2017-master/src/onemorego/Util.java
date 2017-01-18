@@ -107,10 +107,7 @@ public class Util {
 		}
 
 		// Find best tree
-		// METRIC: d(me, tree) + d(tree, enemy)
-		// This stops us from thinking a tree behind the enemy is the best
-		// (unless it is the only one)
-		float lowestMetric = 1000f;
+		float shortestDistanceToEnemy = 1000f;
 		for(int i = trees.length;i-->0;) {
 			if(trees[i].radius < 1f) {
 				continue;
@@ -118,9 +115,9 @@ public class Util {
 			if(rc.senseNearbyRobots(trees[i].location, trees[i].radius, null).length != 0) {
 				continue;
 			}
-			float metric = trees[i].location.distanceTo(closestEnemy.location) + rc.getLocation().distanceTo(trees[i].location);
-			if(metric < lowestMetric) {
-				lowestMetric = metric;
+			float distanceToEnemy = trees[i].location.distanceTo(closestEnemy.location);
+			if(distanceToEnemy < shortestDistanceToEnemy) {
+				shortestDistanceToEnemy = distanceToEnemy;
 				bestTree = trees[i];
 			}
 		}

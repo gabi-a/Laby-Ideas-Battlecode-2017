@@ -6,6 +6,7 @@ public class BotArchon {
 	static RobotController rc;
 	
 	static int buildState = 0;
+	static MapLocation myInitialLocation;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
@@ -15,6 +16,7 @@ public class BotArchon {
 		
 		if(rc.getRoundNum() == 1) {
 			Comms.writeGardenerFinishedPlanting(rc, 1);
+			myInitialLocation = rc.getLocation();
 		}
 		
 		if(rc.getRoundNum() > rc.getRoundLimit() - 2) {
@@ -49,8 +51,13 @@ public class BotArchon {
 			}
 		}
 		
-		
-		Nav.explore(rc, bullets);
+		if(myInitialLocation.distanceTo(rc.getLocation()) > 15f) {
+			Nav.tryMove(rc, rc.getLocation().directionTo(myInitialLocation), bullets);
+			Nav.heading = Nav.randomDirection();
+		}
+		else {
+			Nav.explore(rc, bullets);
+		}
 		System.out.println(Comms.readGardenerFinishedPlanting(rc)+"\n");
 		if(Comms.readGardenerFinishedPlanting(rc) == 1) {
 			if (tryHireGardener()) Comms.writeGardenerFinishedPlanting(rc, 0);
