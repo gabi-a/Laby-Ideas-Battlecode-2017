@@ -24,7 +24,7 @@ public class BotArchon {
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		
 		if(rc.getRoundNum() == 1) {
-			Comms.writeGardenerFinishedPlanting(rc, 1);
+			Comms.gardenerPlanting.write(rc, 1);
 			myInitialLocation = rc.getLocation();
 			MapLocation[] archonLocs = rc.getInitialArchonLocations(rc.getTeam()); 
 			numArchonsAtStart = archonLocs.length;
@@ -68,17 +68,17 @@ public class BotArchon {
 				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
 				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
 				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
-				Comms.writeHoldTreeProduction(rc, 1);
+				Comms.holdTreeProduction.write(rc, 1);
 			}
 
 			if((Util.getNumBots(RobotType.SCOUT) >= 4 || rc.getRoundNum() > 60) && buildState == 1) {
-				Comms.writeHoldTreeProduction(rc, 0);
+				Comms.holdTreeProduction.write(rc, 0);
 				buildState = 2;
 			}
 
 			if(rc.getTreeCount() >= 8 && buildState == 2) {
 				System.out.format("I'm pushing 10 lumberjacks, buildState=%d\n",buildState);
-				Comms.writeHoldTreeProduction(rc, 1);
+				Comms.holdTreeProduction.write(rc, 1);
 				for(int i = 10;i-->0;) {
 					Comms.buildStack.push(rc, RobotType.LUMBERJACK.ordinal());
 					Comms.lumberjackStack.push(rc, 1);
@@ -86,7 +86,7 @@ public class BotArchon {
 				buildState = 3;
 			}
 			if(Util.getNumBots(RobotType.LUMBERJACK) >= 10 && buildState == 3) {
-				Comms.writeHoldTreeProduction(rc, 0);
+				Comms.holdTreeProduction.write(rc, 0);
 				buildState = 4;
 			}
 		}
@@ -98,8 +98,8 @@ public class BotArchon {
 		else {
 			Nav.explore(rc, bullets);
 		}
-		if(Comms.readGardenerFinishedPlanting(rc) == 1 && Util.getNumBots(RobotType.GARDENER) < 1 + rc.getRoundNum()/100) {
-			if (tryHireGardener()) Comms.writeGardenerFinishedPlanting(rc, 0);
+		if(Comms.gardenerPlanting.read(rc) == 1 && Util.getNumBots(RobotType.GARDENER) < 1 + rc.getRoundNum()/100) {
+			if (tryHireGardener()) Comms.gardenerPlanting.write(rc, 0);
 		}
 		
 	}

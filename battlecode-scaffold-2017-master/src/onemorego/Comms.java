@@ -8,12 +8,13 @@ enum AttackGroup {
 public class Comms {
 	
 	public static final int ROBOT_NUMS_START = 700; // End is 706
-	public static final int	GARDENER_PLANTING = 0;
-	public static final int	HOLD_TREE_PRODUCTION = 1;
 	
 	// Up to 6 enemies to focus on attacking at once
 	// Each enemy is stored in two channels: one for MapLocation and one for ID
 	public static final int ATTACK_START = 2; // Goes to channel 12
+
+	public static final CommsInt gardenerPlanting;
+	public static final CommsInt holdTreeProduction;
 	
 	public static final CommsStack buildStack;
 	public static final CommsStack lumberjackStack;
@@ -31,6 +32,9 @@ public class Comms {
 		//enemyTrees = new CommsTree(11,21);
 		buildStack = new CommsStack(50, 100);
 		lumberjackStack = new CommsStack(201,220);
+
+		gardenerPlanting = new CommsInt(0);
+		holdTreeProduction = new CommsInt(1);
 	}
 
 	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id, AttackGroup group) throws GameActionException {
@@ -52,22 +56,6 @@ public class Comms {
 	
 	public static int readAttackID(RobotController rc, AttackGroup group) throws GameActionException {
 		return rc.readBroadcast(ATTACK_START+group.ordinal()+1);
-	}
-	
-	public static void writeHoldTreeProduction(RobotController rc, int hold) throws GameActionException {
-		rc.broadcast(HOLD_TREE_PRODUCTION, hold);
-	}
-	
-	public static int readHoldTreeProduction(RobotController rc) throws GameActionException {
-		return rc.readBroadcast(HOLD_TREE_PRODUCTION);
-	}
-	
-	public static int readGardenerFinishedPlanting(RobotController rc) throws GameActionException {
-		return rc.readBroadcast(GARDENER_PLANTING);
-	}
-	
-	public static void writeGardenerFinishedPlanting(RobotController rc, int finished) throws GameActionException {
-		rc.broadcast(GARDENER_PLANTING, finished);
 	}
 	
 	public static void writeNumRobots(RobotController rc, RobotType type, int num) throws GameActionException {
@@ -108,6 +96,22 @@ public class Comms {
 		return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
 	}
 	
+}
+
+class CommsInt {
+	public int index;
+
+	public CommsInt(int ind){
+		index = ind;
+	}
+
+	public void write(RobotController rc, int data) throws GameActionException {
+		rc.broadcast(index, data);
+	}
+
+	public int read(RobotController rc) throws GameActionException {
+		return rc.readBroadcast(index);
+	}
 }
 
 class CommsStack {
