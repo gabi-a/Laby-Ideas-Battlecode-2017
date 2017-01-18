@@ -47,7 +47,7 @@ public class BotScout {
 			//rc.setIndicatorLine(myLocation,enemies[0].location, 100, 0, 100);
 			TreeInfo bestTree = Util.findBestTree(rc, trees, closestEnemy);
 
-			if(myLocation.distanceTo(closestEnemy.location) <= 2.1f) {
+			if(myLocation.distanceTo(closestEnemy.location) <= 2.1f && closestEnemy.type != RobotType.GARDENER) {
 				Nav.tryMove(rc, myLocation.directionTo(closestEnemy.location).opposite(), bullets);
 			}
 			else if(closestEnemy.type == RobotType.SCOUT || (closestEnemy.type == RobotType.GARDENER && bestTree.location.distanceTo(myLocation) > 2f)) {

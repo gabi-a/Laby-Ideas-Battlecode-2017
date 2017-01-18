@@ -36,6 +36,8 @@ public class BotArchon {
 			buildState = 1;
 			Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
 			Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
+			Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
+			Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
 			Comms.writeHoldTreeProduction(rc, 1);
 		}
 		
