@@ -95,7 +95,7 @@ public class BotArchon {
 		else {
 			Nav.explore(rc, bullets);
 		}
-		if(Comms.readGardenerFinishedPlanting(rc) == 1) {
+		if(Comms.readGardenerFinishedPlanting(rc) == 1 && Util.getNumBots(RobotType.GARDENER) < 1 + rc.getRoundNum()/100) {
 			if (tryHireGardener()) Comms.writeGardenerFinishedPlanting(rc, 0);
 		}
 		
@@ -106,6 +106,7 @@ public class BotArchon {
 		for (int i = 0; i < 8; i++) {
 			if (rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection, 5f))) {
 				rc.hireGardener(hireDirection);
+				Util.increaseNumBotsByOne(rc, RobotType.GARDENER);
 				return true;
 			}
 			hireDirection = hireDirection.rotateLeftRads((float) Math.PI * 0.25f);
