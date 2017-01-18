@@ -65,12 +65,16 @@ public class BotLumberjack {
 			}
 			else {
 				// get in range and kill
-				float strikeRadius = 1f + enemyTarget.getType().bodyRadius;
-				if(rc.getLocation().distanceTo(enemyTarget.getLocation()) <= strikeRadius && rc.senseNearbyRobots(strikeRadius, rc.getTeam()).length == 0){
+				float strikeRadius = RobotType.LUMBERJACK.bodyRadius + enemyTarget.getType().bodyRadius + 0.999f;
+				if(rc.getLocation().distanceTo(enemyTarget.getLocation()) <= strikeRadius && rc.senseNearbyRobots(strikeRadius, rc.getTeam()).length <= 1){
 					rc.strike();
 				} 
 				else {
-					Nav.pathTo(rc, enemyTarget.getLocation(), bullets);
+					if(rc.getLocation().distanceTo(enemyTarget.getLocation()) < 4f) {
+						Nav.tryPrecisionMove(rc, rc.getLocation().directionTo(enemyTarget.getLocation()), rc.getLocation().distanceTo(enemyTarget.getLocation()), bullets);
+					} else {
+						Nav.pathTo(rc, enemyTarget.getLocation(), bullets);
+					}
 				}
 			}
 			

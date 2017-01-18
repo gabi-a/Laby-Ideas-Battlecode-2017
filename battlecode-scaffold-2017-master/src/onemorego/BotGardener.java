@@ -22,7 +22,7 @@ public class BotGardener {
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		if(enemies.length > 0) {
 			RobotInfo enemy = Util.getClosestEnemyExceptArchon(rc, enemies);
-			if(enemy != null) Comms.writeAttackEnemy(rc, enemies[0].location, enemies[0].getID(), AttackGroup.A);
+			if(enemy != null) Comms.writeAttackEnemy(rc, enemies[0].location, enemies[0].getID(), AttackGroup.B);
 		}
 		Util.communicateNearbyEnemies(rc, enemies);
 		

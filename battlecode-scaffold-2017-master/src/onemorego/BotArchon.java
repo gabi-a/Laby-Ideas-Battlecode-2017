@@ -71,6 +71,8 @@ public class BotArchon {
 				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
 				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
 				Comms.buildStack.push(rc, RobotType.SCOUT.ordinal());
+				Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
+				Comms.buildStack.push(rc, RobotType.SOLDIER.ordinal());
 				Comms.holdTreeProduction.write(rc, 1);
 			}
 
