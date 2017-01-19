@@ -25,6 +25,7 @@ public class BotLumberjack {
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 		Util.communicateNearbyEnemies(rc, enemies);
 		
 		if(startupFlag) {
@@ -61,7 +62,9 @@ public class BotLumberjack {
 						if(!Nav.pathTo(rc, targetLocation, bullets)) {
 							Nav.explore(rc, bullets);
 						}
-						if(rc.getLocation().distanceTo(targetLocation) < 5f) exploreFlag = true;
+						if(rc.getLocation().distanceTo(targetLocation) < 5f) {
+							exploreFlag = true;
+						}
 					} else {
 						Nav.explore(rc, bullets);
 					}
@@ -81,12 +84,7 @@ public class BotLumberjack {
 				}
 
 				// Do what a lumberjack does best
-				if(tempTreeTarget == null) {
-					TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
-					if(trees.length == 0){
-						if(!rc.hasMoved()) Nav.explore(rc, bullets);
-						return;
-					}
+				if(tempTreeTarget == null && trees.length > 0) {
 					tempTreeTarget = trees[0];
 				}
 				// Chop target
@@ -106,19 +104,14 @@ public class BotLumberjack {
 			
 			case LUMBERJACK:
 				rc.setIndicatorDot(rc.getLocation(), 0, 255, 0);
-				// Find a target
-				/*if(treeTarget == null) {
-					treeTarget = Comms.neutralTrees.pop(rc);
-				}*/
 
 				if(treeTarget == null) {
-					TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 					if(trees.length == 0){
-						if(!Nav.pathTo(rc, targetLocation, bullets))
-							Nav.explore(rc, bullets);
-						return;
+						Nav.tryMove(rc, rc.getLocation().directionTo(targetLocation),bullets);
 					}
-					treeTarget = trees[0];
+					else {
+						treeTarget = trees[0];
+					}
 				}
 
 				// Go to target
