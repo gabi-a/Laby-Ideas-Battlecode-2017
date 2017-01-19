@@ -1,8 +1,7 @@
 package onemorego;
 import battlecode.common.*;
 
-public class BotTank {
-	static RobotController rc;
+public class BotTank extends RobotPlayer {
 	
 	static Team enemyTeam = RobotPlayer.rc.getTeam().opponent();
 	static MapLocation enemyArchonLocation = RobotPlayer.rc.getInitialArchonLocations(enemyTeam)[0];
@@ -19,9 +18,7 @@ public class BotTank {
 	static boolean startupFlag = true;
 	static MapLocation gardenProtectionLocation = null;
 	
-	public static void turn(RobotController rc) throws GameActionException {
-		BotTank.rc = rc;
-		Util.reportIfDead(rc);
+	public static void turn() throws GameActionException {
 	
 		/* Offense:
 		 * Try and get to AttackGroup B location, if any enemies are seen along the way
@@ -55,7 +52,6 @@ public class BotTank {
 		}
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets(6f);
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		Util.communicateNearbyEnemies(rc, enemies);
 		MapLocation myLocation = rc.getLocation();
 		

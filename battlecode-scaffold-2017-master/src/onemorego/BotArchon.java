@@ -2,8 +2,7 @@ package onemorego;
 
 import battlecode.common.*;
 
-public class BotArchon {
-	static RobotController rc;
+public class BotArchon extends RobotPlayer {
 	
 	static int buildState = 0;
 	static MapLocation myInitialLocation;
@@ -17,12 +16,7 @@ public class BotArchon {
 	static int numArchonsAtStart = 0;
 	static Archon archonDesignation;
 	
-	public static void turn(RobotController rc) throws GameActionException {
-		BotArchon.rc = rc;
-		Util.updateBotCount(rc);
-		
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
-		Util.communicateNearbyEnemies(rc, enemies);
+	public static void turn() throws GameActionException {
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		

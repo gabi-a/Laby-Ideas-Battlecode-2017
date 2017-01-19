@@ -1,9 +1,7 @@
 package onemorego;
-
 import battlecode.common.*;
 
-public class BotGardener {
-	static RobotController rc;
+public class BotGardener extends RobotPlayer {
 	
 	static boolean settled = false;
 	static Direction spawnDirection = null;
@@ -18,24 +16,19 @@ public class BotGardener {
 	static int treeIDIWantCut = 0;
 	static boolean startupFlag = true;
 	
-	public static void turn(RobotController rc) throws GameActionException {
-		
-		BotGardener.rc = rc;
-		Util.updateBotCount(rc);
+	public static void turn() throws GameActionException {
 		
 		if(startupFlag) {
 			Comms.soldierProtectionLocationStack.push(rc, Comms.packLocation(rc, rc.getLocation()));
 			startupFlag = false;
 		}
 		
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		RobotInfo enemy = Util.getClosestEnemyExceptArchon(rc, enemies);
 		
 		if(enemy != null) {
 			Comms.writeAttackEnemy(rc, enemy.location, enemy.getID(), AttackGroup.B);
 		}
 		
-		Util.communicateNearbyEnemies(rc, enemies);
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		

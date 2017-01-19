@@ -1,8 +1,7 @@
 package onemorego;
 import battlecode.common.*;
 
-public class BotScout {
-	static RobotController rc;
+public class BotScout extends RobotPlayer {
 	
 	static Team enemyTeam = RobotPlayer.rc.getTeam().opponent();
 	static MapLocation enemyArchonLocation = RobotPlayer.rc.getInitialArchonLocations(enemyTeam)[0];
@@ -10,18 +9,7 @@ public class BotScout {
 	
 	static boolean exploreFlag = false;
 	
-	public static void turn(RobotController rc) throws GameActionException {
-		BotScout.rc = rc;
-		Util.reportIfDead(rc);
-		
-		//TODO: Don't shoot into trees (waste of bullets)
-			
-		/*
-		 * 
-		 * Scouts care about killing gardeners _only_
-		 * 
-		 * 
-		 */
+	public static void turn() throws GameActionException {
 		
 		MapLocation commsTarget = Comms.readAttackLocation(rc, AttackGroup.A);
 		if(commsTarget != null) {
@@ -32,7 +20,6 @@ public class BotScout {
 		}
 
 		BulletInfo[] bullets = rc.senseNearbyBullets(6f);
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		Util.communicateNearbyEnemies(rc, enemies);
 		MapLocation myLocation = rc.getLocation();
 

@@ -1,17 +1,15 @@
 package onemorego;
 import battlecode.common.*;
 
-public class BotSoldier {
-	static RobotController rc;
+public class BotSoldier extends RobotPlayer {
 	
 	static Team enemyTeam = RobotPlayer.rc.getTeam().opponent();
 	static MapLocation enemyArchonLocation = RobotPlayer.rc.getInitialArchonLocations(enemyTeam)[0];
 	
 	static MapLocation targetLocation = enemyArchonLocation;
-	//static MapLocation secondaryTargetLocation = enemyArchonLocation;
 	
 	static boolean exploreFlag = false;
-	static Strategy strat;// = Strategy.OFFENSE;
+	static Strategy strat;
 	
 	static final float attackRadius = 6f;
 	static final float attackRotAngle = (float) (2*Math.atan(RobotType.SOLDIER.bodyRadius/attackRadius));
@@ -19,10 +17,8 @@ public class BotSoldier {
 	static boolean startupFlag = true;
 	static MapLocation gardenProtectionLocation = null;
 	
-	public static void turn(RobotController rc) throws GameActionException {
-		BotSoldier.rc = rc;
-		Util.reportIfDead(rc);
-	
+	public static void turn() throws GameActionException {
+		
 		/* Offense:
 		 * Try and get to AttackGroup B location, if any enemies are seen along the way
 		 * start targeting them until they are dead 
@@ -55,7 +51,6 @@ public class BotSoldier {
 		}
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets(6f);
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, enemyTeam);
 		Util.communicateNearbyEnemies(rc, enemies);
 		MapLocation myLocation = rc.getLocation();
 		

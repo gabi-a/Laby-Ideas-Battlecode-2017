@@ -2,8 +2,7 @@ package onemorego;
 
 import battlecode.common.*;
 
-public class BotLumberjack {
-	static RobotController rc;
+public class BotLumberjack extends RobotPlayer {
 
 	static TreeInfo treeTarget;
 	static TreeInfo tempTreeTarget;
@@ -18,13 +17,9 @@ public class BotLumberjack {
 	static MapLocation targetLocation = enemyArchonLocation;
 	static boolean exploreFlag = false;
 	
-	public static void turn(RobotController rc) throws GameActionException {
-		
-		BotLumberjack.rc = rc;
-		Util.reportIfDead(rc);
+	public static void turn() throws GameActionException {
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 		Util.communicateNearbyEnemies(rc, enemies);
 		
