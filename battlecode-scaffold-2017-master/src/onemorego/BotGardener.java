@@ -19,6 +19,7 @@ public class BotGardener {
 	static boolean startupFlag = true;
 	
 	public static void turn(RobotController rc) throws GameActionException {
+		
 		BotGardener.rc = rc;
 		Util.updateBotCount(rc);
 		
@@ -28,32 +29,34 @@ public class BotGardener {
 		}
 		
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
-		if(enemies.length > 0) {
-			RobotInfo enemy = Util.getClosestEnemyExceptArchon(rc, enemies);
-			if(enemy != null) Comms.writeAttackEnemy(rc, enemies[0].location, enemies[0].getID(), AttackGroup.B);
+		RobotInfo enemy = Util.getClosestEnemyExceptArchon(rc, enemies);
+		
+		if(enemy != null) {
+			Comms.writeAttackEnemy(rc, enemy.location, enemy.getID(), AttackGroup.B);
 		}
+		
 		Util.communicateNearbyEnemies(rc, enemies);
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		
-		holdTreeProduction = Comms.holdTreeProduction.read(rc) == 1 ? true : false;
+		holdTreeProduction = (Comms.holdTreeProduction.read(rc) == 1);
 		
 		TreeInfo[] treesInTheWay = rc.senseNearbyTrees(2f, Team.NEUTRAL);
-		if(buildOrder == null && treesInTheWay.length > 0 && treeIDIWantCut != treesInTheWay[0].ID) {
-			buildOrder = RobotType.LUMBERJACK;
-			treeIDIWantCut = treesInTheWay[0].ID;
-			Comms.neutralTrees.push(rc, treesInTheWay[0]);
-		}
-		
-		if(Util.getNumBots(RobotType.SCOUT) < 2 && buildOrder == null) {
-			buildOrder = RobotType.SCOUT;
-		}
 		
 		if(buildOrder == null) {
-			int data = Comms.buildQueue.pop(rc);
-			if (data != -1) buildOrder = RobotType.values()[data];
+			if(treesInTheWay.length > 0 && treeIDIWantCut != treesInTheWay[0].ID) {
+				buildOrder = RobotType.LUMBERJACK;
+				treeIDIWantCut = treesInTheWay[0].ID;
+				Comms.neutralTrees.push(rc, treesInTheWay[0]);
+			}
+			else {
+				int data = Comms.buildQueue.pop(rc);
+				if (data != -1) {
+					buildOrder = RobotType.values()[data];
+				}
+			}
 		}
-		
+
 		TreeInfo[] treesPlanted = rc.senseNearbyTrees(2f, rc.getTeam());
 		if(treesPlanted.length >= maxTreesIcanPlant && !broadcastedFinished) {
 			rc.setIndicatorDot(rc.getLocation(), 0, 255, 0);
@@ -66,22 +69,20 @@ public class BotGardener {
 		}
 		
 		if(settled) {
-		
-			waterTrees();
-			
+			waterTrees();	
 			if(spawnDirection == null) {
-				if(!setSpawnDirection()) {
+				spawnDirection = setSpawnDirection();
+				if(spawnDirection == null) {
 					settled = false;
 					Nav.treeBug(rc, bullets);
 				}
-			}
-			
+			}	
 			if(spawnDirection != null && !holdTreeProduction) {
 				maxTreesIcanPlant = maxTreesIcanPlant();
 				plantTrees();
-			}
-			
-		} else {
+			}	
+		} 
+		else {
 			Nav.treeBug(rc, bullets);
 			turnsNotSettled ++;
 			settled = settleHere();
@@ -95,7 +96,6 @@ public class BotGardener {
 			if(rc.canBuildRobot(typeToBuild, buildDirection)) {
 				rc.buildRobot(typeToBuild, buildDirection);
 				Util.increaseNumBotsByOne(rc, typeToBuild);
-				buildOrder = null;
 				return true;
 			}
 			buildDirection = buildDirection.rotateLeftDegrees(60);
@@ -123,41 +123,29 @@ public class BotGardener {
 		return false;
 	}
 	
-	public static boolean setSpawnDirection() throws GameActionException {
-		
+	public static Direction setSpawnDirection() throws GameActionException {
 		Direction testDirection = Direction.getEast();
 		for(int i = 72;i-->0;) {
-			
 			rc.setIndicatorDot(rc.getLocation().add(testDirection,2f), 0, 255, 0);
-			
-			if(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection, 2f), 1f) || rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection, 3f), 2f) || !rc.onTheMap(rc.getLocation().add(testDirection, 2f), 2f)) {
+			if(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection, 2f), 1f) || !rc.onTheMap(rc.getLocation().add(testDirection, 2f), 1f)) {
 				testDirection = testDirection.rotateLeftDegrees(5f);
 				continue;
-			} else {
-				spawnDirection = testDirection;
-				rc.setIndicatorDot(rc.getLocation().add(testDirection,2f), 0, 0, 255);
-				break;
-			}
-			
+			} 
+			else {
+				return testDirection;
+			}	
 		}
-		return (spawnDirection != null);
-		
+		return null;
 	}
 	
 	public static void plantTrees() throws GameActionException {
 		Direction buildDirection = spawnDirection.rotateLeftDegrees(60);
 		for(int i = 5; i-->0;) {
-			
 			rc.setIndicatorDot(rc.getLocation().add(buildDirection,2f), 255, 0, 0);
-			
 			if(rc.canPlantTree(buildDirection)) {
 				rc.plantTree(buildDirection);
-				break;
-			} else {
-				buildDirection = buildDirection.rotateLeftDegrees(60);
-				continue;
 			}
-			
+			buildDirection = buildDirection.rotateLeftDegrees(60);
 		}
 	}
 	
@@ -165,17 +153,11 @@ public class BotGardener {
 		Direction buildDirection = spawnDirection.rotateLeftDegrees(60);
 		int maxTrees = 0;
 		for(int i = 5; i-->0;) {
-			
 			rc.setIndicatorDot(rc.getLocation().add(buildDirection,2f), 255, 0, 0);
-			
 			if(rc.canPlantTree(buildDirection)) {
 				maxTrees++;
-				continue;
-			} else {
-				buildDirection = buildDirection.rotateLeftDegrees(60);
-				continue;
 			}
-			
+			buildDirection = buildDirection.rotateLeftDegrees(60);
 		}
 		return maxTrees;
 	}
