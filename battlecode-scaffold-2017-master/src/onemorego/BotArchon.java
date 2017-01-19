@@ -117,6 +117,7 @@ public class BotArchon {
 				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
 				Comms.buildQueue.push(rc, RobotType.SOLDIER.ordinal());
 				Comms.buildQueue.push(rc, RobotType.SCOUT.ordinal());
+				buildState = 7;
 			}
 		}
 		
