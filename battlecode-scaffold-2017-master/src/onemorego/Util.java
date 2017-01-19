@@ -16,8 +16,8 @@ public class Util {
 			botsBuilt[i] = Comms.readNumRobots(rc, RobotType.values()[i]);
 		}
 	}
-	public static void reportDeath(RobotController rc) throws GameActionException {
-		if(!reportedDeath && rc.getHealth() < 5f) {
+	public static void reportIfDead(RobotController rc) throws GameActionException {
+		if(!reportedDeath && rc.getHealth() <= 5f) {
 			updateBotCount(rc);
     		Comms.writeNumRobots(rc, rc.getType(), botsBuilt[rc.getType().ordinal()] - 1);
     		reportedDeath = true;
@@ -129,18 +129,23 @@ public class Util {
 	
 	public static void communicateNearbyEnemies(RobotController rc, RobotInfo[] enemies) throws GameActionException {
 		for(int i = enemies.length; i-->0;) {
-			if(enemies[i].getType() == RobotType.GARDENER) {
-				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.A);
-				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.B);
-			} else if (enemies[i].getType() == RobotType.ARCHON) {
-				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.B);
-			} else {
-				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.C);
+			switch (enemies[i].getType()) {
+				case GARDENER:
+					Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.A);
+					Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.B);
+					break;
+				case ARCHON:
+					Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.B);
+					break;
+				default:
+					Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID(), AttackGroup.C);
+					break;
 			}
-			if(enemies[i].getID() == Comms.readAttackID(rc, AttackGroup.A) && enemies[i].getHealth() < 20f) {
-					Comms.clearAttackEnemy(rc, AttackGroup.A);
+			//CLEARING
+			if(enemies[i].getID() == Comms.readAttackID(rc, AttackGroup.A) && enemies[i].getHealth() < 5f) {
+				Comms.clearAttackEnemy(rc, AttackGroup.A);
 			}
-			if(enemies[i].getID() == Comms.readAttackID(rc, AttackGroup.B) && enemies[i].getHealth() < 20f) {
+			if(enemies[i].getID() == Comms.readAttackID(rc, AttackGroup.B) && enemies[i].getHealth() < 5f) {
 				Comms.clearAttackEnemy(rc, AttackGroup.B);
 			}
 		}
@@ -154,7 +159,7 @@ public class Util {
 			return null;
 		}
 
-		for(int i = 0; i<enemies.length; i++) {
+		for(int i = 0; i < enemies.length; i++) {
 			if(enemies[i].getType() != RobotType.ARCHON) {
 				closestEnemy = enemies[i];
 				break;

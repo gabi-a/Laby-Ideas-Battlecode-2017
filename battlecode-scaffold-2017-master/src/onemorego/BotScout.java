@@ -12,7 +12,7 @@ public class BotScout {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotScout.rc = rc;
-		Util.reportDeath(rc);
+		Util.reportIfDead(rc);
 		
 		//TODO: Don't shoot into trees (waste of bullets)
 			

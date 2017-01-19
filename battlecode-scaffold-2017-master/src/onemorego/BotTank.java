@@ -21,7 +21,7 @@ public class BotTank {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotTank.rc = rc;
-		Util.reportDeath(rc);
+		Util.reportIfDead(rc);
 	
 		/* Offense:
 		 * Try and get to AttackGroup B location, if any enemies are seen along the way
