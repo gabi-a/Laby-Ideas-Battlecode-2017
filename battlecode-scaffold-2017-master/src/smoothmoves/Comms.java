@@ -38,7 +38,6 @@ public class Comms {
 		MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
 		MapLocation cornerPoint = referencePoint.add((float) Math.PI, 100).add((float) Math.PI * 0.5f, -100);
 		
-		
 		return new MapLocation(cornerPoint.x + mapZoneX, cornerPoint.y + mapZoneY);
 	}
 	
