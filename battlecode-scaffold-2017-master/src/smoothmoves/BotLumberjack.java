@@ -14,24 +14,26 @@ public class BotLumberjack {
 		
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
-		BulletInfo[] bullets = rc.senseNearbyBullets(4f);
+		BulletInfo[] bullets = rc.senseNearbyBullets();
 		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
+		TreeInfo bestTree = null;
 		
 		/************* Determine where to move *******************/
-		Direction moveDirection = Direction.NORTH;
+		Direction moveDirection = null;
 		float moveStride = RobotType.LUMBERJACK.strideRadius;
 		
 		/* If there are any bullets nearby, just dodge them and don't
 		 * worry about going to the target 
 		 */
 		if(bullets.length > 0) {
-			moveDirection = Nav.awayFromBullets(myLocation, bullets);
+			moveDirection = Nav.awayFromBulletsAndTrees(rc, myLocation, bullets, trees);
+			
 		}
 		
 		/*
 		 * If there are enemies then get in strike range
 		 */
-		else if(enemies.length > 0){
+		if(enemies.length > 0 && moveDirection == null){
 			
 			// Move towards scouts, gardeners and archons, away from other enemies
 			RobotInfo bestCloseEnemy = enemies[0];
@@ -45,16 +47,15 @@ public class BotLumberjack {
 					bestCloseEnemy = enemy;
 				} 
 				
-				// If there is a dangerous enemy within 5 units, run away!
-				else if (myLocation.distanceTo(enemy.getLocation()) < 5f ){
+				// If there is a dangerous enemy and about to be in stride radius, run away!
+				else if (myLocation.distanceTo(enemy.location) < 3f){
 					goalLocation.add(myLocation.directionTo(enemy.getLocation()).opposite());
-					moveStride = 5f - myLocation.distanceTo(enemy.getLocation());
 					enemiesToRunFrom++;
 				}
 			}
 			
-			// Don't be a wuss
-			if(enemiesToRunFrom > 1) {
+			// Be a wuss
+			if(enemiesToRunFrom > 0) {
 				moveDirection = myLocation.directionTo(goalLocation);
 			}
 			else {
@@ -65,9 +66,21 @@ public class BotLumberjack {
 		}
 		
 		/*
-		 * If there are trees around chop them
+		 * If there are trees around head to them
 		 */
-		else if(trees.length > 0){
+		if(trees.length > 0 && ((moveDirection != null && !rc.canMove(moveDirection)) || moveDirection == null)) {
+			bestTree = trees[0];
+			float lowestHealth = 1000f;
+			for(int i = 0; i-->0;) {
+				TreeInfo tree = trees[i];
+				if(tree.health < lowestHealth) {
+					lowestHealth = tree.health;
+					bestTree = tree;
+				}
+			}
+			moveDirection = myLocation.directionTo(bestTree.location);
+			moveDirection = Nav.tryMove(rc, moveDirection, 5f, 12, bullets);
+			moveStride = 0.9f*(myLocation.distanceTo(bestTree.location) - bestTree.radius - RobotType.LUMBERJACK.bodyRadius);
 			
 		}
 		
@@ -89,18 +102,42 @@ public class BotLumberjack {
 			action = Action.LUMBERJACK_STRIKE;
 		}
 		
-		/************* Do Move ***********************************/
-		if(rc.canMove(moveDirection, moveStride)) {
-			rc.move(moveDirection, moveStride);
+		/*
+		 * If there are trees, chop 'em
+		 */
+		else if(trees.length > 0) {
+			action = Action.CHOP;
+			if(bestTree != null && rc.canChop(bestTree.ID)) {
+				chopID = bestTree.ID;
+			} else if(rc.canChop(trees[0].ID)) {
+				chopID = trees[0].ID;
+			} else {
+				System.err.format("\nI wanted to chop a tree but I couldn't :(\n");
+			}
 		}
 		
+		/************* Do Move ***********************************/
+		
+		/*
+		 * All checks to see if this move is possible should already
+		 * have taken place
+		 */
+		if(moveDirection != null && rc.canMove(moveDirection))
+			rc.move(moveDirection, moveStride);
+		
 		/************* Do action *********************************/
+		
+		/*
+		 * All checks to see if this action is possible should already
+		 * have taken place
+		 */
+		
 		switch(action) {
 		case Action.CHOP:
-			if(rc.canChop(chopID)) rc.chop(chopID);
+			rc.chop(chopID);
 			break;
 		case Action.LUMBERJACK_STRIKE:
-			if(rc.canStrike()) rc.strike();
+			rc.strike();
 			break;
 		default:
 			break;
