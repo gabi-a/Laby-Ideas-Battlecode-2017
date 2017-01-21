@@ -18,15 +18,18 @@ public class Nav {
 		
 		// Apply Anti Gravity from each bullet in its current or future position
 		for(int i = bullets.length;i-->0;) {
-			if(bullets[i].location.distanceTo(myLocation) > 2f) {
+
+			// If we might intersect the bullet in its current position on our next move,
+			// decide where to move based on its current position
+			if(bullets[i].location.distanceTo(myLocation) < bullets[i].speed + RobotType.LUMBERJACK.strideRadius) {
+				rc.setIndicatorDot(bullets[i].location, 255, 50, 50);
+				moveLocation = moveLocation.add(bullets[i].location.directionTo(myLocation), Math.max(2f, 1f/(bullets[i].location.distanceTo(myLocation))));
+				rc.setIndicatorLine(bullets[i].location, bullets[i].location.add(bullets[i].location.directionTo(myLocation)), 255, 0, 0);
+			}
+			else {
 				rc.setIndicatorDot(futureBullets[i].location, 255, 50, 50);
 				moveLocation = moveLocation.add(futureBullets[i].location.directionTo(myLocation), Math.max(2f, 1f/(futureBullets[i].location.distanceTo(myLocation))));
 				rc.setIndicatorLine(futureBullets[i].location, futureBullets[i].location.add(futureBullets[i].location.directionTo(myLocation)), 255, 0, 0);
-			}
-			else {
-				rc.setIndicatorDot(bullets[i].location, 255, 50, 50);
-				moveLocation = moveLocation.add(bullets[i].location.directionTo(myLocation), Math.max(2f, 1f/(bullets[i].location.distanceTo(myLocation))));
-				rc.setIndicatorLine(bullets[i].location, futureBullets[i].location.add(bullets[i].location.directionTo(myLocation)), 255, 0, 0);
 			}
 		}
 		
