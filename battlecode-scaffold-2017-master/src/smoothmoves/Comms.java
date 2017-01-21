@@ -97,6 +97,24 @@ class CommsStack {
 		
 		return data;
 	}
+
+	public int length(RobotController rc) throws GameActionException {
+		return rc.readBroadcast(stackStart);
+	}
+
+	public int[] array(RobotController rc) throws GameActionException {
+		int stackPointer = rc.readBroadcast(stackStart);
+		if (stackPointer == 0) {
+			return null;
+		}
+
+		int[stackPointer] data;
+		for(int i = 0; i < stackPointer; i++){
+			data[i] = rc.readBroadcast(stackStart + offset + i);
+		}
+
+		return data;
+	}
 }
 
 class CommsQueue {
@@ -144,6 +162,34 @@ class CommsQueue {
 
 		queueData = (newHead << 8) | (tail);
 		rc.broadcast(queueStart, queueData);
+
+		return data;
+	}
+
+	public int length(RobotController rc) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+		int head = (queueData & 0xFF00) >> 8;
+		int tail = queueData & 0x00FF;
+
+		return head > tail? head - tail : tail - head;
+	}
+
+	public int[] array(RobotController rc) throws GameActionException {
+		int queueData = rc.readBroadcast(queueStart);
+		int head = (queueData & 0xFF00) >> 8;
+		int tail = queueData & 0x00FF;
+
+		if(tail == head) {
+			return -1;	// queue is empty
+		}
+
+		int length = head > tail? head - tail : tail - head;
+
+		int[length] data;
+		for(int i = 0; i < length; i++){
+			if(head > queueEnd) head = queueStart + offset;
+			data[i] = rc.readBroadcast(queueStart + offset + head);
+		}
 
 		return data;
 	}
