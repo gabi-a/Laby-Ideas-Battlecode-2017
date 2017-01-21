@@ -62,7 +62,7 @@ public class BotSoldier {
 					action = Action.FIRE_PENTAD;
 				}
 				
-				// Otherwise do a bit of cheeky hurding
+				// Otherwise do a bit of cheeky herding
 				else {
 					rc.setIndicatorDot(myLocation, 0, 0, 255);
 					fireOffsetDegrees = -fireOffsetDegrees;
