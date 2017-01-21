@@ -201,6 +201,11 @@ class CommsArray {
 	public int[] array;
 	public int[] lastUpdated;
 
+	public CommsArray(int start, int end){
+		arrayStart = start;
+		arrayEnd = end;
+	}
+
 	public void write(RobotController rc, int index, int data) throws GameActionException {
 		if(index > arrayEnd - arrayStart){
 			System.out.println("error: out of comms array bounds");
