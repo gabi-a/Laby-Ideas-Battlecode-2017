@@ -108,7 +108,7 @@ class CommsStack {
 			return null;
 		}
 
-		int[stackPointer] data;
+		int[] data = new int[stackPointer];
 		for(int i = 0; i < stackPointer; i++){
 			data[i] = rc.readBroadcast(stackStart + offset + i);
 		}
@@ -180,12 +180,12 @@ class CommsQueue {
 		int tail = queueData & 0x00FF;
 
 		if(tail == head) {
-			return -1;	// queue is empty
+			return null;	// queue is empty
 		}
 
 		int length = head > tail? head - tail : tail - head;
 
-		int[length] data;
+		int[] data = new int[length];
 		for(int i = 0; i < length; i++){
 			if(head > queueEnd) head = queueStart + offset;
 			data[i] = rc.readBroadcast(queueStart + offset + head);
