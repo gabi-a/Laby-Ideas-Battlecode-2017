@@ -20,16 +20,34 @@ public class BotSoldier {
 		Direction moveDirection = null;
 		float moveStride = RobotType.SOLDIER.strideRadius;
 		
+		BulletInfo[] bullets = rc.senseNearbyBullets();
+		TreeInfo[] trees = rc.senseNearbyTrees();
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		
 		/************* Determine where to move *******************/
 
-		if(enemies.length > 0) {
-			if(myLocation.distanceTo(enemies[0].location) < 5f)
-				moveDirection = myLocation.directionTo(enemies[0].location).opposite();
-			if(myLocation.distanceTo(enemies[0].location) > 4.99f)
-				moveDirection = myLocation.directionTo(enemies[0].location);
+		if(bullets.length > 0) {
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
+			moveDirection = myLocation.directionTo(moveLocation);
+			moveStride = myLocation.distanceTo(moveLocation);
+		}
+		
+		if(enemies.length > 0 && (moveDirection == null || moveDirection != null && !rc.canMove(moveDirection,moveStride))) {
+			RobotInfo closestEnemy = enemies[0];
+			if(closestEnemy.type == RobotType.LUMBERJACK) {
+				if(myLocation.distanceTo(closestEnemy.location) < 4f) {
+					moveDirection = closestEnemy.location.directionTo(myLocation);
+				} else if(myLocation.distanceTo(closestEnemy.location) > 5f) {
+					moveDirection = myLocation.directionTo(closestEnemy.location);
+					moveStride = myLocation.distanceTo(closestEnemy.location) - 4.5f;
+				}
+			} else {
+				moveDirection = myLocation.directionTo(closestEnemy.location);
+				moveStride = myLocation.distanceTo(closestEnemy.location) - closestEnemy.getRadius() - RobotType.SOLDIER.bodyRadius;
+			}
+			moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
+			
 		}
 		
 		
@@ -52,8 +70,6 @@ public class BotSoldier {
 				
 				rc.setIndicatorDot(trackedEnemy.location, 255, 0, 0);
 				rc.setIndicatorDot(enemies[0].location, 255, 0, 0);
-				
-				System.out.println(lateralMovement);
 				
 				// If not moving laterally relative to us, fire at will!
 				if(lateralMovement < 0.5f) {

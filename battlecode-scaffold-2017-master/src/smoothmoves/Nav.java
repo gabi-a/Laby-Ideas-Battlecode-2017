@@ -4,7 +4,7 @@ import battlecode.common.*;
 public class Nav {
 	
 	
-	public static MapLocation awayFromBulletsTreesAndBots(RobotController rc, MapLocation myLocation, BulletInfo[] bullets, TreeInfo[] trees, RobotInfo[] bots) throws GameActionException {
+	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets, TreeInfo[] trees, RobotInfo[] bots) throws GameActionException {
 		
 		// Time step all the bullets forward by 1 turn
 		BulletInfo[] futureBullets = new BulletInfo[bullets.length];
@@ -48,6 +48,75 @@ public class Nav {
 			}
 			rc.setIndicatorDot(bots[i].location, 0, 50, 50);
 			moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation), 1f);
+		}
+		
+		// Apply Anti Gravity for map edges
+		if (!rc.onTheMap(myLocation.add(Direction.NORTH, 2f))) moveLocation=moveLocation.add(Direction.SOUTH, bullets.length);
+		if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 2f))) moveLocation=moveLocation.add(Direction.NORTH, bullets.length);
+		if (!rc.onTheMap(myLocation.add(Direction.WEST, 2f))) moveLocation=moveLocation.add(Direction.EAST, bullets.length);
+		if (!rc.onTheMap(myLocation.add(Direction.EAST, 2f))) moveLocation=moveLocation.add(Direction.WEST, bullets.length);
+		
+		rc.setIndicatorDot(moveLocation, 255, 255, 255);
+		Direction moveDirection = myLocation.directionTo(moveLocation);
+		if(moveDirection == null) return null;
+		moveDirection = tryMove(rc, moveDirection, 5f, 24, bullets);
+		
+		// Rescale stride 
+		float moveStride = (float) (2 - 1f/Math.pow(myLocation.distanceTo(moveLocation)+0.7, 2));
+		moveLocation = myLocation.add(moveDirection, moveStride);
+		
+		rc.setIndicatorDot(moveLocation, 0, 0, 0);
+		
+		//rc.setIndicatorLine(myLocation,moveLocation, 255, 20, 10);
+		
+		return moveLocation;
+	}
+	
+	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets, TreeInfo[] trees) throws GameActionException {
+		
+		// Time step all the bullets forward by 1 turn
+		BulletInfo[] futureBullets = new BulletInfo[bullets.length];
+		for(int i = bullets.length;i-->0;) {
+			BulletInfo bullet = bullets[i];
+			futureBullets[i] = new BulletInfo(bullet.ID, bullet.location.add(bullet.dir,1f*bullet.getSpeed()), bullet.dir,bullet.getSpeed(),bullet.getDamage());
+		}
+		
+		// The move location will move around influenced by bullets and trees
+		MapLocation moveLocation = myLocation;
+		
+		// Apply Anti Gravity from each bullet in its current or future position
+		for(int i = bullets.length;i-->0;) {
+			
+			boolean goingAway = (Math.cos(myLocation.directionTo(bullets[i].location).radiansBetween(bullets[i].dir)) > 0);
+			boolean couldHit = bullets[i].location.distanceTo(myLocation) < 3f;
+			if(goingAway && !couldHit) {
+				rc.setIndicatorDot(bullets[i].location, 0, 255, 0);
+			} else {
+				rc.setIndicatorDot(bullets[i].location, 255, 0, 0);
+			}
+			
+			// If we might intersect the bullet in its current position on our next move,
+			// decide where to move based on its current position
+			if(couldHit) {
+				//rc.setIndicatorDot(bullets[i].location, 255, 50, 50);
+				moveLocation = moveLocation.add(bullets[i].location.directionTo(myLocation), Math.max(2f, 1f/(bullets[i].location.distanceTo(myLocation))));
+				//rc.setIndicatorLine(bullets[i].location, bullets[i].location.add(bullets[i].location.directionTo(myLocation)), 255, 0, 0);
+			}
+			else if(!goingAway){
+				//rc.setIndicatorDot(futureBullets[i].location, 255, 50, 50);
+				moveLocation = moveLocation.add(futureBullets[i].location.directionTo(myLocation), Math.max(2f, 2f/(futureBullets[i].location.distanceTo(myLocation))));
+				//rc.setIndicatorLine(futureBullets[i].location, futureBullets[i].location.add(futureBullets[i].location.directionTo(myLocation)), 255, 0, 0);
+			}
+			
+		}
+		
+		// Apply Anti Gravity for close trees
+		for(int i = trees.length;i-->0;) {
+			if(myLocation.distanceTo(trees[i].location) > trees[i].radius + RobotType.LUMBERJACK.bodyRadius + 2f) {
+				continue;
+			}
+			rc.setIndicatorDot(trees[i].location, 0, 50, 50);
+			moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), 1f);
 		}
 		
 		// Apply Anti Gravity for map edges
