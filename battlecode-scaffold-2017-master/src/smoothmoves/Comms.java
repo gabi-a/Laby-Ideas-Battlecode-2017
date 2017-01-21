@@ -217,8 +217,8 @@ class CommsArray {
 		}
 
 		rc.broadcast(arrayStart + index, data);
-		array[index] = data;
-		lastUpdated[index] = rc.getRoundNum();
+		// array[index] = data;
+		// lastUpdated[index] = rc.getRoundNum();
 	}
 
 	public int read(RobotController rc, int index) throws GameActionException {
@@ -227,12 +227,14 @@ class CommsArray {
 			return -1;
 		}
 
-		if(lastUpdated[index] != rc.getRoundNum()){
-			array[index] = rc.readBroadcast(arrayStart + index);
-			lastUpdated[index] = rc.getRoundNum();
-		}
+		return rc.readBroadcast(arrayStart + index);
 
-		return array[index];
+		// if(lastUpdated[index] != rc.getRoundNum()){
+			// array[index] = rc.readBroadcast(arrayStart + index);
+			// lastUpdated[index] = rc.getRoundNum();
+		// }
+
+		// return array[index];
 	}
 }
 
