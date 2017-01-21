@@ -14,6 +14,7 @@ public class BotLumberjack {
 		
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
+		RobotInfo[] bots = rc.senseNearbyRobots();
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 		TreeInfo bestTree = null;
@@ -27,7 +28,7 @@ public class BotLumberjack {
 		 */
 		if(bullets.length > 0) {
 			rc.setIndicatorDot(myLocation, 0, 255, 0);
-			MapLocation moveLocation = Nav.awayFromBulletsAndTrees(rc, myLocation, bullets, trees);	
+			MapLocation moveLocation = Nav.awayFromBulletsTreesAndBots(rc, myLocation, bullets, trees, bots);	
 			moveDirection = myLocation.directionTo(moveLocation);
 			moveStride = myLocation.distanceTo(moveLocation);
 		} 
