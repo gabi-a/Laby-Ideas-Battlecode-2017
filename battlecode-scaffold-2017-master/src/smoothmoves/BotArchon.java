@@ -1,7 +1,6 @@
 package smoothmoves;
 import battlecode.common.*;
 import battlecode.schema.Action;
-import onemorego.Util;
 
 public class BotArchon {
 	static RobotController rc;
@@ -60,7 +59,7 @@ public class BotArchon {
 		for (int i = 0; i < 8; i++) {
 			if (rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection, 5f))) {
 				rc.hireGardener(hireDirection);
-				Util.increaseNumBotsByOne(rc, RobotType.GARDENER);
+				Comms.ourBotCount.incrementNumBots(rc, RobotType.GARDENER);
 				return true;
 			}
 			hireDirection = hireDirection.rotateLeftRads((float) Math.PI * 0.25f);

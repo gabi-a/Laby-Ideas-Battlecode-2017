@@ -9,6 +9,7 @@ public strictfp class RobotPlayer {
 	public static void run(RobotController rc) throws GameActionException {
 		RobotPlayer.rc = rc;
 		while(true) {
+			Util.reportIfDead(rc);
 			try {
 				switch (rc.getType()) {
 				case ARCHON:

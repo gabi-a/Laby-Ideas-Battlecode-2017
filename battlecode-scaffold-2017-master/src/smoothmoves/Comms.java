@@ -8,10 +8,14 @@ public class Comms {
 	 * TreeInfo stuff = Comms.neutralTrees.pop(RobotController rc);
 	 */
 
+	public static final CommsBotCount ourBotCount;
+	public static final CommsBotCount theirBotCount;
+	
 	static {
-		CommsArray ourBotCount = new CommsArray();
+		ourBotCount = new CommsBotCount(0,6);
+		theirBotCount = new CommsBotCount(0,6);
 	}
-
+	
 	public static int packLocation(RobotController rc, MapLocation location) {
 		Team myTeam = rc.getTeam();
 		MapLocation referencePoint = (rc.getInitialArchonLocations(myTeam))[0];
@@ -196,10 +200,10 @@ class CommsQueue {
 }
 
 class CommsArray {
-	public int arrayStart;
-	public int arrayEnd;
-	public int[] array;
-	public int[] lastUpdated;
+	private int arrayStart;
+	private int arrayEnd;
+	private int[] array;
+	private int[] lastUpdated;
 
 	public CommsArray(int start, int end){
 		arrayStart = start;
@@ -230,6 +234,32 @@ class CommsArray {
 
 		return array[index];
 	}
+}
+
+class CommsBotCount extends CommsArray {
+	
+	CommsBotCount(int start, int end) {
+		super(start, end);
+	}
+	
+	public void writeNumBots(RobotController rc, RobotType type, int count) throws GameActionException {
+		write(rc, type.ordinal(), count);
+	}
+	
+	public int readNumBots(RobotController rc, RobotType type) throws GameActionException {
+		return read(rc, type.ordinal());
+	}
+	
+	public void incrementNumBots(RobotController rc, RobotType type) throws GameActionException {
+		int count = read(rc, type.ordinal());
+		write(rc, type.ordinal(), count++);
+	}
+	
+	public void decrementNumBots(RobotController rc, RobotType type) throws GameActionException {
+		int count = read(rc, type.ordinal());
+		write(rc, type.ordinal(), count--);
+	}
+	
 }
 
 class CommsTree {
