@@ -10,5 +10,7 @@ public class BotGardener {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
 		
+		
+		
 	}
 }

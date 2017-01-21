@@ -18,17 +18,16 @@ public class Nav {
 		
 		// Apply Anti Gravity from each bullet in its current or future position
 		for(int i = bullets.length;i-->0;) {
-
 			// If we might intersect the bullet in its current position on our next move,
 			// decide where to move based on its current position
-			if(bullets[i].location.distanceTo(myLocation) < bullets[i].speed + RobotType.LUMBERJACK.strideRadius) {
+			if(bullets[i].location.distanceTo(myLocation) < 3f) {
 				rc.setIndicatorDot(bullets[i].location, 255, 50, 50);
 				moveLocation = moveLocation.add(bullets[i].location.directionTo(myLocation), Math.max(2f, 1f/(bullets[i].location.distanceTo(myLocation))));
 				rc.setIndicatorLine(bullets[i].location, bullets[i].location.add(bullets[i].location.directionTo(myLocation)), 255, 0, 0);
 			}
 			else {
 				rc.setIndicatorDot(futureBullets[i].location, 255, 50, 50);
-				moveLocation = moveLocation.add(futureBullets[i].location.directionTo(myLocation), Math.max(2f, 1f/(futureBullets[i].location.distanceTo(myLocation))));
+				moveLocation = moveLocation.add(futureBullets[i].location.directionTo(myLocation), Math.max(2f, 2f/(futureBullets[i].location.distanceTo(myLocation))));
 				rc.setIndicatorLine(futureBullets[i].location, futureBullets[i].location.add(futureBullets[i].location.directionTo(myLocation)), 255, 0, 0);
 			}
 		}
@@ -58,8 +57,9 @@ public class Nav {
 		if (!rc.onTheMap(myLocation.add(Direction.EAST, 2f))) moveLocation=moveLocation.add(Direction.WEST, bullets.length);
 		
 		rc.setIndicatorDot(moveLocation, 255, 255, 255);
-		
-		Direction moveDirection = tryMove(rc, myLocation.directionTo(moveLocation), 5f, 24, bullets);
+		Direction moveDirection = myLocation.directionTo(moveLocation);
+		if(moveDirection == null) return null;
+		moveDirection = tryMove(rc, moveDirection, 5f, 24, bullets);
 		
 		// Rescale stride 
 		float moveStride = (float) (2 - 1f/Math.pow(myLocation.distanceTo(moveLocation)+0.7, 2));
