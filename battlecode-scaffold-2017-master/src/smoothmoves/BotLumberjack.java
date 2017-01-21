@@ -50,7 +50,7 @@ public class BotLumberjack {
 			// Move away from bots
 			if(bots.length > 0) {
 				for(int i = bots.length;i-->0;) {
-					goalLocation = goalLocation.add(myLocation.directionTo(bots[i].getLocation()).opposite(), 1f);
+					goalLocation = goalLocation.add(myLocation.directionTo(bots[i].getLocation()).opposite(), (bots[i].team == us) ? 1f : 3f);
 				}
 			}
 			moveDirection = myLocation.directionTo(goalLocation);
