@@ -252,12 +252,12 @@ class CommsBotCount extends CommsArray {
 	
 	public void incrementNumBots(RobotController rc, RobotType type) throws GameActionException {
 		int count = read(rc, type.ordinal());
-		write(rc, type.ordinal(), count++);
+		write(rc, type.ordinal(), ++count);
 	}
 	
 	public void decrementNumBots(RobotController rc, RobotType type) throws GameActionException {
 		int count = read(rc, type.ordinal());
-		write(rc, type.ordinal(), count--);
+		write(rc, type.ordinal(), --count);
 	}
 	
 }

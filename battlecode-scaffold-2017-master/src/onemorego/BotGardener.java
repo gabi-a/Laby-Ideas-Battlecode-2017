@@ -172,5 +172,4 @@ public class BotGardener extends RobotPlayer {
 			rc.water(treeToWater.ID);
 		}
 	}
-	
 }
