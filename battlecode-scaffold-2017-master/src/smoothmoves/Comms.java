@@ -9,7 +9,7 @@ public class Comms {
 	 */
 
 	static {
-		
+		CommsArray ourBotCount = new CommsArray();
 	}
 
 	public static int packLocation(RobotController rc, MapLocation location) {

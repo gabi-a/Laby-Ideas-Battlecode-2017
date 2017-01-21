@@ -34,7 +34,7 @@ public class Nav {
 		
 		// Apply Anti Gravity for close trees
 		for(int i = trees.length;i-->0;) {
-			if(myLocation.distanceTo(trees[i].location) > trees[i].radius + RobotType.LUMBERJACK.bodyRadius + 2f) {
+			if(myLocation.distanceTo(trees[i].location) > trees[i].radius + rc.getType().bodyRadius + 2f) {
 				continue;
 			}
 			rc.setIndicatorDot(trees[i].location, 0, 50, 50);
@@ -112,7 +112,7 @@ public class Nav {
 		
 		// Apply Anti Gravity for close trees
 		for(int i = trees.length;i-->0;) {
-			if(myLocation.distanceTo(trees[i].location) > trees[i].radius + RobotType.LUMBERJACK.bodyRadius + 2f) {
+			if(myLocation.distanceTo(trees[i].location) > trees[i].radius + rc.getType().bodyRadius + 2f) {
 				continue;
 			}
 			rc.setIndicatorDot(trees[i].location, 0, 50, 50);
