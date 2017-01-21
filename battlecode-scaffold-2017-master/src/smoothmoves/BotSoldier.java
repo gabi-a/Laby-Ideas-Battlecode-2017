@@ -27,11 +27,11 @@ public class BotSoldier {
 		
 		/************* Determine where to move *******************/
 
-		if(bullets.length > 0) {
-			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
-			moveDirection = myLocation.directionTo(moveLocation);
-			moveStride = myLocation.distanceTo(moveLocation);
-		}
+		//if(bullets.length > 0) {
+		//	MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
+		//	moveDirection = myLocation.directionTo(moveLocation);
+		//	moveStride = myLocation.distanceTo(moveLocation);
+		//}
 		
 		if(enemies.length > 0 && (moveDirection == null || moveDirection != null && !rc.canMove(moveDirection,moveStride))) {
 			RobotInfo closestEnemy = enemies[0];
@@ -48,6 +48,10 @@ public class BotSoldier {
 			}
 			moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
 			
+		}
+		
+		else {
+			moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
 		}
 		
 		

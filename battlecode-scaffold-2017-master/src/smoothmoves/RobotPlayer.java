@@ -8,8 +8,6 @@ public strictfp class RobotPlayer {
 	
 	public static void run(RobotController rc) throws GameActionException {
 		RobotPlayer.rc = rc;
-		Comms.ourBotCount.init(rc);
-		Comms.theirBotCount.init(rc);
 		while(true) {
 			Util.reportIfDead(rc);
 			try {
