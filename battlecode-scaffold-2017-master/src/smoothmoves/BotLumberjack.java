@@ -43,22 +43,22 @@ public class BotLumberjack {
 			// Move towards trees of low health or that contain bots
 			if(trees.length > 0) {
 				for(int i = trees.length;i-->0;) {
-					goalLocation = goalLocation.add(myLocation.directionTo(trees[i].location), Math.max(1f, (trees[i].getContainedRobot() != null ? 1f : 0f) + 1f/trees[i].health));
+					goalLocation = goalLocation.add(myLocation.directionTo(trees[i].location), Math.max(0.5f, (trees[i].getContainedRobot() != null ? 1f : 0f) + 1f/(trees[i].health + 2f)));
 				}
 			}
 			
-			// Move away from enemies
-			if(enemies.length > 0) {
-				for(int i = enemies.length;i-->0;) {
-					goalLocation = goalLocation.add(myLocation.directionTo(enemies[i].getLocation()).opposite());
+			// Move away from bots
+			if(bots.length > 0) {
+				for(int i = bots.length;i-->0;) {
+					goalLocation = goalLocation.add(myLocation.directionTo(bots[i].getLocation()).opposite(), 1f);
 				}
 			}
-			
 			moveDirection = myLocation.directionTo(goalLocation);
+			if(moveDirection != null) moveDirection = Nav.tryMove(rc, myLocation.directionTo(goalLocation), 10f, 24, bullets);
 			moveStride = myLocation.distanceTo(goalLocation);
 			
 			// Rescale stride distance
-			moveStride = moveStride * RobotType.LUMBERJACK.strideRadius / (trees.length + enemies.length);
+			moveStride = moveStride * RobotType.LUMBERJACK.strideRadius / (trees.length + bots.length);
 			
 		}
 		
@@ -147,6 +147,12 @@ public class BotLumberjack {
 			float lowestHealth = 1000f;
 			for(int i = 0; i-->0;) {
 				TreeInfo tree = trees[i];
+				
+				if(tree.getContainedRobot() != null && rc.canChop(tree.ID)) {
+					bestTree = tree;
+					break;
+				}
+				
 				if(tree.health < lowestHealth) {
 					lowestHealth = tree.health;
 					bestTree = tree;
