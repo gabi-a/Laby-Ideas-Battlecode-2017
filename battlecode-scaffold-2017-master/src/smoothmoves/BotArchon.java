@@ -26,6 +26,8 @@ public class BotArchon {
 		
 		byte action = Action.DIE_EXCEPTION;
 		
+		tryHireGardener();
+		
 		/************* Do Move ***********************************/
 		
 		/*
