@@ -1,16 +1,115 @@
 package smoothmoves;
 import battlecode.common.*;
+import battlecode.schema.Action;
 
 public class BotSoldier {
 	static RobotController rc;
 	
+	static Team us = RobotPlayer.rc.getTeam();
+	static Team them = us.opponent();
+	
+	static boolean trapped = false;
+	static RobotInfo trackedEnemy;
+	static float fireOffsetDegrees = 30f;
+	static int shootCooldown = 10;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
 		
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
-		if(enemies.length > 0) { 
-			rc.firePentadShot(rc.getLocation().directionTo(enemies[0].location).rotateLeftRads((float) (Math.random()-0.5)));
+		Direction shootDirection = null;
+		Direction moveDirection = null;
+		float moveStride = RobotType.SOLDIER.strideRadius;
+		
+		MapLocation myLocation = rc.getLocation();
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
+		
+		/************* Determine where to move *******************/
+
+		if(enemies.length > 0) {
+			if(myLocation.distanceTo(enemies[0].location) < 5f)
+				moveDirection = myLocation.directionTo(enemies[0].location).opposite();
+			if(myLocation.distanceTo(enemies[0].location) > 4.99f)
+				moveDirection = myLocation.directionTo(enemies[0].location);
+		}
+		
+		
+		/************* Determine what action to take *************/
+		byte action = Action.DIE_EXCEPTION;
+		
+		if(enemies.length > 0) {
+			
+			if(trackedEnemy == null) {
+				trackedEnemy = enemies[0];
+			}
+			
+			// We have a lock!
+			if(enemies[0].ID == trackedEnemy.ID) {
+				
+				float H = myLocation.distanceTo(enemies[0].location);
+				float d = myLocation.distanceTo(trackedEnemy.location);
+				float theta = myLocation.directionTo(enemies[0].location).radiansBetween(myLocation.directionTo(trackedEnemy.location));
+				float lateralMovement = Math.abs((float) (H * Math.sin(theta)));
+				
+				rc.setIndicatorDot(trackedEnemy.location, 255, 0, 0);
+				rc.setIndicatorDot(enemies[0].location, 255, 0, 0);
+				
+				System.out.println(lateralMovement);
+				
+				// If not moving laterally relative to us, fire at will!
+				if(lateralMovement < 0.5f) {
+					rc.setIndicatorDot(myLocation, 0, 255, 0);
+					shootDirection  = myLocation.directionTo(enemies[0].location);
+					action = Action.FIRE_PENTAD;
+				}
+				
+				// Otherwise do a bit of cheeky hurding
+				else {
+					rc.setIndicatorDot(myLocation, 0, 0, 255);
+					fireOffsetDegrees = -fireOffsetDegrees;
+					shootDirection  = myLocation.directionTo(enemies[0].location).rotateLeftDegrees(fireOffsetDegrees);
+					if(shootCooldown <= 0) {
+						action = Action.FIRE;
+					}
+				}
+				
+			}
+			
+			else {
+				
+			}
+			
+			trackedEnemy = enemies[0];
+			
+		}
+		
+		/************* Do Move ***********************************/
+		
+		/*
+		 * All checks to see if this move is possible should already
+		 * have taken place
+		 */
+		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
+			rc.move(moveDirection, moveStride);
+		
+		/************* Do action *********************************/
+		
+		/*
+		 * All checks to see if this action is possible should already
+		 * have taken place
+		 */
+		
+		switch(action) {
+		case Action.FIRE:
+			rc.fireSingleShot(shootDirection);
+			shootCooldown = 10;
+			break;
+		case Action.FIRE_PENTAD:
+			rc.firePentadShot(shootDirection);
+			shootCooldown = 15;
+			break;
+		default:
+			shootCooldown--;
+			break;
 		}
 	}
-	
 }
