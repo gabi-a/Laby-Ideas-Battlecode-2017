@@ -33,13 +33,6 @@ public class Nav {
 			}
 		}
 		
-		// Apply Anti Gravity from each bullet in its future position
-		//for(int i = futureBullets.length;i-->0;) {
-		//	rc.setIndicatorDot(futureBullets[i].location, 255, 50, 50);
-		//	moveLocation = moveLocation.add(futureBullets[i].location.directionTo(myLocation), Math.max(2f, 1f/(futureBullets[i].location.distanceTo(myLocation))));
-		//	rc.setIndicatorLine(futureBullets[i].location, futureBullets[i].location.add(futureBullets[i].location.directionTo(myLocation)), 255, 0, 0);
-		//}
-		
 		// Apply Anti Gravity for close trees
 		for(int i = trees.length;i-->0;) {
 			if(myLocation.distanceTo(trees[i].location) > trees[i].radius + RobotType.LUMBERJACK.bodyRadius + 2f) {
