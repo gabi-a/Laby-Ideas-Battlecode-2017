@@ -29,8 +29,10 @@ public class BotScout {
 		if(bullets.length > 0) {
 			System.out.println("RUN!");
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);
-			moveDirection = myLocation.directionTo(moveLocation);
-			moveStride = myLocation.distanceTo(moveLocation);
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
+			}
 		}
 		
 		else {
