@@ -38,15 +38,17 @@ public class BotSoldier {
 		if(enemies.length > 0 && (moveDirection == null || moveDirection != null && !rc.canMove(moveDirection,moveStride))) {
 			RobotInfo closestEnemy = enemies[0];
 			if(closestEnemy.type == RobotType.LUMBERJACK) {
-				if(myLocation.distanceTo(closestEnemy.location) < 4f) {
+				if(myLocation.distanceTo(closestEnemy.location) < 3f) {
 					moveDirection = closestEnemy.location.directionTo(myLocation);
-				} else if(myLocation.distanceTo(closestEnemy.location) > 5f) {
-					moveDirection = myLocation.directionTo(closestEnemy.location);
-					moveStride = myLocation.distanceTo(closestEnemy.location) - 4.5f;
+				} else if(myLocation.distanceTo(closestEnemy.location) > 4f) {
+					MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location.add(closestEnemy.location.directionTo(myLocation), 3f), bullets);
+					moveDirection = myLocation.directionTo(moveLocation);
+					moveStride = myLocation.distanceTo(moveLocation);
 				}
 			} else {
-				moveDirection = myLocation.directionTo(closestEnemy.location);
-				moveStride = myLocation.distanceTo(closestEnemy.location) - closestEnemy.getRadius() - RobotType.SOLDIER.bodyRadius;
+				MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
 			}
 			if(moveDirection != null) moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
 			
@@ -56,7 +58,9 @@ public class BotSoldier {
 			moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
 			for(int i = enemyGardeners.length;i-->0;) {
 				if(enemyGardeners[i] != null) {
-					moveDirection = Nav.tryMove(rc, myLocation.directionTo(enemyGardeners[i].location), 5f, 24, bullets);
+					MapLocation moveLocation = Nav.pathTo(rc, enemyGardeners[i].location, bullets);
+					moveStride = myLocation.distanceTo(moveLocation);
+					break;
 				}
 			}
 			

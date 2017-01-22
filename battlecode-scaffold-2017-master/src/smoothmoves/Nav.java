@@ -269,4 +269,140 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
         return new Direction((float)Math.random() * 2 * (float)Math.PI);
     }
 	
+	
+	/*
+	 * 
+	 *  Magic pathing
+	 * 
+	 * 
+	 * 
+	 */
+	
+	static MoveState moveState = MoveState.TOWARD_LEFT;
+	static float dMin = 10000f;
+	static MapLocation goalCache = new MapLocation(-1, -1);
+
+	static Team myTeam = RobotPlayer.rc.getTeam();
+	
+	public static enum MoveState {
+		LEFT,
+		RIGHT,
+		TOWARD_LEFT,
+		TOWARD_RIGHT
+	}
+	
+	static MapLocation pathTo(RobotController rc, MapLocation goal, BulletInfo[] bullets) throws GameActionException {
+		RobotType[] avoid = new RobotType[0];
+		return pathTo(rc, goal, avoid, rc.getType().strideRadius, bullets); 
+	}
+	
+	static MapLocation pathTo(RobotController rc, MapLocation goal, RobotType[] avoid, BulletInfo[] bullets) throws GameActionException {
+		return pathTo(rc, goal, avoid, rc.getType().strideRadius, bullets); 
+	}
+
+	static MapLocation pathTo(RobotController rc, MapLocation goal, RobotType[] avoid, float stride, BulletInfo[] bullets) throws GameActionException {
+		
+		MapLocation myLocation = rc.getLocation();
+		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
+		
+		// If this is the first time going here, clear our pathing memory
+		if (goal.distanceTo(goalCache) > 5f) {
+			goalCache = goal;
+			dMin = 10000f;
+			moveState = MoveState.TOWARD_LEFT;
+		}
+		
+		goalCache = goal;
+
+		float degreeOffset = 30f;
+		Direction trial;
+
+		// Idea: if we can go closer to the goal than we ever have before, do so.
+		for (int i = 0; i < 3; i++) {
+			trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
+			if (rc.canMove(trial, stride) && myLocation.add(trial, stride).distanceTo(goal) < dMin
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+				dMin = myLocation.add(trial, stride).distanceTo(goal);
+				moveState = chooseMoveState();
+				return myLocation.add(trial, stride);
+			}
+			trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
+			if (rc.canMove(trial, stride) && myLocation.add(trial, stride).distanceTo(goal) < dMin
+					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+				dMin = myLocation.add(trial, stride).distanceTo(goal);
+				moveState = chooseMoveState();
+				return myLocation.add(trial, stride);
+			}
+		}
+
+		// If we're a lumberjack, stop thinking too hard and chop your way through
+		/*
+		if(rc.getType() == RobotType.LUMBERJACK && !rc.hasAttacked()){
+			TreeInfo[] trees = rc.senseNearbyTrees(2f, Team.NEUTRAL);
+			if(trees.length > 0) rc.chop(trees[0].getID());
+			return false;
+		}
+		*/
+		// Else, let's start following a wall.
+		if (moveState == MoveState.TOWARD_LEFT) {
+			moveState = moveState.LEFT;
+		} else if (moveState == MoveState.TOWARD_RIGHT) {
+			moveState = moveState.RIGHT;
+		}
+
+		switch (moveState) {
+			case LEFT:
+				for (int i = 0; i < 6; i++) {
+					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
+					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+						return myLocation.add(trial, stride);
+					}
+				}
+				break;
+			case RIGHT:
+				for (int i = 0; i < 6; i++) {
+					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
+					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
+						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+						myLocation.add(trial, stride);
+					}
+				}
+				break;
+			default:
+				System.out.println("PATHING SHOULDN'T GET HERE!");
+				break;
+		}
+
+		moveState = (moveState == moveState.LEFT) ? moveState.RIGHT : moveState.LEFT;
+		return null;
+
+	}
+
+	private static MoveState chooseMoveState() {
+		if (moveState == MoveState.LEFT || moveState == MoveState.TOWARD_LEFT) {
+			return MoveState.TOWARD_LEFT;
+		} else {
+			return MoveState.TOWARD_RIGHT;
+		}
+	}
+	
+	private static boolean inEnemySight(RobotController rc, Direction trial, RobotType[] avoid, RobotInfo[] enemyList, MapLocation myLocation, float stride) {
+		if (avoid.length == 0) {
+			return false;
+		}
+		boolean scoutFlag = false;
+		if (rc.getType() == RobotType.SCOUT) {
+			scoutFlag = true;
+		}
+		for(RobotInfo enemy : enemyList) {
+			if(java.util.Arrays.asList(avoid).contains(enemy.type)
+					&& enemy.location.distanceTo(myLocation.add(trial, stride)) <= enemy.type.sensorRadius) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 }
