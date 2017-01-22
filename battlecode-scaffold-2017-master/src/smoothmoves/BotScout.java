@@ -41,12 +41,14 @@ public class BotScout {
 				}
 				
 				moveDirection = myLocation.directionTo(moveLocation);
-				//moveStride = myLocation.distanceTo(moveLocation);
-				
 				if(moveDirection != null) moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
-				//moveStride = moveStride * RobotType.SCOUT.strideRadius / trees.length;
+				
+				if(myLocation.distanceTo(moveLocation) < 0.01f) {
+					moveDirection = Nav.explore(rc, bullets);
+				}
+				
 			} else {
-				moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
+				moveDirection = Nav.explore(rc, bullets);
 			}
 		}
 		

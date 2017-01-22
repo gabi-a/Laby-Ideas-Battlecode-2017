@@ -3,6 +3,7 @@ import battlecode.common.*;
 
 public class Nav {
 	
+	static Direction heading = randomDirection();
 	
 	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets, TreeInfo[] trees, RobotInfo[] bots) throws GameActionException {
 		
@@ -210,6 +211,7 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
 		// First, try intended direction
 		//moveLocation = myLocation.add(dir,rc.getType().strideRadius);
 		if (rc.canMove(dir) /*&& isSafeLocation(rc, moveLocation, bullets)*/) {
+			heading = dir;
 			return dir;
 		}
 
@@ -220,12 +222,14 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
 			// Try the offset of the left side
 			//moveLocation = myLocation.add(dir.rotateLeftDegrees(degreeOffset * currentCheck),rc.getType().strideRadius);
 			if (rc.canMove(dir.rotateLeftDegrees(degreeOffset * currentCheck)) /*&& Nav.isSafeLocation(rc, moveLocation, bullets)*/) {
-				return dir.rotateLeftDegrees(degreeOffset * currentCheck);
+				heading = dir.rotateLeftDegrees(degreeOffset * currentCheck);
+				return heading;
 			}
 			// Try the offset on the right side
 			//moveLocation = myLocation.add(dir.rotateRightDegrees(degreeOffset * currentCheck),rc.getType().strideRadius);
 			if (rc.canMove(dir.rotateRightDegrees(degreeOffset * currentCheck)) /*&& Nav.isSafeLocation(rc, moveLocation, bullets)*/) {
-				return dir.rotateRightDegrees(degreeOffset * currentCheck);
+				heading = dir.rotateRightDegrees(degreeOffset * currentCheck);
+				return heading;
 			}
 			// No move performed, try slightly further
 			currentCheck++;
@@ -237,4 +241,32 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
 		return null;
 	}
 
+	public static Direction explore(RobotController rc, BulletInfo[] bullets) throws GameActionException {
+    	
+		Direction moveDirection;
+		
+		MapLocation myLocation = rc.getLocation();
+		if(heading == null) {
+			heading = randomDirection();
+		}
+    	int moveAttemptCount = 0;
+    	while(moveAttemptCount < 5) {
+    		moveDirection = Nav.tryMove(rc, heading, 5f, 24, bullets);
+    		if(rc.onTheMap(myLocation.add(heading,rc.getType().strideRadius + rc.getType().bodyRadius ),rc.getType().bodyRadius+2f) 
+					&& rc.canMove(moveDirection)) {
+    				return moveDirection;
+    		}
+    		Direction lastHeading = heading;
+    		while(lastHeading.degreesBetween(heading) < 30) {
+    			heading = Nav.randomDirection();
+    		}
+    		moveAttemptCount++;
+    	}
+    	return null;
+    }
+	
+	public static Direction randomDirection() {
+        return new Direction((float)Math.random() * 2 * (float)Math.PI);
+    }
+	
 }
