@@ -80,12 +80,8 @@ public class BotGardener {
 		buildUnit();
 		waterTrees();
 		
-		if(settled) {
+		if(settled && rc.getTeamBullets() > 100) {
 			plantTrees();
-		}
-		
-		else {
-			buildUnit();
 		}
 		
 		/************* Do Move ***********************************/
