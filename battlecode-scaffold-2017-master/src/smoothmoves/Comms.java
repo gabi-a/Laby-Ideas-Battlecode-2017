@@ -273,6 +273,62 @@ class CommsBotCount extends CommsArray {
 	
 }
 
+class CommsBotArray extends CommsArray {
+	CommsBotArray(int start, int end) {
+		super(start, end);
+	}
+
+	public void writeBot(RobotController rc, RobotInfo robot) throws GameActionException {
+		// check id cache
+
+		// search array
+		int[] array = super.array(rc);
+		int index = -1;
+		for(int i = 0; i < array.length; i++){
+			RobotInfo bot = unpackBot(rc, super.read(rc, i));
+			if(bot == null){
+				if(index == -1) index = i;
+				continue;
+			}
+			if(bot.ID == robot.ID){
+				index = i;
+				break;
+			}
+		}
+
+		super.write(rc, index, packBot(rc, robot));
+	}
+
+	public RobotInfo readBot(RobotController rc, int index) throws GameActionException {
+		return unpackBot(rc, super.read(rc, index));
+	}
+
+	public RobotInfo[] arrayBots(RobotController rc) throws GameActionException {
+		int[] intArray = super.array(rc);
+		RobotInfo[] botArray = new RobotInfo[intArray.length];
+
+		for(int i = 0; i < intArray.length; i++){
+			botArray[i] = unpackBot(rc, intArray[i]);
+		}
+
+		return botArray;
+	}
+
+	public int packBot(RobotController rc, RobotInfo robot) {
+		int loc = Comms.packLocation(rc, robot.getLocation());
+		return (robot.getID() << 16) | (loc);
+	}
+
+	public RobotInfo unpackBot(RobotController rc, int data) {
+		if(data == 0) return null;
+
+		int id = (data) >> 16;
+		MapLocation loc = Comms.unpackLocation(rc, data & 0xFFFF);
+
+		return new RobotInfo(id, null, null, loc, 0, 0, 0);
+	}
+}
+
 class CommsTree {
 	CommsQueue trees;
 
