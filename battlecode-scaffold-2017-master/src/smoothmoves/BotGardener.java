@@ -64,7 +64,7 @@ public class BotGardener {
 			settled = settleHere();
 			
 		} else {
-			spawnDirection = setSpawnDirection();
+			spawnDirection = setSpawnDirection(myLocation);
 			if(spawnDirection == null) {
 				settled = false;
 				MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees, bots);
@@ -76,15 +76,15 @@ public class BotGardener {
 		/************* Determine what action to take *************/
 		
 		byte action = Action.DIE_EXCEPTION;
+
+		//tryToBuild(RobotType.SOLDIER);
+		waterTrees();
 		
 		if(settled) {
-			tryToBuild(RobotType.SOLDIER);
 			plantTrees();
-			waterTrees();
 		}
 		
 		else {
-			tryToBuild(RobotType.SOLDIER);
 		}
 		
 		/************* Do Move ***********************************/
@@ -115,7 +115,7 @@ public class BotGardener {
 	public static boolean settleHere() throws GameActionException {
 		
 		TreeInfo[] closeTrees = rc.senseNearbyTrees(2f);
-		RobotInfo[] closeRobots = rc.senseNearbyRobots(2f);
+		RobotInfo[] closeRobots = rc.senseNearbyRobots(4f);
 		
 		int bigTrees = 0;
 		for(TreeInfo tree : closeTrees) {
@@ -131,8 +131,8 @@ public class BotGardener {
 		return false;
 	}
 	
-	public static Direction setSpawnDirection() throws GameActionException {
-		Direction testDirection = Direction.getEast();
+	public static Direction setSpawnDirection(MapLocation myLocation) throws GameActionException {
+		Direction testDirection = myLocation.directionTo(rc.getInitialArchonLocations(them)[0]);
 		for(int i = 72;i-->0;) {
 			rc.setIndicatorDot(rc.getLocation().add(testDirection,2f), 0, 255, 0);
 			if(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection, 2f), 1f) || !rc.onTheMap(rc.getLocation().add(testDirection, 2f), 1f)) {
