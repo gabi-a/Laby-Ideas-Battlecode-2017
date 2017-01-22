@@ -210,6 +210,10 @@ class CommsArray {
 		arrayEnd = end;
 	}
 
+	public int length() {
+		return arrayEnd - arrayStart;
+	}
+
 	public void write(RobotController rc, int index, int data) throws GameActionException {
 		if(index > arrayEnd - arrayStart){
 			System.out.println("error: out of comms array bounds");
@@ -282,9 +286,8 @@ class CommsBotArray extends CommsArray {
 		// check id cache
 
 		// search array
-		int[] array = super.array(rc);
 		int index = -1;
-		for(int i = 0; i < array.length; i++){
+		for(int i = 0; i < super.length(); i++){
 			RobotInfo bot = unpackBot(rc, super.read(rc, i));
 			if(bot == null){
 				if(index == -1) index = i;
@@ -299,8 +302,24 @@ class CommsBotArray extends CommsArray {
 		super.write(rc, index, packBot(rc, robot));
 	}
 
+	public RobotInfo readBot(RobotController rc, RobotInfo robot) throws GameActionException {
+		// todo
+		return null;
+	}
+
 	public RobotInfo readBot(RobotController rc, int index) throws GameActionException {
 		return unpackBot(rc, super.read(rc, index));
+	}
+
+	public void deleteBot(RobotController rc, RobotInfo robot) throws GameActionException {
+		int index = -1;
+		for(int i = 0; i < super.length(); i++){
+			RobotInfo bot = unpackBot(rc, super.read(rc, i));
+			if(bot != null && bot.ID == robot.ID){
+				super.write(rc, i, 0);
+				break;
+			}
+		}
 	}
 
 	public RobotInfo[] arrayBots(RobotController rc) throws GameActionException {
