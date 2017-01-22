@@ -5,8 +5,8 @@ import battlecode.schema.Action;
 public class BotGardener {
 	static RobotController rc;
 	
-	Team us = rc.getTeam();
-	Team them = us.opponent();
+	static Team us = RobotPlayer.rc.getTeam();
+	static Team them = us.opponent();
 	
 	static Direction spawnDirection = Direction.NORTH;
 	static boolean settled = false;
@@ -23,11 +23,46 @@ public class BotGardener {
 		float moveStride = RobotType.GARDENER.strideRadius;
 		
 		/************* Determine where to move *******************/
-		
-		if(!settled) {
+
+		if(bullets.length > 0) {
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees, bots);
 			moveDirection = myLocation.directionTo(moveLocation);
 			moveStride = myLocation.distanceTo(myLocation);
+		}
+		
+		else if(!settled) {
+			
+			// Keep a distance from archons and gardeners
+			MapLocation moveLocation = myLocation;
+			if(bots.length > 0) {
+				for(int i = bots.length;i-->0;) {
+					if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
+						moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation));
+					}
+				}
+			}
+			if(trees.length > 0) {
+				for(int i = trees.length;i-->0;) {
+					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation));
+				}
+			}
+			
+			if (!rc.onTheMap(myLocation.add(Direction.NORTH, 5f))) moveLocation=moveLocation.add(Direction.SOUTH, 3f);
+			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 5f))) moveLocation=moveLocation.add(Direction.NORTH, 3f);
+			if (!rc.onTheMap(myLocation.add(Direction.WEST, 5f))) moveLocation=moveLocation.add(Direction.EAST, 3f);
+			if (!rc.onTheMap(myLocation.add(Direction.EAST, 5f))) moveLocation=moveLocation.add(Direction.WEST, 3f);
+
+			
+			// Stay away from the enemy base
+			moveLocation = moveLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]).opposite(), 1/myLocation.distanceTo(rc.getInitialArchonLocations(them)[0]));
+			rc.setIndicatorDot(moveLocation, 100, 0, 100);
+			
+			moveDirection = myLocation.directionTo(moveLocation);
+			moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
+			moveStride = myLocation.distanceTo(moveLocation); //* RobotType.GARDENER.strideRadius / (trees.length + bots.length);
+			
+			settled = settleHere();
+			
 		} else {
 			spawnDirection = setSpawnDirection();
 			if(spawnDirection == null) {

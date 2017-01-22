@@ -119,14 +119,18 @@ public class BotSoldier {
 		 */
 		
 		switch(action) {
-		case Action.FIRE:
-			rc.fireSingleShot(shootDirection);
-			shootCooldown = 10;
-			break;
 		case Action.FIRE_PENTAD:
-			rc.firePentadShot(shootDirection);
-			shootCooldown = 15;
-			break;
+			if(rc.canFirePentadShot()) {
+				rc.firePentadShot(shootDirection);
+				shootCooldown = 15;
+				break;
+			}
+		case Action.FIRE:
+			if(rc.canFireSingleShot()) {
+				rc.fireSingleShot(shootDirection);
+				shootCooldown = 10;
+				break;
+			}
 		default:
 			shootCooldown--;
 			break;
