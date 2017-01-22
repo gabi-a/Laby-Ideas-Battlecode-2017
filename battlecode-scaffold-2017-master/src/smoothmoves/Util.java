@@ -17,8 +17,9 @@ public class Util {
 		RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
 		
 		for(int i = enemyGardeners.length;i-->0;) {
-			if(rc.canSenseRobot(enemyGardeners[i].ID) && rc.senseRobot(enemyGardeners[i].ID).health < 5f) {
-				// Delete the bot
+			if(enemyGardeners[i] != null) rc.setIndicatorDot(enemyGardeners[i].location, 0, 0, 255);
+			if(enemyGardeners[i] != null && rc.canSenseLocation(enemyGardeners[i].location) && !rc.canSenseRobot(enemyGardeners[i].ID)) {
+				Comms.enemyGardenersArray.deleteBot(rc, enemyGardeners[i]);
 			}
 		}
 		
@@ -27,6 +28,7 @@ public class Util {
 				Comms.enemyGardenersArray.writeBot(rc, enemies[i]);
 			}
 		}
+		
 	}
 	
 }

@@ -61,7 +61,8 @@ public class BotArchon {
 		
 		byte action = Action.DIE_EXCEPTION;
 		
-		tryHireGardener();
+		if(rc.getTreeCount() >= 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER))
+			tryHireGardener();
 		
 		/************* Do Move ***********************************/
 		

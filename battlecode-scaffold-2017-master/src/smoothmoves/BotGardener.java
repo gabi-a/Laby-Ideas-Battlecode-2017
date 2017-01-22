@@ -34,7 +34,7 @@ public class BotGardener {
 			if(bots.length > 0) {
 				for(int i = bots.length;i-->0;) {
 					if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
-						moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation));
+						moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation), 2f);
 					}
 				}
 			}

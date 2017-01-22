@@ -53,8 +53,13 @@ public class BotSoldier {
 		} else {
 			
 			RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
+			moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
+			for(int i = enemyGardeners.length;i-->0;) {
+				if(enemyGardeners[i] != null) {
+					moveDirection = Nav.tryMove(rc, myLocation.directionTo(enemyGardeners[i].location), 5f, 24, bullets);
+				}
+			}
 			
-			moveDirection = (enemyGardeners[0] != null) ? Nav.tryMove(rc, myLocation.directionTo(enemyGardeners[0].location), 5f, 24, bullets) : Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
 		}
 		
 		
