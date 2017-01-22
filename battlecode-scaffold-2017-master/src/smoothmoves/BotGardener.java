@@ -10,6 +10,8 @@ public class BotGardener {
 	
 	static Direction spawnDirection = Direction.NORTH;
 	static boolean settled = false;
+
+	static MapLocation myLocation;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
@@ -17,7 +19,7 @@ public class BotGardener {
 		RobotInfo[] bots = rc.senseNearbyRobots();
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		BulletInfo[] bullets = rc.senseNearbyBullets();
-		MapLocation myLocation = rc.getLocation();
+		myLocation = rc.getLocation();
 		
 		Direction moveDirection = null;
 		float moveStride = RobotType.GARDENER.strideRadius;
@@ -64,7 +66,7 @@ public class BotGardener {
 			settled = settleHere();
 			
 		} else {
-			spawnDirection = setSpawnDirection();
+			spawnDirection = setSpawnDirection(myLocation);
 			if(spawnDirection == null) {
 				settled = false;
 				MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees, bots);
@@ -76,11 +78,12 @@ public class BotGardener {
 		/************* Determine what action to take *************/
 		
 		byte action = Action.DIE_EXCEPTION;
+
+		buildUnit();
+		waterTrees();
 		
 		if(settled) {
-			buildUnit();
 			plantTrees();
-			waterTrees();
 		}
 		
 		else {
@@ -115,7 +118,7 @@ public class BotGardener {
 	public static boolean settleHere() throws GameActionException {
 		
 		TreeInfo[] closeTrees = rc.senseNearbyTrees(2f);
-		RobotInfo[] closeRobots = rc.senseNearbyRobots(2f);
+		RobotInfo[] closeRobots = rc.senseNearbyRobots(4f);
 		
 		int bigTrees = 0;
 		for(TreeInfo tree : closeTrees) {
@@ -131,8 +134,8 @@ public class BotGardener {
 		return false;
 	}
 	
-	public static Direction setSpawnDirection() throws GameActionException {
-		Direction testDirection = Direction.getEast();
+	public static Direction setSpawnDirection(MapLocation myLocation) throws GameActionException {
+		Direction testDirection = myLocation.directionTo(rc.getInitialArchonLocations(them)[0]);
 		for(int i = 72;i-->0;) {
 			rc.setIndicatorDot(rc.getLocation().add(testDirection,2f), 0, 255, 0);
 			if(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection, 2f), 1f) || !rc.onTheMap(rc.getLocation().add(testDirection, 2f), 1f)) {
@@ -195,7 +198,7 @@ public class BotGardener {
 	public static boolean firstUnits(int[] units) throws GameActionException {
 		if(rc.senseNearbyTrees().length > 5){
 			if(units[RobotType.SCOUT.ordinal()] == 0){
-				if(tryToBuild(RobotType.SCOUT)) return true;
+				// if(tryToBuild(RobotType.SCOUT)) return true;
 			}
 		} else {
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
@@ -210,6 +213,8 @@ public class BotGardener {
 	}
 	
 	public static boolean tryToBuild(RobotType typeToBuild) throws GameActionException {
+		if(spawnDirection == null) spawnDirection = setSpawnDirection(myLocation);
+		if(spawnDirection == null) return false;
 		Direction buildDirection = spawnDirection;
 		for(int i = 6; i-->0;) {
 			if(rc.canBuildRobot(typeToBuild, buildDirection)) {

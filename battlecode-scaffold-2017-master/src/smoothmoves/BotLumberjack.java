@@ -43,8 +43,12 @@ public class BotLumberjack {
 			// Move towards trees of low health or that contain bots
 			if(trees.length > 0) {
 				for(int i = trees.length;i-->0;) {
-					goalLocation = goalLocation.add(myLocation.directionTo(trees[i].location), Math.max(0.5f, (trees[i].getContainedRobot() != null ? 1f : 0f) + 1f/(trees[i].health + 2f)));
+					goalLocation = goalLocation.add(myLocation.directionTo(trees[i].location), Math.max(1f, (trees[i].getContainedRobot() != null ? 1f : 0f) + /*1f/(trees[i].health + 1f) +*/ 1f/(trees[i].location.distanceTo(myLocation) + 1f)));
 				}
+			} 
+			
+			else {
+				goalLocation = goalLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 2f);
 			}
 			
 			// Move away from bots
@@ -53,6 +57,7 @@ public class BotLumberjack {
 					goalLocation = goalLocation.add(myLocation.directionTo(bots[i].getLocation()).opposite(), (bots[i].team == us) ? 1f : 3f);
 				}
 			}
+			
 			moveDirection = myLocation.directionTo(goalLocation);
 			if(moveDirection != null) moveDirection = Nav.tryMove(rc, myLocation.directionTo(goalLocation), 10f, 24, bullets);
 			moveStride = myLocation.distanceTo(goalLocation);
