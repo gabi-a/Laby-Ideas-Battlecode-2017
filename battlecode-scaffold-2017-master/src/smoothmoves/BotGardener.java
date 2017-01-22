@@ -26,13 +26,8 @@ public class BotGardener {
 		
 		/************* Determine where to move *******************/
 
-		if(bullets.length > 0) {
-			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees, bots);
-			moveDirection = myLocation.directionTo(moveLocation);
-			moveStride = myLocation.distanceTo(myLocation);
-		}
 		
-		else if(!settled) {
+		if(!settled) {
 			
 			// Keep a distance from archons and gardeners
 			MapLocation moveLocation = myLocation;
@@ -66,7 +61,10 @@ public class BotGardener {
 			settled = settleHere();
 			
 		} else {
+
 			spawnDirection = setSpawnDirection(myLocation);
+			
+			
 			if(spawnDirection == null) {
 				settled = false;
 				MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees, bots);
@@ -196,17 +194,17 @@ public class BotGardener {
 	}
 
 	public static boolean firstUnits(int[] units) throws GameActionException {
-		if(rc.senseNearbyTrees().length > 5){
+		if(rc.senseNearbyTrees().length > 2){
 			if(units[RobotType.SCOUT.ordinal()] == 0){
-				// if(tryToBuild(RobotType.SCOUT)) return true;
+				if(tryToBuild(RobotType.SCOUT)) return true;
 			}
-		} else {
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
 				if(tryToBuild(RobotType.LUMBERJACK)) return true;
 			}
-		}
-		if(units[RobotType.SOLDIER.ordinal()] == 0){
-			if(tryToBuild(RobotType.SOLDIER)) return true;
+		} else {
+			if(units[RobotType.SOLDIER.ordinal()] == 0){
+				if(tryToBuild(RobotType.SOLDIER)) return true;
+			}
 		}
 
 		return false;

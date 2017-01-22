@@ -46,7 +46,7 @@ public class BotSoldier {
 				moveDirection = myLocation.directionTo(closestEnemy.location);
 				moveStride = myLocation.distanceTo(closestEnemy.location) - closestEnemy.getRadius() - RobotType.SOLDIER.bodyRadius;
 			}
-			moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
+			if(moveDirection != null) moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
 			
 		}
 		
