@@ -186,18 +186,18 @@ public class BotGardener {
 		if(rc.getTeamBullets() < 130) return;
 
 		// later round spawning
-		if(units[RobotType.LUMBERJACK.ordinal()] < units[RobotType.SOLDIER.ordinal()]){
-			tryToBuild(RobotType.LUMBERJACK);
-		} else {
+		//if(units[RobotType.LUMBERJACK.ordinal()] < units[RobotType.SOLDIER.ordinal()]){
+		//	tryToBuild(RobotType.LUMBERJACK);
+		//} else {
 			tryToBuild(RobotType.SOLDIER);
-		}
+		//}
 	}
 
 	public static boolean firstUnits(int[] units) throws GameActionException {
+		if(units[RobotType.SCOUT.ordinal()] == 0){
+			if(tryToBuild(RobotType.SCOUT)) return true;
+		}
 		if(rc.senseNearbyTrees().length > 2){
-			if(units[RobotType.SCOUT.ordinal()] == 0){
-				if(tryToBuild(RobotType.SCOUT)) return true;
-			}
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
 				if(tryToBuild(RobotType.LUMBERJACK)) return true;
 			}
