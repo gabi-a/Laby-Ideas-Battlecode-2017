@@ -25,6 +25,8 @@ public class BotSoldier {
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		
+		Util.reportEnemyBots(rc, enemies);
+		
 		/************* Determine where to move *******************/
 
 		//if(bullets.length > 0) {
@@ -48,10 +50,11 @@ public class BotSoldier {
 			}
 			if(moveDirection != null) moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
 			
-		}
-		
-		else {
-			moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
+		} else {
+			
+			RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
+			
+			moveDirection = (enemyGardeners[0] != null) ? Nav.tryMove(rc, myLocation.directionTo(enemyGardeners[0].location), 5f, 24, bullets) : Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
 		}
 		
 		

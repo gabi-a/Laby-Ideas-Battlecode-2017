@@ -21,6 +21,8 @@ public class BotScout {
 		
 		Direction moveDirection = null;
 		float moveStride = RobotType.SCOUT.strideRadius;
+
+		Util.reportEnemyBots(rc, enemies);
 		
 		/************* Determine where to move *******************/
 
@@ -64,9 +66,12 @@ public class BotScout {
 			}
 		}
 		
-		if(enemies.length > 0 && enemies[0].location.distanceTo(myLocation) < 3f) {
-			shootDirection = myLocation.directionTo(enemies[0].location);
-			action = Action.FIRE;
+		if(action != Action.SHAKE_TREE && enemies.length > 0) {
+			if(rc.canFireSingleShot()) {
+				action = Action.FIRE;
+				shootDirection = myLocation.directionTo(enemies[0].location);
+
+			}
 		}
 		
 		/************* Do Move ***********************************/
