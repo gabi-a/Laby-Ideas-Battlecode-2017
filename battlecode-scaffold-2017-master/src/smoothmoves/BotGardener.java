@@ -77,7 +77,7 @@ public class BotGardener {
 		
 		byte action = Action.DIE_EXCEPTION;
 
-		//tryToBuild(RobotType.SOLDIER);
+		tryToBuild(RobotType.LUMBERJACK, myLocation);
 		waterTrees();
 		
 		if(settled) {
@@ -175,7 +175,9 @@ public class BotGardener {
 		}
 	}
 	
-	public static boolean tryToBuild(RobotType typeToBuild) throws GameActionException {
+	public static boolean tryToBuild(RobotType typeToBuild, MapLocation myLocation) throws GameActionException {
+		if(spawnDirection == null) spawnDirection = setSpawnDirection(myLocation);
+		if(spawnDirection == null) return false;
 		Direction buildDirection = spawnDirection;
 		for(int i = 6; i-->0;) {
 			if(rc.canBuildRobot(typeToBuild, buildDirection)) {
