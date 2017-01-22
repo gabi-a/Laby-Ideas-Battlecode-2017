@@ -64,6 +64,14 @@ class CommsInt {
 	public int read(RobotController rc) throws GameActionException {
 		return rc.readBroadcast(index);
 	}
+
+	public void increment(RobotController rc, int increment) throws GameActionException {
+		rc.broadcast(index, rc.readBroadcast(index) + increment);
+	}
+
+	public void decrement(RobotController rc, int decrement) throws GameActionException {
+		rc.broadcast(index, rc.readBroadcast(index) - decrement);
+	}
 }
 
 class CommsStack {
