@@ -43,13 +43,13 @@ public class BotGardener {
 		byte action = Action.DIE_EXCEPTION;
 		
 		if(settled) {
-			tryToBuild(RobotType.SOLDIER);
+			buildUnit();
 			plantTrees();
 			waterTrees();
 		}
 		
 		else {
-			tryToBuild(RobotType.SOLDIER);
+			buildUnit();
 		}
 		
 		/************* Do Move ***********************************/
@@ -138,6 +138,36 @@ public class BotGardener {
 		if(tree != null) {
 			rc.water(treeToWater.ID);
 		}
+	}
+
+	public static void buildUnit() throws GameActionException {
+		int[] units = Comms.ourBotCount.array(rc);
+
+		// leave some bullets for shooting
+		if(rc.getTeamBullets() < 130) return;
+
+		// first units to spawn
+		if(firstUnits(units)) return;
+
+		// later round spawning
+		if(tryToBuild(RobotType.SOLDIER)) return;
+	}
+
+	public static boolean firstUnits(int[] units) throws GameActionException {
+		if(rc.senseNearbyTrees().length > 5){
+			if(units[RobotType.SCOUT.ordinal()] == 0){
+				if(tryToBuild(RobotType.SCOUT)) return true;
+			}
+		} else {
+			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
+				if(tryToBuild(RobotType.LUMBERJACK)) return true;
+			}
+		}
+		if(units[RobotType.SOLDIER.ordinal()] == 0){
+			if(tryToBuild(RobotType.SOLDIER)) return true;
+		}
+
+		return false;
 	}
 	
 	public static boolean tryToBuild(RobotType typeToBuild) throws GameActionException {

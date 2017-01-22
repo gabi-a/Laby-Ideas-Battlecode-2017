@@ -55,6 +55,7 @@ public class BotArchon {
 	}
 	
 	public static boolean tryHireGardener() throws GameActionException {
+		if(Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) > 1) return false;
 		Direction hireDirection = new Direction(0);
 		for (int i = 0; i < 8; i++) {
 			if (rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection, 5f))) {

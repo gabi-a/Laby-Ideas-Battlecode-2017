@@ -13,7 +13,7 @@ public class Comms {
 	
 	static {
 		ourBotCount = new CommsBotCount(0,6);
-		theirBotCount = new CommsBotCount(0,6);
+		theirBotCount = new CommsBotCount(7,13);
 	}
 	
 	public static int packLocation(RobotController rc, MapLocation location) {
@@ -235,6 +235,15 @@ class CommsArray {
 		// }
 
 		// return array[index];
+	}
+
+	public int[] array(RobotController rc) throws GameActionException {
+		int[] data = new int[arrayEnd - arrayStart];
+		for(int i = 0; i < arrayEnd - arrayStart; i++){
+			data[i] = rc.readBroadcast(arrayStart + i);
+		}
+
+		return data;
 	}
 }
 
