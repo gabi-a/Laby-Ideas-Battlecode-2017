@@ -178,14 +178,18 @@ public class BotGardener {
 	public static void buildUnit() throws GameActionException {
 		int[] units = Comms.ourBotCount.array(rc);
 
-		// leave some bullets for shooting
-		if(rc.getTeamBullets() < 130) return;
-
 		// first units to spawn
 		if(firstUnits(units)) return;
 
+		// leave some bullets for shooting
+		if(rc.getTeamBullets() < 130) return;
+
 		// later round spawning
-		if(tryToBuild(RobotType.SOLDIER)) return;
+		if(units[RobotType.LUMBERJACK.ordinal()] < units[RobotType.SOLDIER.ordinal()]){
+			tryToBuild(RobotType.LUMBERJACK);
+		} else {
+			tryToBuild(RobotType.SOLDIER);
+		}
 	}
 
 	public static boolean firstUnits(int[] units) throws GameActionException {
