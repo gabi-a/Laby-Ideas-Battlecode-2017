@@ -93,6 +93,7 @@ public class BotScout {
 		switch(action) {
 		case Action.FIRE:
 			if(rc.canFireSingleShot()) rc.fireSingleShot(shootDirection);
+			break;
 		case Action.SHAKE_TREE:
 			rc.shake(treeToShake.ID);
 			break;
