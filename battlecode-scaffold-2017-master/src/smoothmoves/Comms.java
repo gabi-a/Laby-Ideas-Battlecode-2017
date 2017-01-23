@@ -14,11 +14,14 @@ public class Comms {
 	public static final CommsBotArray enemyGardenersArray;
 	public static final CommsBotArray enemyArchonsArray;
 	
+	public static final CommsBotArray enemiesAttackingUs;
+	
 	static {
 		ourBotCount = new CommsBotCount(0,6);
 		theirBotCount = new CommsBotCount(7,13);
 		enemyGardenersArray = new CommsBotArray(14, 24);
 		enemyArchonsArray = new CommsBotArray(25, 35);
+		enemiesAttackingUs = new CommsBotArray(36,46);
 	}
 	
 	public static int packLocation(RobotController rc, MapLocation location) {

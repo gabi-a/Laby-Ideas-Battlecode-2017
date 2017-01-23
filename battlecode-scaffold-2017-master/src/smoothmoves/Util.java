@@ -32,12 +32,24 @@ public class Util {
 			}
 		}
 		
+		RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
+		
+		for(int i = enemiesAttackingUs.length;i-->0;) {
+			if(enemiesAttackingUs[i] != null) rc.setIndicatorDot(enemiesAttackingUs[i].location, 0, 0, 255);
+			if(enemiesAttackingUs[i] != null && rc.canSenseLocation(enemiesAttackingUs[i].location) && !rc.canSenseRobot(enemiesAttackingUs[i].ID)) {
+				Comms.enemiesAttackingUs.deleteBot(rc, enemiesAttackingUs[i]);
+			}
+		}
+		
 		for(int i = enemies.length;i-->0;) {
 			if(enemies[i].type == RobotType.GARDENER && enemies[i].health > 5f) {
 				Comms.enemyGardenersArray.writeBot(rc, enemies[i]);
 			}
-			if(enemies[i].type == RobotType.ARCHON && enemies[i].health > 5f) {
+			else if(enemies[i].type == RobotType.ARCHON && enemies[i].health > 5f) {
 				Comms.enemyArchonsArray.writeBot(rc, enemies[i]);
+			}
+			else if(rc.getType() == RobotType.GARDENER || rc.getType() == RobotType.ARCHON) {
+				Comms.enemiesAttackingUs.writeBot(rc, enemies[i]);
 			}
 		}
 		
