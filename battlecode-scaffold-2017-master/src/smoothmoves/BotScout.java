@@ -36,20 +36,12 @@ public class BotScout {
 		}
 		
 		else {
-			MapLocation moveLocation = myLocation;
-			if(trees.length > 0) {
-				for(int i = trees.length;i-->0;) {
-					moveLocation = moveLocation.add(myLocation.directionTo(trees[i].location), (trees[i].getContainedBullets()/10) * 1f/(myLocation.distanceTo(trees[i].location)+1f));
-				}
-				
-				moveDirection = myLocation.directionTo(moveLocation);
-				if(moveDirection != null) moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
-				
-				if(myLocation.distanceTo(moveLocation) < 0.01f) {
-					moveDirection = Nav.explore(rc, bullets);
-				}
-				
-			} else {
+			MapLocation moveLocation = applyTreeGravity(myLocation, trees);
+			moveDirection = myLocation.directionTo(moveLocation);
+			if(moveDirection != null && myLocation.distanceTo(moveLocation) > 0.01f) {
+				moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
+			}
+			else {
 				moveDirection = Nav.explore(rc, bullets);
 			}
 		}
@@ -74,7 +66,6 @@ public class BotScout {
 			if(rc.canFireSingleShot()) {
 				action = Action.FIRE;
 				shootDirection = myLocation.directionTo(enemies[0].location);
-
 			}
 		}
 		
@@ -104,5 +95,18 @@ public class BotScout {
 		default:
 			break;
 		}
+	}
+	
+	private static MapLocation applyTreeGravity(MapLocation myLocation, TreeInfo[] trees) {
+		MapLocation moveLocation = myLocation;
+		if(trees.length == 0) {
+			return moveLocation;
+		}
+		else {
+			for(int i = trees.length;i-->0;) {
+				moveLocation = moveLocation.add(myLocation.directionTo(trees[i].location), (trees[i].getContainedBullets()/10) * 1f/(myLocation.distanceTo(trees[i].location)+1f));
+			}
+		}
+		return moveLocation;
 	}
 }
