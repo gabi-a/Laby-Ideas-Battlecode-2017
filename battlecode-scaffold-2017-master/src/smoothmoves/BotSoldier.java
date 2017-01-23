@@ -47,8 +47,10 @@ public class BotSoldier {
 				}
 			} else {
 				MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
-				moveDirection = myLocation.directionTo(moveLocation);
-				moveStride = myLocation.distanceTo(moveLocation);
+				if(moveLocation != null) {
+					moveDirection = myLocation.directionTo(moveLocation);
+					moveStride = myLocation.distanceTo(moveLocation);
+				}
 			}
 			if(moveDirection != null) moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
 			
