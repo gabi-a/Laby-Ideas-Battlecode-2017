@@ -188,7 +188,11 @@ public class BotGardener {
 		//if(units[RobotType.LUMBERJACK.ordinal()] < units[RobotType.SOLDIER.ordinal()]){
 		//	tryToBuild(RobotType.LUMBERJACK);
 		//} else {
+		if(Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 3 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)) {
+			tryToBuild(RobotType.LUMBERJACK);
+		} else {
 			tryToBuild(RobotType.SOLDIER);
+		}
 		//}
 	}
 

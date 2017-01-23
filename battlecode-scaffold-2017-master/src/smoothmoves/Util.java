@@ -75,6 +75,7 @@ public class Util {
 			return loc1.add(new Direction(loc1, loc2), loc1.distanceTo(loc2) / 2);
 		}
 		
+		
 		public static boolean goodToShoot(RobotController rc, MapLocation myLocation, RobotInfo enemyBot) {
 			
 			MapLocation halfwayLocation = Util.halfwayLocation(myLocation, enemyBot.location);
@@ -92,12 +93,14 @@ public class Util {
 					break;
 				}
 			}
+			/*
 			for(int i = treesBetweenUs.length; i-->0;) {
 				if(!(rc.getType() == RobotType.SCOUT && treesBetweenUs[i].location.distanceTo(myLocation) < 1f) && Util.doesLineIntersectWithCircle(myLocation, enemyBot.location, treesBetweenUs[i].location, treesBetweenUs[i].getRadius())) {
 					goodToShoot = false;
 					break;
 				}
 			}
+			*/
 			return goodToShoot;
 		}
 	

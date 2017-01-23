@@ -69,6 +69,21 @@ public class BotScout {
 			}
 		}
 		
+		/************* Do pre move action *********************************/
+		
+		/*
+		 * All checks to see if this action is possible should already
+		 * have taken place
+		 */
+		
+		switch(action) {
+		case Action.SHAKE_TREE:
+			rc.shake(treeToShake.ID);
+			break;
+		default:
+			break;
+		}
+		
 		/************* Do Move ***********************************/
 		
 		/*
@@ -78,7 +93,7 @@ public class BotScout {
 		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
 			rc.move(moveDirection, moveStride);
 		
-		/************* Do action *********************************/
+		/************* Do post move action *********************************/
 		
 		/*
 		 * All checks to see if this action is possible should already
@@ -88,9 +103,6 @@ public class BotScout {
 		switch(action) {
 		case Action.FIRE:
 			if(rc.canFireSingleShot()) rc.fireSingleShot(shootDirection);
-			break;
-		case Action.SHAKE_TREE:
-			rc.shake(treeToShake.ID);
 			break;
 		default:
 			break;
