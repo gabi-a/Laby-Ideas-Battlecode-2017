@@ -8,6 +8,17 @@ public class BotArchon {
 	static Team us = RobotPlayer.rc.getTeam();
 	static Team them = us.opponent();
 	
+	static int numInitialArchons = 0;
+	
+	static enum Archon {
+		FIRST,
+		SECOND,
+		THIRD,
+		EXTRA
+	}
+
+	static Archon archonDesignation;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		
@@ -18,6 +29,30 @@ public class BotArchon {
 		
 		Direction moveDirection = null;
 		float moveStride = RobotType.ARCHON.strideRadius;
+		
+		/************* Setup game variables    *******************/
+		if(rc.getRoundNum() == 1) {
+			MapLocation[] archonLocs = rc.getInitialArchonLocations(rc.getTeam()); 
+			numInitialArchons = archonLocs.length;
+			for(int i = 0; i < archonLocs.length; i++) {
+				if(archonLocs[i] == rc.getLocation()) {
+					switch (i) {
+						case 0:
+							archonDesignation = Archon.FIRST;
+							break;
+						case 1:
+							archonDesignation = Archon.SECOND;
+							break;
+						case 2:
+							archonDesignation = Archon.THIRD;
+							break;
+						default:
+							archonDesignation = Archon.EXTRA;
+					}
+				}
+			}
+		}
+		
 		
 		/************* Determine where to move *******************/
 		
@@ -62,7 +97,7 @@ public class BotArchon {
 		byte action = Action.DIE_EXCEPTION;
 		
 		if(rc.getTreeCount() >= 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER))
-			tryHireGardener();
+			action = Action.SPAWN_UNIT;
 		
 		/************* Do Move ***********************************/
 		
@@ -79,15 +114,15 @@ public class BotArchon {
 		 * All checks to see if this action is possible should already
 		 * have taken place
 		 */
-		
-		switch(action) {
-		case Action.SPAWN_UNIT:
-			tryHireGardener();
-			break;
-		default:
-			break;
-		}
-		
+		if(isMyTurn()) {
+			switch(action) {
+			case Action.SPAWN_UNIT:
+				tryHireGardener();
+				break;
+			default:
+				break;
+			}
+		}	
 	}
 	
 	public static boolean tryHireGardener() throws GameActionException {
@@ -101,6 +136,20 @@ public class BotArchon {
 			hireDirection = hireDirection.rotateLeftRads((float) Math.PI * 0.25f);
 		}
 		return false;
+	}
+	
+	public static boolean isMyTurn() {
+		int roundNum = rc.getRoundNum();
+		switch(numInitialArchons) {
+			case 1:
+				return true;
+			case 2:
+				return archonDesignation == Archon.FIRST ? roundNum % 2 == 0 : roundNum % 2 == 1;
+			case 3:
+				return archonDesignation == Archon.FIRST ? roundNum % 3 == 0 : archonDesignation == Archon.SECOND ? roundNum % 3 == 1 : roundNum % 3 == 2;
+		}
+		// shouldn't get here
+		return true;
 	}
 }
 
