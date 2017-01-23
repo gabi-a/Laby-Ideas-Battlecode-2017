@@ -23,9 +23,21 @@ public class Util {
 			}
 		}
 		
+		RobotInfo[] enemyArchons = Comms.enemyArchonsArray.arrayBots(rc);
+		
+		for(int i = enemyArchons.length;i-->0;) {
+			if(enemyArchons[i] != null) rc.setIndicatorDot(enemyArchons[i].location, 0, 0, 255);
+			if(enemyArchons[i] != null && rc.canSenseLocation(enemyArchons[i].location) && !rc.canSenseRobot(enemyArchons[i].ID)) {
+				Comms.enemyArchonsArray.deleteBot(rc, enemyArchons[i]);
+			}
+		}
+		
 		for(int i = enemies.length;i-->0;) {
 			if(enemies[i].type == RobotType.GARDENER && enemies[i].health > 5f) {
 				Comms.enemyGardenersArray.writeBot(rc, enemies[i]);
+			}
+			if(enemies[i].type == RobotType.ARCHON && enemies[i].health > 5f) {
+				Comms.enemyArchonsArray.writeBot(rc, enemies[i]);
 			}
 		}
 		
