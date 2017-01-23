@@ -138,7 +138,7 @@ public class BotSoldier {
 					rc.setIndicatorDot(enemyToAttack.location, 255, 0, 0);
 					
 					// If not moving laterally relative to us, fire at will!
-					if(lateralMovement < 0.5f) {
+					if(lateralMovement < 0.5f || myLocation.distanceTo(enemyToAttack.location) < 4f || enemies.length > 1) {
 						rc.setIndicatorDot(myLocation, 0, 255, 0);
 						shootDirection  = myLocation.directionTo(enemyToAttack.location);
 						action = Action.FIRE_PENTAD;
