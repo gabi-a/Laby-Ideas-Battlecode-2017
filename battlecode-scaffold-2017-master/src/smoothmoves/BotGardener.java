@@ -26,7 +26,6 @@ public class BotGardener {
 		float moveStride = RobotType.GARDENER.strideRadius;
 		
 		Util.reportEnemyBots(rc, enemies);
-		Util.reportIfDead(rc);
 		
 		/************* Determine where to move *******************/
 
