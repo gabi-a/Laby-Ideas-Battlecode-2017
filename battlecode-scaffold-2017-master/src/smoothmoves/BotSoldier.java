@@ -45,7 +45,7 @@ public class BotSoldier {
 					moveDirection = myLocation.directionTo(moveLocation);
 					moveStride = myLocation.distanceTo(moveLocation);
 				}
-			} else {
+			} else if (!Util.goodToShoot(rc, myLocation, closestEnemy)){
 				MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
 				if(moveLocation != null) {
 					moveDirection = myLocation.directionTo(moveLocation);
@@ -61,8 +61,11 @@ public class BotSoldier {
 			for(int i = enemyGardeners.length;i-->0;) {
 				if(enemyGardeners[i] != null) {
 					MapLocation moveLocation = Nav.pathTo(rc, enemyGardeners[i].location, bullets);
-					moveStride = myLocation.distanceTo(moveLocation);
-					break;
+					if(moveLocation != null) {
+						moveDirection = myLocation.directionTo(moveLocation);
+						moveStride = myLocation.distanceTo(moveLocation);
+						break;
+					}
 				}
 			}
 			
@@ -74,46 +77,58 @@ public class BotSoldier {
 		
 		if(enemies.length > 0) {
 			
-			if(trackedEnemy == null) {
-				trackedEnemy = enemies[0];
+			RobotInfo enemyToAttack = null;
+			
+			// Find an enemy that we can safely attack
+			for(int i = 0; i < enemies.length; i++) {
+				if(Util.goodToShoot(rc, myLocation, enemies[i])) {
+					enemyToAttack = enemies[i];
+					break;
+				}
 			}
 			
-			// We have a lock!
-			if(enemies[0].ID == trackedEnemy.ID) {
+			if(enemyToAttack != null) {
 				
-				float H = myLocation.distanceTo(enemies[0].location);
-				float d = myLocation.distanceTo(trackedEnemy.location);
-				float theta = myLocation.directionTo(enemies[0].location).radiansBetween(myLocation.directionTo(trackedEnemy.location));
-				float lateralMovement = Math.abs((float) (H * Math.sin(theta)));
-				
-				rc.setIndicatorDot(trackedEnemy.location, 255, 0, 0);
-				rc.setIndicatorDot(enemies[0].location, 255, 0, 0);
-				
-				// If not moving laterally relative to us, fire at will!
-				if(lateralMovement < 0.5f) {
-					rc.setIndicatorDot(myLocation, 0, 255, 0);
-					shootDirection  = myLocation.directionTo(enemies[0].location);
-					action = Action.FIRE_PENTAD;
+				if(trackedEnemy == null) {
+					trackedEnemy = enemyToAttack;
 				}
 				
-				// Otherwise do a bit of cheeky herding
-				else {
-					rc.setIndicatorDot(myLocation, 0, 0, 255);
-					fireOffsetDegrees = -fireOffsetDegrees;
-					shootDirection  = myLocation.directionTo(enemies[0].location).rotateLeftDegrees(fireOffsetDegrees);
-					if(shootCooldown <= 0) {
-						action = Action.FIRE;
+				// We have a lock!
+				if(enemies[0].ID == trackedEnemy.ID) {
+					
+					float H = myLocation.distanceTo(enemies[0].location);
+					float d = myLocation.distanceTo(trackedEnemy.location);
+					float theta = myLocation.directionTo(enemyToAttack.location).radiansBetween(myLocation.directionTo(trackedEnemy.location));
+					float lateralMovement = Math.abs((float) (H * Math.sin(theta)));
+					
+					rc.setIndicatorDot(trackedEnemy.location, 255, 0, 0);
+					rc.setIndicatorDot(enemyToAttack.location, 255, 0, 0);
+					
+					// If not moving laterally relative to us, fire at will!
+					if(lateralMovement < 0.5f) {
+						rc.setIndicatorDot(myLocation, 0, 255, 0);
+						shootDirection  = myLocation.directionTo(enemyToAttack.location);
+						action = Action.FIRE_PENTAD;
 					}
+					
+					// Otherwise do a bit of cheeky herding
+					else {
+						rc.setIndicatorDot(myLocation, 0, 0, 255);
+						fireOffsetDegrees = -fireOffsetDegrees;
+						shootDirection  = myLocation.directionTo(enemyToAttack.location).rotateLeftDegrees(fireOffsetDegrees);
+						if(shootCooldown <= 0) {
+							action = Action.FIRE;
+						}
+					}
+					
 				}
 				
-			}
-			
-			else {
+				else {
+					
+				}
 				
+				trackedEnemy = enemyToAttack;
 			}
-			
-			trackedEnemy = enemies[0];
-			
 		}
 		
 		/************* Do Move ***********************************/
