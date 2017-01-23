@@ -236,8 +236,8 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
 		}
 
 		// A move never happened, so return false.
-		System.out.println("I'm stuck! :( I have "+
-		Clock.getBytecodesLeft()+" bytecodes left");
+		//System.out.println("I'm stuck! :( I have "+
+		//Clock.getBytecodesLeft()+" bytecodes left");
 		return null;
 	}
 
@@ -252,7 +252,7 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
     	int moveAttemptCount = 0;
     	while(moveAttemptCount < 5) {
     		moveDirection = Nav.tryMove(rc, heading, 5f, 24, bullets);
-    		if(rc.onTheMap(myLocation.add(heading,rc.getType().strideRadius + rc.getType().bodyRadius ),rc.getType().bodyRadius+2f) 
+    		if(moveDirection != null && rc.onTheMap(myLocation.add(heading,rc.getType().strideRadius + rc.getType().bodyRadius ),rc.getType().bodyRadius+2f) 
 					&& rc.canMove(moveDirection)) {
     				return moveDirection;
     		}
