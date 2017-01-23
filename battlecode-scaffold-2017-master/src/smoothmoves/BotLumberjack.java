@@ -110,20 +110,12 @@ public class BotLumberjack {
 			}
 		}
 		
-		/************* Do Move ***********************************/
-		
-		/*
-		 * All checks to see if this move is possible should already
-		 * have taken place
-		 */
-		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
-			rc.move(moveDirection, moveStride);
-		
 		/************* Do action *********************************/
 		
 		/*
 		 * All checks to see if this action is possible should already
 		 * have taken place
+		 * Note: we must do this before moving else we may move out of range
 		 */
 		
 		switch(action) {
@@ -136,5 +128,14 @@ public class BotLumberjack {
 		default:
 			break;
 		}
+		
+		/************* Do Move ***********************************/
+		
+		/*
+		 * All checks to see if this move is possible should already
+		 * have taken place
+		 */
+		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
+			rc.move(moveDirection, moveStride);
 	}
 }
