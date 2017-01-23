@@ -42,8 +42,10 @@ public class BotSoldier {
 					moveDirection = closestEnemy.location.directionTo(myLocation);
 				} else if(myLocation.distanceTo(closestEnemy.location) > 4f) {
 					MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location.add(closestEnemy.location.directionTo(myLocation), 3f), bullets);
-					moveDirection = myLocation.directionTo(moveLocation);
-					moveStride = myLocation.distanceTo(moveLocation);
+					if(moveLocation != null) {
+						moveDirection = myLocation.directionTo(moveLocation);
+						moveStride = myLocation.distanceTo(moveLocation);
+					}
 				}
 			} else if (!Util.goodToShoot(rc, myLocation, closestEnemy)){
 				MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
@@ -55,30 +57,46 @@ public class BotSoldier {
 			if(moveDirection != null) moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
 			
 		} else {
-			boolean foundGardener = false;
-			RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
+			boolean protectGardener = false;
+			RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
 			moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
-			for(int i = enemyGardeners.length;i-->0;) {
-				if(enemyGardeners[i] != null) {
-					MapLocation moveLocation = Nav.pathTo(rc, enemyGardeners[i].location, bullets);
+			for(int i = enemiesAttackingUs.length;i-->0;) {
+				if(enemiesAttackingUs[i] != null) {
+					MapLocation moveLocation = Nav.pathTo(rc, enemiesAttackingUs[i].location, bullets);
 					if(moveLocation != null) {
 						moveDirection = myLocation.directionTo(moveLocation);
 						moveStride = myLocation.distanceTo(moveLocation);
-						foundGardener = true;
+						protectGardener = true;
 						break;
 					}
 				}
 			}
-			
-			if(!foundGardener) {
-				RobotInfo[] enemyArchons = Comms.enemyArchonsArray.arrayBots(rc);
-				for(int i = enemyArchons.length;i-->0;) {
-					if(enemyArchons[i] != null) {
-						MapLocation moveLocation = Nav.pathTo(rc, enemyArchons[i].location, bullets);
+			if(!protectGardener) {
+				boolean foundGardener = false;
+				RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
+				moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
+				for(int i = enemyGardeners.length;i-->0;) {
+					if(enemyGardeners[i] != null) {
+						MapLocation moveLocation = Nav.pathTo(rc, enemyGardeners[i].location, bullets);
 						if(moveLocation != null) {
 							moveDirection = myLocation.directionTo(moveLocation);
 							moveStride = myLocation.distanceTo(moveLocation);
+							foundGardener = true;
 							break;
+						}
+					}
+				}
+				
+				if(!foundGardener) {
+					RobotInfo[] enemyArchons = Comms.enemyArchonsArray.arrayBots(rc);
+					for(int i = enemyArchons.length;i-->0;) {
+						if(enemyArchons[i] != null) {
+							MapLocation moveLocation = Nav.pathTo(rc, enemyArchons[i].location, bullets);
+							if(moveLocation != null) {
+								moveDirection = myLocation.directionTo(moveLocation);
+								moveStride = myLocation.distanceTo(moveLocation);
+								break;
+							}
 						}
 					}
 				}

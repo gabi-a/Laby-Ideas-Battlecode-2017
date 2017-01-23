@@ -17,12 +17,15 @@ public class BotGardener {
 		BotGardener.rc = rc;
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		myLocation = rc.getLocation();
 		
 		Direction moveDirection = null;
 		float moveStride = RobotType.GARDENER.strideRadius;
+		
+		Util.reportEnemyBots(rc, enemies);
 		
 		/************* Determine where to move *******************/
 
