@@ -28,8 +28,8 @@ public class BotArchon {
 			rc.donate(rc.getTeamBullets());
 		}
 		
-		if(rc.getTeamBullets() > 10000) {
-			rc.donate(10000);
+		if(rc.getTeamBullets() > 1000 * (7.5f + rc.getRoundNum() * 0.0041666666f)) {
+			rc.donate(rc.getTeamBullets());
 		}
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();

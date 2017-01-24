@@ -46,7 +46,7 @@ public class BotLumberjack {
 					float newScore = rateTree(trees[i]);
 					if(newScore > score){
 						score = newScore;
-						goalLocation = trees[i].getLocation();
+						goalLocation = goalLocation.add(myLocation.directionTo(trees[i].getLocation()));
 					}
 				}
 			} 
@@ -90,7 +90,7 @@ public class BotLumberjack {
 			moveStride = myLocation.distanceTo(goalLocation);
 			
 			// Rescale stride distance
-			moveStride = moveStride * RobotType.LUMBERJACK.strideRadius / (trees.length + allies.length);
+			moveStride = Math.max(RobotType.LUMBERJACK.strideRadius, moveStride * RobotType.LUMBERJACK.strideRadius / (((trees.length == 0) ? 0.001f : 1f) + allies.length));
 
 		}
 		
