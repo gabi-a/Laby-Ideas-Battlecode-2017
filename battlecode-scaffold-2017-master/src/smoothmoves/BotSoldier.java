@@ -82,6 +82,13 @@ public class BotSoldier {
 				}
 				
 				else {
+					RobotInfo passiveEnemy = Util.getBestPassiveEnemyLocation(rc);
+					MapLocation moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
+					if(moveLocation != null) {
+						moveDirection = myLocation.directionTo(moveLocation);
+						moveStride = myLocation.distanceTo(moveLocation);
+					}
+					/*
 					boolean foundGardener = false;
 					RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
 					System.out.println("Finding gardeners");
@@ -111,7 +118,7 @@ public class BotSoldier {
 								}
 							}
 						}
-					}
+					}*/
 				}
 			}
 		}

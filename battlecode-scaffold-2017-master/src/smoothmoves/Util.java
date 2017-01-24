@@ -140,4 +140,51 @@ public class Util {
 			return count;
 		}
 	
+		public static void updateMyPostion(RobotController rc) throws GameActionException {
+			switch(rc.getType()) {
+			case SOLDIER:
+				Comms.ourLumberjackAndSoldiers.writeBot(rc, new RobotInfo(rc.getID(), null, null, rc.getLocation(), 0f, 0, 0) );
+				break;
+			case LUMBERJACK:
+				Comms.ourLumberjackAndSoldiers.writeBot(rc, new RobotInfo(rc.getID(), null, null, rc.getLocation(), 0f, 0, 0) );
+				break;
+			}
+		}
+		
+		public static MapLocation getClosestToEnemyBase(RobotController rc) throws GameActionException {
+			MapLocation enemyLocation = getBestPassiveEnemyLocation(rc).location;
+			if(enemyLocation == null) return null;
+			RobotInfo[] ourBots = Comms.ourLumberjackAndSoldiers.arrayBots(rc);
+			float dmin = 10000f;
+			RobotInfo bestBot = null;
+			for(int i = ourBots.length;i-->0;) {
+				if(ourBots[i] != null && ourBots[i].location.distanceTo(enemyLocation) < dmin) {
+					dmin = ourBots[i].location.distanceTo(enemyLocation);
+					bestBot = ourBots[i];
+				}
+			}
+			if (bestBot == null) return null;
+			return bestBot.location;
+		}
+		
+		public static RobotInfo getBestPassiveEnemyLocation(RobotController rc ) throws GameActionException {
+			
+			boolean foundGardener = false;
+			RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
+			for(int i = 0; i < enemyGardeners.length;i++) {
+				if(enemyGardeners[i] != null) {
+					return enemyGardeners[i];
+				}
+			}
+			if(!foundGardener) {
+				RobotInfo[] enemyArchons = Comms.enemyArchonsArray.arrayBots(rc);
+				for(int i = 0; i < enemyArchons.length;i++) {
+					if(enemyArchons[i] != null) {
+						return enemyArchons[i];
+					}
+				}
+			}
+			return null;
+			
+		}
 }
