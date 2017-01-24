@@ -133,7 +133,7 @@ public class BotLumberjack {
 				chopID = trees[0].ID;
 				action = Action.CHOP;
 			} else {
-				System.err.format("\nI wanted to chop a tree but I couldn't :(\n");
+				//System.err.format("\nI wanted to chop a tree but I couldn't :(\n");
 			}
 		}
 		
