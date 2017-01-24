@@ -15,7 +15,7 @@ public class BotLumberjack {
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		RobotInfo[] allies = rc.senseNearbyRobots(-1, us);
-		BulletInfo[] bullets = rc.senseNearbyBullets();
+		BulletInfo[] bullets = rc.senseNearbyBullets(4);
 		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 		TreeInfo bestTree = null;
 		
@@ -42,9 +42,10 @@ public class BotLumberjack {
 			
 			// Move towards trees of low health or that contain bots
 			if(trees.length > 0) {
-				for(int i = trees.length;i-->0;) {
-					goalLocation = goalLocation.add(myLocation.directionTo(trees[i].location), Math.max(1f, (trees[i].getContainedRobot() != null ? 1f : 0f) + /*1f/(trees[i].health + 1f) +*/ 1f/(trees[i].location.distanceTo(myLocation) + 1f)));
-				}
+				// for(int i = trees.length;i-->0;) {
+					// goalLocation = goalLocation.add(myLocation.directionTo(trees[i].location), Math.max(1f, (trees[i].getContainedRobot() != null ? 1f : 0f) + /*1f/(trees[i].health + 1f) +*/ 1f/(trees[i].location.distanceTo(myLocation) + 1f)));
+				// }
+				goalLocation = trees[0].getLocation();
 			} 
 			
 			else {
@@ -56,6 +57,11 @@ public class BotLumberjack {
 				for(int i = allies.length;i-->0;) {
 					goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 1f);
 				}
+			}
+
+			// Move towards enemies
+			if(enemies.length > 0){
+				goalLocation = goalLocation.add(myLocation.directionTo(enemies[0].getLocation()), 3f);
 			}
 			
 			moveDirection = myLocation.directionTo(goalLocation);
