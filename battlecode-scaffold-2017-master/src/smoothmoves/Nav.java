@@ -374,6 +374,7 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
 		goalCache = goal;
 
 		float degreeOffset = 30f;
+		int tries = 6;
 		Direction trial;
 
 		// Idea: if we can go closer to the goal than we ever have before, do so.
@@ -411,7 +412,7 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
 
 		switch (moveState) {
 			case LEFT:
-				for (int i = 0; i < 6; i++) {
+				for (int i = 0; i < tries; i++) {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
@@ -420,11 +421,12 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
 				}
 				break;
 			case RIGHT:
-				for (int i = 0; i < 6; i++) {
+				for (int i = 0; i < tries; i++) {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
 					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
 						myLocation.add(trial, stride);
+						return myLocation.add(trial, stride);
 					}
 				}
 				break;
