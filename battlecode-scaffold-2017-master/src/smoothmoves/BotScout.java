@@ -27,7 +27,7 @@ public class BotScout {
 		/************* Determine where to move *******************/
 
 		if(bullets.length > 0) {
-			System.out.println("RUN!");
+			//System.out.println("RUN!");
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, enemies);
 			if(moveLocation != null) {
 				moveDirection = myLocation.directionTo(moveLocation);
