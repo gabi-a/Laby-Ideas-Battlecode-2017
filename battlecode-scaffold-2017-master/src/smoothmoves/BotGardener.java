@@ -30,9 +30,11 @@ public class BotGardener {
 		/************* Determine where to move *******************/
 
 		if(bullets.length > 0) {
-			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
-			moveDirection = myLocation.directionTo(moveLocation);
-			moveStride = myLocation.distanceTo(moveLocation);
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);
+			if (moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
+			}
 		}
 		
 		else if(!settled) {
