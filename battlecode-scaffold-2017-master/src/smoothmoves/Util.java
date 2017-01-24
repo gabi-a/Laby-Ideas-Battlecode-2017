@@ -131,5 +131,13 @@ public class Util {
 			
 			return goodToShoot;
 		}
+		
+		public static int[] countBots(RobotInfo[] bots) {
+			int[] count = {0,0,0,0,0,0};
+			for(int i = bots.length;i-->0;) {
+				count[bots[i].type.ordinal()] += 1;
+			}
+			return count;
+		}
 	
 }

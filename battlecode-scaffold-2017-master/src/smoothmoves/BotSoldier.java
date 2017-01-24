@@ -30,12 +30,91 @@ public class BotSoldier {
 		
 		/************* Determine where to move *******************/
 
+		boolean dodgeBullets = false;
+		
 		if(bullets.length > 0 && closeEnemies.length > 0) {
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
-			moveDirection = myLocation.directionTo(moveLocation);
-			moveStride = myLocation.distanceTo(moveLocation);
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
+				dodgeBullets = moveDirection != null && rc.canMove(moveDirection, moveStride);
+			}
 		}
 		
+		if(!dodgeBullets) {
+			boolean protectGardener = false;
+			RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
+			moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
+			for(int i = enemiesAttackingUs.length;i-->0;) {
+				if(enemiesAttackingUs[i] != null) {
+					MapLocation moveLocation = Nav.pathTo(rc, enemiesAttackingUs[i].location, bullets);
+					if(moveLocation != null) {
+						moveDirection = myLocation.directionTo(moveLocation);
+						moveStride = myLocation.distanceTo(moveLocation);
+						protectGardener = true;
+						break;
+					}
+				}
+			}
+			
+			if(protectGardener && leaveCurrentEngagement(enemies)) {
+				if(enemies.length > 0 ) {
+					RobotInfo closestEnemy = enemies[0];
+					if(closestEnemy.type == RobotType.LUMBERJACK) {
+						if(myLocation.distanceTo(closestEnemy.location) < 3f) {
+							moveDirection = closestEnemy.location.directionTo(myLocation);
+						} else if(myLocation.distanceTo(closestEnemy.location) > 4f) {
+							MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location.add(closestEnemy.location.directionTo(myLocation), 3f), bullets);
+							if(moveLocation != null) {
+								moveDirection = myLocation.directionTo(moveLocation);
+								moveStride = myLocation.distanceTo(moveLocation);
+							}
+						}
+					} else if (!Util.goodToShootNotTrees(rc, myLocation, closestEnemy)){
+						MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
+						if(moveLocation != null) {
+							moveDirection = myLocation.directionTo(moveLocation);
+							moveStride = myLocation.distanceTo(moveLocation);
+						}
+					}
+					if(moveDirection != null) moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
+					
+				}
+				
+				else {
+					boolean foundGardener = false;
+					RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
+					moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
+					for(int i = enemyGardeners.length;i-->0;) {
+						if(enemyGardeners[i] != null) {
+							MapLocation moveLocation = Nav.pathTo(rc, enemyGardeners[i].location, bullets);
+							if(moveLocation != null) {
+								moveDirection = myLocation.directionTo(moveLocation);
+								moveStride = myLocation.distanceTo(moveLocation);
+								foundGardener = true;
+								break;
+							}
+						}
+					}
+					
+					if(!foundGardener) {
+						RobotInfo[] enemyArchons = Comms.enemyArchonsArray.arrayBots(rc);
+						for(int i = enemyArchons.length;i-->0;) {
+							if(enemyArchons[i] != null) {
+								MapLocation moveLocation = Nav.pathTo(rc, enemyArchons[i].location, bullets);
+								if(moveLocation != null) {
+									moveDirection = myLocation.directionTo(moveLocation);
+									moveStride = myLocation.distanceTo(moveLocation);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		/*
 		if(enemies.length > 0 && (moveDirection == null || moveDirection != null && !rc.canMove(moveDirection,moveStride))) {
 			RobotInfo closestEnemy = enemies[0];
 			if(closestEnemy.type == RobotType.LUMBERJACK) {
@@ -104,7 +183,7 @@ public class BotSoldier {
 			}
 			
 		}
-		
+		*/
 		
 		/************* Determine what action to take *************/
 		byte action = Action.DIE_EXCEPTION;
@@ -203,4 +282,17 @@ public class BotSoldier {
 			break;
 		}
 	}
+	
+	static boolean leaveCurrentEngagement(RobotInfo[] enemies) {
+		if (enemies.length == 0) return true;
+		int[] count = Util.countBots(enemies);
+		if(count[RobotType.GARDENER.ordinal()] > 0) {
+			return false;
+		}
+		if(count[RobotType.SOLDIER.ordinal()] >= 3) {
+			return false;
+		}
+		return true;
+	}
+	
 }
