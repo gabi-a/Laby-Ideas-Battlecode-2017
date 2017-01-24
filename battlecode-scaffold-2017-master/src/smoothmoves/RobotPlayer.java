@@ -10,6 +10,7 @@ public strictfp class RobotPlayer {
 		RobotPlayer.rc = rc;
 		while(true) {
 			Util.reportIfDead(rc);
+			Util.updateMyPostion(rc);
 			try {
 				switch (rc.getType()) {
 				case ARCHON:

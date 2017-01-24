@@ -82,7 +82,7 @@ public class BotSoldier {
 				}
 				
 				else {
-					RobotInfo passiveEnemy = Util.getBestPassiveEnemyLocation(rc);
+					RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
 					MapLocation moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
 					if(moveLocation != null) {
 						moveDirection = myLocation.directionTo(moveLocation);

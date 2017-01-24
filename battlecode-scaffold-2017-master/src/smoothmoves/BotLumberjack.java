@@ -37,7 +37,6 @@ public class BotLumberjack {
 		 * Otherwise move to target, trees, away from enemies
 		 */
 		else {
-			
 			MapLocation goalLocation = myLocation;
 			
 			// Move towards trees of low health or that contain bots
@@ -51,15 +50,33 @@ public class BotLumberjack {
 					}
 				}
 			} 
-			
-			else {
-				goalLocation = goalLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 2f);
+			rc.setIndicatorDot(goalLocation, 255, 0, 0);
+			MapLocation closestToEnemyBase = Util.getClosestToEnemyBase(rc);
+			MapLocation enemyBase = null;
+			RobotInfo enemyBaseBot = Util.getBestPassiveEnemy(rc);
+			if(enemyBaseBot != null) {
+				enemyBase = enemyBaseBot.location;
+			} else {
+				enemyBase = rc.getInitialArchonLocations(them)[0];
 			}
+			rc.setIndicatorDot(enemyBase, 255, 0, 0);
+			if(closestToEnemyBase != null && closestToEnemyBase != myLocation){
+				goalLocation = goalLocation.add(myLocation.directionTo(closestToEnemyBase), 1f);
+				rc.setIndicatorDot(closestToEnemyBase, 0, 255, 0);
+			} 
+			else if(enemyBase != null){
+				goalLocation = goalLocation.add(myLocation.directionTo(enemyBase), 1f);
+			}
+			rc.setIndicatorDot(goalLocation, 0, 0, 255);
+			
+			//else {
+			//	goalLocation = goalLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 2f);
+			//}
 			
 			// Move away from ally bots
 			if(allies.length > 0) {
 				for(int i = allies.length;i-->0;) {
-					goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 1f);
+					goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 0.2f);
 				}
 			}
 

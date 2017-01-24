@@ -152,7 +152,9 @@ public class Util {
 		}
 		
 		public static MapLocation getClosestToEnemyBase(RobotController rc) throws GameActionException {
-			MapLocation enemyLocation = getBestPassiveEnemyLocation(rc).location;
+			RobotInfo enemy = getBestPassiveEnemy(rc);
+			if(enemy == null) return null;
+			MapLocation enemyLocation = enemy.location;
 			if(enemyLocation == null) return null;
 			RobotInfo[] ourBots = Comms.ourLumberjackAndSoldiers.arrayBots(rc);
 			float dmin = 10000f;
@@ -167,7 +169,7 @@ public class Util {
 			return bestBot.location;
 		}
 		
-		public static RobotInfo getBestPassiveEnemyLocation(RobotController rc ) throws GameActionException {
+		public static RobotInfo getBestPassiveEnemy(RobotController rc ) throws GameActionException {
 			
 			boolean foundGardener = false;
 			RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
