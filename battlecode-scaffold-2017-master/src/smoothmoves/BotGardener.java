@@ -29,8 +29,13 @@ public class BotGardener {
 		
 		/************* Determine where to move *******************/
 
+		if(bullets.length > 0) {
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
+			moveDirection = myLocation.directionTo(moveLocation);
+			moveStride = myLocation.distanceTo(moveLocation);
+		}
 		
-		if(!settled) {
+		else if(!settled) {
 			
 			// Keep a distance from archons and gardeners
 			MapLocation moveLocation = myLocation;
@@ -197,17 +202,16 @@ public class BotGardener {
 	}
 
 	public static boolean firstUnits(int[] units) throws GameActionException {
-		if(units[RobotType.SCOUT.ordinal()] == 0){
-			if(tryToBuild(RobotType.SCOUT)) return true;
+		if(units[RobotType.SOLDIER.ordinal()] <= 1){
+			if(tryToBuild(RobotType.SOLDIER)) return true;
 		}
 		if(rc.senseNearbyTrees().length > 2){
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
 				if(tryToBuild(RobotType.LUMBERJACK)) return true;
 			}
-		} else {
-			if(units[RobotType.SOLDIER.ordinal()] == 0){
-				if(tryToBuild(RobotType.SOLDIER)) return true;
-			}
+		}
+		if(units[RobotType.SCOUT.ordinal()] == 0){
+			if(tryToBuild(RobotType.SCOUT)) return true;
 		}
 
 		return false;

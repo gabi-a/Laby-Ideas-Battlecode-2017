@@ -14,7 +14,7 @@ public class BotLumberjack {
 		
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
-		RobotInfo[] bots = rc.senseNearbyRobots();
+		RobotInfo[] allies = rc.senseNearbyRobots(-1, us);
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 		TreeInfo bestTree = null;
@@ -28,7 +28,7 @@ public class BotLumberjack {
 		 */
 		if(bullets.length > 0) {
 			rc.setIndicatorDot(myLocation, 0, 255, 0);
-			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees, bots);	
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
 			moveDirection = myLocation.directionTo(moveLocation);
 			moveStride = myLocation.distanceTo(moveLocation);
 		} 
@@ -51,10 +51,10 @@ public class BotLumberjack {
 				goalLocation = goalLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 2f);
 			}
 			
-			// Move away from bots
-			if(bots.length > 0) {
-				for(int i = bots.length;i-->0;) {
-					goalLocation = goalLocation.add(myLocation.directionTo(bots[i].getLocation()).opposite(), (bots[i].team == us) ? 1f : 3f);
+			// Move away from ally bots
+			if(allies.length > 0) {
+				for(int i = allies.length;i-->0;) {
+					goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 1f);
 				}
 			}
 			
@@ -63,7 +63,7 @@ public class BotLumberjack {
 			moveStride = myLocation.distanceTo(goalLocation);
 			
 			// Rescale stride distance
-			moveStride = moveStride * RobotType.LUMBERJACK.strideRadius / (trees.length + bots.length);
+			moveStride = moveStride * RobotType.LUMBERJACK.strideRadius / (trees.length + allies.length);
 
 		}
 		
