@@ -16,12 +16,15 @@ public class Comms {
 	
 	public static final CommsBotArray enemiesAttackingUs;
 	
+	public static final CommsBotArray ourLumberjackAndSoldiers;
+	
 	static {
 		ourBotCount = new CommsBotCount(0,6);
 		theirBotCount = new CommsBotCount(7,13);
 		enemyGardenersArray = new CommsBotArray(14, 24);
 		enemyArchonsArray = new CommsBotArray(25, 35);
 		enemiesAttackingUs = new CommsBotArray(36,46);
+		ourLumberjackAndSoldiers = new CommsBotArray(47,67);
 	}
 	
 	public static int packLocation(RobotController rc, MapLocation location) {
