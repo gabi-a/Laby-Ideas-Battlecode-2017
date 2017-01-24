@@ -35,6 +35,7 @@ public class BotSoldier {
 		if(bullets.length > 0 && closeEnemies.length > 0) {
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
 			if(moveLocation != null) {
+				System.out.println("Dodging bullets");
 				moveDirection = myLocation.directionTo(moveLocation);
 				moveStride = myLocation.distanceTo(moveLocation);
 				dodgeBullets = moveDirection != null && rc.canMove(moveDirection, moveStride);
@@ -56,8 +57,7 @@ public class BotSoldier {
 					}
 				}
 			}
-			
-			if(protectGardener && leaveCurrentEngagement(enemies)) {
+			if(!(protectGardener && leaveCurrentEngagement(enemies))) {
 				if(enemies.length > 0 ) {
 					RobotInfo closestEnemy = enemies[0];
 					if(closestEnemy.type == RobotType.LUMBERJACK) {
@@ -84,10 +84,12 @@ public class BotSoldier {
 				else {
 					boolean foundGardener = false;
 					RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
+					System.out.println("Finding gardeners");
 					moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
 					for(int i = enemyGardeners.length;i-->0;) {
 						if(enemyGardeners[i] != null) {
 							MapLocation moveLocation = Nav.pathTo(rc, enemyGardeners[i].location, bullets);
+							System.out.println("Trying to go to"+enemyGardeners[i].location);
 							if(moveLocation != null) {
 								moveDirection = myLocation.directionTo(moveLocation);
 								moveStride = myLocation.distanceTo(moveLocation);
