@@ -24,6 +24,14 @@ public class BotArchon {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		
+		if(rc.getRoundNum() > rc.getRoundLimit() - 2) {
+			rc.donate(rc.getTeamBullets());
+		}
+		
+		if(rc.getTeamBullets() > 10000) {
+			rc.donate(10000);
+		}
+		
 		RobotInfo[] bots = rc.senseNearbyRobots();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		TreeInfo[] trees = rc.senseNearbyTrees();
