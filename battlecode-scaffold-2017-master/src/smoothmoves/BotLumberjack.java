@@ -42,10 +42,14 @@ public class BotLumberjack {
 			
 			// Move towards trees of low health or that contain bots
 			if(trees.length > 0) {
-				// for(int i = trees.length;i-->0;) {
-					// goalLocation = goalLocation.add(myLocation.directionTo(trees[i].location), Math.max(1f, (trees[i].getContainedRobot() != null ? 1f : 0f) + /*1f/(trees[i].health + 1f) +*/ 1f/(trees[i].location.distanceTo(myLocation) + 1f)));
-				// }
-				goalLocation = trees[0].getLocation();
+				float score = 0;
+				for(int i = 0; i < trees.length; i++){
+					float newScore = rateTree(trees[i]);
+					if(newScore > score){
+						score = newScore;
+						goalLocation = trees[i].getLocation();
+					}
+				}
 			} 
 			
 			else {
@@ -143,5 +147,9 @@ public class BotLumberjack {
 		 */
 		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
 			rc.move(moveDirection, moveStride);
+	}
+
+	public static float rateTree(TreeInfo tree) throws GameActionException {
+				return (7-rc.getLocation().distanceTo(tree.getLocation())) + (tree.getContainedRobot() != null ? 1f: 0f) /* + health */;
 	}
 }
