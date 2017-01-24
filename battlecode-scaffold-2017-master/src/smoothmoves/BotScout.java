@@ -14,7 +14,7 @@ public class BotScout {
 		BotScout.rc = rc;
 
 		//RobotInfo[] bots = rc.senseNearbyRobots();
-		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
+		RobotInfo[] enemies = rc.senseNearbyRobots(5f, them);
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		myLocation = rc.getLocation();
@@ -62,7 +62,7 @@ public class BotScout {
 			}
 		}
 		
-		if(action != Action.SHAKE_TREE && enemies.length > 0) {
+		if(action != Action.SHAKE_TREE && enemies.length > 0 && enemies[0].type == RobotType.SCOUT) {
 			if(rc.canFireSingleShot()) {
 				action = Action.FIRE;
 				shootDirection = myLocation.directionTo(enemies[0].location);

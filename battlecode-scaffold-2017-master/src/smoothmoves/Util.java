@@ -103,5 +103,33 @@ public class Util {
 			*/
 			return goodToShoot;
 		}
+		
+		public static boolean goodToShootNotTrees(RobotController rc, MapLocation myLocation, RobotInfo enemyBot) {
+			
+			MapLocation halfwayLocation = Util.halfwayLocation(myLocation, enemyBot.location);
+			float senseRadius = myLocation.distanceTo(enemyBot.location) - RobotType.SOLDIER.bodyRadius - enemyBot.getType().bodyRadius;
+			
+			// There is no space in between us so no point continuing
+			if(senseRadius < 0.5f) return true;
+			
+			RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, rc.getTeam());
+			TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
+			boolean goodToShoot = true;
+			for(int i = botsBetweenUs.length; i-->0;) {
+				if(botsBetweenUs[i].getID() != enemyBot.getID() && botsBetweenUs[i].getID() != rc.getID() && Util.doesLineIntersectWithCircle(myLocation, enemyBot.location, botsBetweenUs[i].location, botsBetweenUs[i].getRadius())) {
+					goodToShoot = false;
+					break;
+				}
+			}
+			
+			for(int i = treesBetweenUs.length; i-->0;) {
+				if(!(rc.getType() == RobotType.SCOUT && treesBetweenUs[i].location.distanceTo(myLocation) < 1f) && Util.doesLineIntersectWithCircle(myLocation, enemyBot.location, treesBetweenUs[i].location, treesBetweenUs[i].getRadius())) {
+					goodToShoot = false;
+					break;
+				}
+			}
+			
+			return goodToShoot;
+		}
 	
 }

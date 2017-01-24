@@ -64,7 +64,7 @@ public class BotLumberjack {
 			
 			// Rescale stride distance
 			moveStride = moveStride * RobotType.LUMBERJACK.strideRadius / (trees.length + bots.length);
-			
+
 		}
 		
 		/************* Determine what action to take *************/

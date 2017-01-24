@@ -83,7 +83,7 @@ public class BotGardener {
 		buildUnit();
 		waterTrees();
 		
-		if(settled && rc.getTeamBullets() > 100) {
+		if(settled /*&& rc.getTeamBullets() > 100*/) {
 			plantTrees();
 		}
 		
@@ -115,7 +115,7 @@ public class BotGardener {
 	public static boolean settleHere() throws GameActionException {
 		
 		TreeInfo[] closeTrees = rc.senseNearbyTrees(2f);
-		RobotInfo[] closeRobots = rc.senseNearbyRobots(4f);
+		RobotInfo[] closeRobots = rc.senseNearbyRobots(2f);
 		
 		int bigTrees = 0;
 		for(TreeInfo tree : closeTrees) {

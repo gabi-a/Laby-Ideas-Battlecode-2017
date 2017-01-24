@@ -24,16 +24,17 @@ public class BotSoldier {
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
+		RobotInfo[] closeEnemies = rc.senseNearbyRobots(3f, them);
 		
 		Util.reportEnemyBots(rc, enemies);
 		
 		/************* Determine where to move *******************/
 
-		//if(bullets.length > 0) {
-		//	MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
-		//	moveDirection = myLocation.directionTo(moveLocation);
-		//	moveStride = myLocation.distanceTo(moveLocation);
-		//}
+		if(bullets.length > 0 && closeEnemies.length > 0) {
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
+			moveDirection = myLocation.directionTo(moveLocation);
+			moveStride = myLocation.distanceTo(moveLocation);
+		}
 		
 		if(enemies.length > 0 && (moveDirection == null || moveDirection != null && !rc.canMove(moveDirection,moveStride))) {
 			RobotInfo closestEnemy = enemies[0];
@@ -47,7 +48,7 @@ public class BotSoldier {
 						moveStride = myLocation.distanceTo(moveLocation);
 					}
 				}
-			} else if (!Util.goodToShoot(rc, myLocation, closestEnemy)){
+			} else if (!Util.goodToShootNotTrees(rc, myLocation, closestEnemy)){
 				MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
 				if(moveLocation != null) {
 					moveDirection = myLocation.directionTo(moveLocation);
@@ -141,7 +142,11 @@ public class BotSoldier {
 					if(lateralMovement < 0.5f || myLocation.distanceTo(enemyToAttack.location) < 4f || enemies.length > 1) {
 						rc.setIndicatorDot(myLocation, 0, 255, 0);
 						shootDirection  = myLocation.directionTo(enemyToAttack.location);
-						action = Action.FIRE_PENTAD;
+						if(enemyToAttack.type == RobotType.ARCHON) {
+							action = Action.FIRE;
+						} else {
+							action = Action.FIRE_PENTAD;
+						}
 					}
 					
 					// Otherwise do a bit of cheeky herding

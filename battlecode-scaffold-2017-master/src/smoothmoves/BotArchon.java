@@ -19,23 +19,29 @@ public class BotArchon {
 
 	static Archon archonDesignation;
 	
+	static boolean initialSpawningArchon = false;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		MapLocation myLocation = rc.getLocation();
+		
+		Util.reportEnemyBots(rc, enemies);
 		
 		Direction moveDirection = null;
 		float moveStride = RobotType.ARCHON.strideRadius;
 		
 		/************* Setup game variables    *******************/
 		if(rc.getRoundNum() == 1) {
-			MapLocation[] archonLocs = rc.getInitialArchonLocations(rc.getTeam()); 
-			numInitialArchons = archonLocs.length;
-			for(int i = 0; i < archonLocs.length; i++) {
-				if(archonLocs[i] == rc.getLocation()) {
+			MapLocation[] ourArchonLocs = rc.getInitialArchonLocations(us); 
+			MapLocation[] theirArchonLocs = rc.getInitialArchonLocations(them); 
+			numInitialArchons = ourArchonLocs.length;
+			for(int i = 0; i < ourArchonLocs.length; i++) {
+				if(ourArchonLocs[i] == rc.getLocation()) {
 					switch (i) {
 						case 0:
 							archonDesignation = Archon.FIRST;
@@ -50,6 +56,21 @@ public class BotArchon {
 							archonDesignation = Archon.EXTRA;
 					}
 				}
+			}
+			
+			float longestDistance = 0f;
+			MapLocation bestArchonLocation = myLocation;
+			for(int i = ourArchonLocs.length;i-->0;) {
+				MapLocation ourArchonLoc = ourArchonLocs[i];
+				for(int j = theirArchonLocs.length;j-->0;) {
+					if(theirArchonLocs[j].distanceTo(ourArchonLoc) > longestDistance) {
+						longestDistance = theirArchonLocs[j].distanceTo(ourArchonLoc);
+						bestArchonLocation = ourArchonLoc;
+					}
+				}
+			}
+			if(bestArchonLocation == myLocation) {
+				initialSpawningArchon = true;
 			}
 		}
 		
@@ -140,6 +161,9 @@ public class BotArchon {
 	
 	public static boolean isMyTurn() {
 		int roundNum = rc.getRoundNum();
+		if(roundNum < 10) {
+			return initialSpawningArchon;
+		}
 		switch(numInitialArchons) {
 			case 1:
 				return true;
