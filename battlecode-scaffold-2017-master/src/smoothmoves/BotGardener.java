@@ -13,8 +13,25 @@ public class BotGardener {
 
 	static MapLocation myLocation;
 	
+	static boolean lotsOfTrees = false;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
+		
+		/*
+		 * Get an idea for how many trees on the map based on the archons perceptions
+		 */
+		if(rc.getRoundNum() < 10) {
+			int[] archonTrees = Comms.archonTreeCount.array(rc);
+			int count = 0;
+			for(int i = archonTrees.length;i-->0;) {
+				count += archonTrees[i];
+			}
+			if(count/3f > 4f) {
+				lotsOfTrees = true;
+			}
+			System.out.println("Tree count: "+count);
+		}
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
@@ -195,7 +212,7 @@ public class BotGardener {
 		//if(units[RobotType.LUMBERJACK.ordinal()] < units[RobotType.SOLDIER.ordinal()]){
 		//	tryToBuild(RobotType.LUMBERJACK);
 		//} else {
-		if(Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 3 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)) {
+		if( lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 20 /*Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 3 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)*/) {
 			tryToBuild(RobotType.LUMBERJACK);
 		} else {
 			tryToBuild(RobotType.SOLDIER);
@@ -204,13 +221,14 @@ public class BotGardener {
 	}
 
 	public static boolean firstUnits(int[] units) throws GameActionException {
-		if(units[RobotType.SOLDIER.ordinal()] <= 1){
-			if(tryToBuild(RobotType.SOLDIER)) return true;
-		}
-		if(rc.senseNearbyTrees().length > 2){
+		
+		if(lotsOfTrees){
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
 				if(tryToBuild(RobotType.LUMBERJACK)) return true;
 			}
+		}
+		if(units[RobotType.SOLDIER.ordinal()] <= 1){
+			if(tryToBuild(RobotType.SOLDIER)) return true;
 		}
 		if(units[RobotType.SCOUT.ordinal()] == 0){
 			if(tryToBuild(RobotType.SCOUT)) return true;
