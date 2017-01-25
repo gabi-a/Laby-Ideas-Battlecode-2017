@@ -18,9 +18,11 @@ public class BotGardener {
 	
 	static int settleThreshold = 3;
 	
+	static int turnsAlive = 0;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
-		
+		turnsAlive++;
 		if(rc.getRoundNum() % 10 == 0) {
 			settleThreshold = Math.max(0, settleThreshold - 1);
 		}
@@ -177,8 +179,9 @@ public class BotGardener {
 	}
 	
 	public static Direction setSpawnDirection() throws GameActionException {
+		System.out.println("Set spawn direction");
 		Direction testDirection = myLocation.directionTo(rc.getInitialArchonLocations(them)[0]);
-		for(int i = 36;i-->0;) {
+		for(int i = 0;i<36;i++) {
 			rc.setIndicatorDot(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i),2f), 0, 255, 0);
 			if( !(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i), 2f), 1f) || !rc.onTheMap(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i), 2f), 1f))) {			
 				return testDirection.rotateLeftDegrees(5f * i);
@@ -262,6 +265,8 @@ public class BotGardener {
 
 	public static boolean firstUnits(int[] units) throws GameActionException {
 
+		if(turnsAlive >= 60) return false;
+		
 		if(units[RobotType.SCOUT.ordinal()] == 0){
 			tryToBuild(RobotType.SCOUT); 
 			return true;
