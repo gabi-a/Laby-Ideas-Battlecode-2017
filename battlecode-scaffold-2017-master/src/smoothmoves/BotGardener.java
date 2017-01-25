@@ -23,7 +23,7 @@ public class BotGardener {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
 		turnsAlive++;
-		if(rc.getRoundNum() % 10 == 0) {
+		if(turnsAlive % 10 == 0) {
 			settleThreshold = Math.max(0, settleThreshold - 1);
 		}
 		
@@ -77,7 +77,7 @@ public class BotGardener {
 			}
 			if(trees.length > 0) {
 				for(int i = trees.length;i-->0;) {
-					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), (float) Math.pow(1f/(1f+trees[i].location.distanceTo(myLocation)), 2));
+					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), (float) (2f*Math.pow(1f/(1f+trees[i].location.distanceTo(myLocation)), 2)));
 				}
 			}
 			
