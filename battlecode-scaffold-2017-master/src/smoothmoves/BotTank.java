@@ -18,7 +18,7 @@ public class BotTank {
 		
 		Direction shootDirection = null;
 		Direction moveDirection = null;
-		float moveStride = RobotType.SOLDIER.strideRadius;
+		float moveStride = RobotType.TANK.strideRadius;
 		
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		TreeInfo[] trees = rc.senseNearbyTrees();
