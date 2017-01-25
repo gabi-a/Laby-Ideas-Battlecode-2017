@@ -8,7 +8,7 @@ public class BotGardener {
 	static Team us = RobotPlayer.rc.getTeam();
 	static Team them = us.opponent();
 	
-	static Direction spawnDirection = Direction.NORTH;
+	static Direction spawnDirection = RobotPlayer.rc.getLocation().directionTo(RobotPlayer.rc.getInitialArchonLocations(them)[0]);
 	static boolean settled = false;
 
 	static MapLocation myLocation;
@@ -97,7 +97,7 @@ public class BotGardener {
 			
 		} else {
 
-			spawnDirection = setSpawnDirection();
+			if(rc.senseTreeAtLocation(myLocation.add(spawnDirection)) != null) spawnDirection = setSpawnDirection();
 			
 			if(spawnDirection == null) {
 				settled = false;
@@ -111,10 +111,12 @@ public class BotGardener {
 		
 		byte action = Action.DIE_EXCEPTION;
 
-		buildUnit();
+		int[] units = Comms.ourBotCount.array(rc);
+		
+		buildUnit(units);
 		waterTrees();
 		
-		if(settled /*&& rc.getTeamBullets() > 100*/) {
+		if(settled && !firstUnits(units)/*&& rc.getTeamBullets() > 100*/) {
 			plantTrees();
 		}
 		
@@ -236,8 +238,8 @@ public class BotGardener {
 		}
 	}
 
-	public static void buildUnit() throws GameActionException {
-		int[] units = Comms.ourBotCount.array(rc);
+	public static void buildUnit(int[] units) throws GameActionException {
+		//int[] units = Comms.ourBotCount.array(rc);
 
 		// first units to spawn
 		if(firstUnits(units)) return;
@@ -258,19 +260,22 @@ public class BotGardener {
 	}
 
 	public static boolean firstUnits(int[] units) throws GameActionException {
-		
+
+		if(units[RobotType.SCOUT.ordinal()] == 0){
+			tryToBuild(RobotType.SCOUT); 
+			return true;
+		}
+		if(units[RobotType.SOLDIER.ordinal()] <= 1){
+			tryToBuild(RobotType.SOLDIER); 
+			return true;
+		}
+		/*
 		if(lotsOfTrees){
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
 				if(tryToBuild(RobotType.LUMBERJACK)) return true;
 			}
 		}
-		if(units[RobotType.SOLDIER.ordinal()] <= 1){
-			if(tryToBuild(RobotType.SOLDIER)) return true;
-		}
-		if(units[RobotType.SCOUT.ordinal()] == 0){
-			if(tryToBuild(RobotType.SCOUT)) return true;
-		}
-
+		*/
 		return false;
 	}
 	

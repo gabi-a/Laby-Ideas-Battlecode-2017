@@ -216,18 +216,28 @@ public static MapLocation awayFromBullets(RobotController rc, MapLocation myLoca
 	
 	// Apply Anti Gravity from each bullet in its current or future position
 	for(int i = bullets.length;i-->0;) {
+		
+		boolean goingAway = (Math.cos(myLocation.directionTo(bullets[i].location).radiansBetween(bullets[i].dir)) > 0);
+		boolean couldHit = bullets[i].location.distanceTo(myLocation) < 3f;
+		if(goingAway && !couldHit) {
+			rc.setIndicatorDot(bullets[i].location, 0, 255, 0);
+		} else {
+			rc.setIndicatorDot(bullets[i].location, 255, 0, 0);
+		}
+		
 		// If we might intersect the bullet in its current position on our next move,
 		// decide where to move based on its current position
-		if(bullets[i].location.distanceTo(myLocation) < 3f) {
-			rc.setIndicatorDot(bullets[i].location, 255, 50, 50);
+		if(couldHit) {
+			//rc.setIndicatorDot(bullets[i].location, 255, 50, 50);
 			moveLocation = moveLocation.add(bullets[i].location.directionTo(myLocation), Math.max(2f, 1f/(bullets[i].location.distanceTo(myLocation))));
-			rc.setIndicatorLine(bullets[i].location, bullets[i].location.add(bullets[i].location.directionTo(myLocation)), 255, 0, 0);
+			//rc.setIndicatorLine(bullets[i].location, bullets[i].location.add(bullets[i].location.directionTo(myLocation)), 255, 0, 0);
 		}
-		else {
-			rc.setIndicatorDot(futureBullets[i].location, 255, 50, 50);
+		else if(!goingAway){
+			//rc.setIndicatorDot(futureBullets[i].location, 255, 50, 50);
 			moveLocation = moveLocation.add(futureBullets[i].location.directionTo(myLocation), Math.max(2f, 2f/(futureBullets[i].location.distanceTo(myLocation))));
-			rc.setIndicatorLine(futureBullets[i].location, futureBullets[i].location.add(futureBullets[i].location.directionTo(myLocation)), 255, 0, 0);
+			//rc.setIndicatorLine(futureBullets[i].location, futureBullets[i].location.add(futureBullets[i].location.directionTo(myLocation)), 255, 0, 0);
 		}
+		
 	}
 	
 	// Apply Anti Gravity for close bots

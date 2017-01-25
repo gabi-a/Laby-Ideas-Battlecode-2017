@@ -26,25 +26,78 @@ public class BotScout {
 		
 		/************* Determine where to move *******************/
 
-		if(bullets.length > 0) {
-			//System.out.println("RUN!");
-			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, enemies);
-			if(moveLocation != null) {
-				moveDirection = myLocation.directionTo(moveLocation);
-				moveStride = myLocation.distanceTo(moveLocation);
+		boolean dodgeBullets = false;
+		
+		if(bullets.length > 0 || (enemies.length > 0 && enemies[0].type == RobotType.LUMBERJACK && enemies[0].location.distanceTo(myLocation) < 4f)) {
+			
+			boolean hideInTree = false;
+			
+			// Hide in a tree if possible
+			if(trees.length > 0) {
+				TreeInfo bestTree = null;
+				for(int i = trees.length; i-->0;) {
+					if(trees[i].radius > 1f) {
+						bestTree = trees[i];
+					}
+				}
+				if(bestTree != null && bestTree.location.distanceTo(myLocation) < 5f) {
+					MapLocation moveLocation = Nav.pathTo(rc, bestTree.location, bullets);
+					if(moveLocation != null) {
+						moveDirection = myLocation.directionTo(moveLocation);
+						moveStride = myLocation.distanceTo(moveLocation);
+						hideInTree = moveDirection != null && rc.canMove(moveDirection, moveStride);
+						dodgeBullets = hideInTree;
+					}
+				}
+			}
+			
+			// Otherwise dodge bullets
+			if(!hideInTree && bullets.length > 0) {
+				MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, enemies);
+				if(moveLocation != null) {
+					moveDirection = myLocation.directionTo(moveLocation);
+					moveStride = myLocation.distanceTo(moveLocation);
+					dodgeBullets = moveDirection != null && rc.canMove(moveDirection, moveStride);
+				}
 			}
 		}
 		
-		else {
-			MapLocation moveLocation = applyTreeGravity(myLocation, trees);
-			moveDirection = myLocation.directionTo(moveLocation);
-			if(moveDirection != null && myLocation.distanceTo(moveLocation) > 0.01f) {
-				moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
+		if(!dodgeBullets) {
+			
+			boolean attackGardener = false;
+			
+			if(enemies.length > 0) {
+				RobotInfo enemyGardener = Util.getGardenerAndAllPassive(enemies);
+				if(enemyGardener != null && (enemyGardener.location.distanceTo(myLocation) > 3f || !Util.goodToShootNotTrees(rc, myLocation, enemyGardener))) {
+					MapLocation moveLocation = Nav.pathTo(rc, enemyGardener.location, bullets);
+					if(moveLocation != null) {
+						moveDirection = myLocation.directionTo(moveLocation);
+						moveStride = myLocation.distanceTo(moveLocation);
+						attackGardener = true;
+					}
+				}
 			}
-			else {
-				moveDirection = Nav.explore(rc, bullets);
+			
+			if(!attackGardener) {
+				MapLocation moveLocation = applyTreeGravity(myLocation, trees);
+				moveDirection = myLocation.directionTo(moveLocation);
+				if(moveDirection != null && myLocation.distanceTo(moveLocation) > 0.01f) {
+					moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
+				}
+				else {
+					moveDirection = Nav.explore(rc, bullets);
+				}
 			}
 		}
+		
+		/************* Do Move ***********************************/
+		
+		/*
+		 * All checks to see if this move is possible should already
+		 * have taken place
+		 */
+		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
+			rc.move(moveDirection, moveStride);
 		
 		/************* Determine what action to take *************/
 		Direction shootDirection = null;
@@ -62,36 +115,12 @@ public class BotScout {
 			}
 		}
 		
-		if(action != Action.SHAKE_TREE && enemies.length > 0 && enemies[0].type == RobotType.SCOUT) {
+		if(action != Action.SHAKE_TREE && enemies.length > 0 /*&& enemies[0].type == RobotType.SCOUT || enemies[0].type == RobotType.GARDENER*/) {
 			if(rc.canFireSingleShot()) {
 				action = Action.FIRE;
 				shootDirection = myLocation.directionTo(enemies[0].location);
 			}
 		}
-		
-		/************* Do pre move action *********************************/
-		
-		/*
-		 * All checks to see if this action is possible should already
-		 * have taken place
-		 */
-		
-		switch(action) {
-		case Action.SHAKE_TREE:
-			rc.shake(treeToShake.ID);
-			break;
-		default:
-			break;
-		}
-		
-		/************* Do Move ***********************************/
-		
-		/*
-		 * All checks to see if this move is possible should already
-		 * have taken place
-		 */
-		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
-			rc.move(moveDirection, moveStride);
 		
 		/************* Do post move action *********************************/
 		
@@ -103,6 +132,9 @@ public class BotScout {
 		switch(action) {
 		case Action.FIRE:
 			if(rc.canFireSingleShot()) rc.fireSingleShot(shootDirection);
+			break;
+		case Action.SHAKE_TREE:
+			rc.shake(treeToShake.ID);
 			break;
 		default:
 			break;

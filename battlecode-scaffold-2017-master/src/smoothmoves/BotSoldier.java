@@ -97,6 +97,17 @@ public class BotSoldier {
 			}
 		}
 		
+		
+		
+		/************* Do Move ***********************************/
+		
+		/*
+		 * All checks to see if this move is possible should already
+		 * have taken place
+		 */
+		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
+			rc.move(moveDirection, moveStride);
+		
 		/************* Determine what action to take *************/
 		byte action = Action.DIE_EXCEPTION;
 		
@@ -181,15 +192,6 @@ public class BotSoldier {
 				trackedEnemy = enemyToAttack;
 			}
 		}
-		
-		/************* Do Move ***********************************/
-		
-		/*
-		 * All checks to see if this move is possible should already
-		 * have taken place
-		 */
-		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
-			rc.move(moveDirection, moveStride);
 		
 		/************* Do action *********************************/
 		
