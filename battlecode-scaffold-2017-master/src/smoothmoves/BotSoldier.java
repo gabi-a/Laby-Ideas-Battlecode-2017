@@ -138,10 +138,33 @@ public class BotSoldier {
 				if(lateralMovement < 0.5f || myLocation.distanceTo(enemyToAttack.location) < 4f || enemies.length > 1) {
 					rc.setIndicatorDot(myLocation, 0, 255, 0);
 					shootDirection  = myLocation.directionTo(enemyToAttack.location);
-					if(enemyToAttack.type == RobotType.ARCHON) {
-						action = Action.FIRE;
-					} else {
+					float d = myLocation.distanceTo(enemyToAttack.location);
+					float rMe = rc.getType().bodyRadius;
+					float rEn = enemyToAttack.type.bodyRadius;
+					if(enemyToAttack.type != RobotType.ARCHON && enemies.length == 1) {
+						// Magic numbers ahead. These represent 1/sin(t), where
+						// t is the spread angle
+						if(d < 2f * rEn + rMe) {
+							// All 5 will hit
+							action = Action.FIRE_PENTAD;
+						}
+						else if(d < 2.924f * rEn + rMe) {
+							// All 3 will hit
+							action = Action.FIRE_TRIAD;
+						}
+						else if(d < 3.864f * rEn + rMe) {
+							// 3 of 5 will hit
+							action = Action.FIRE_PENTAD;
+						}
+						else {
+							action = Action.FIRE;
+						}
+					}
+					else if (enemyToAttack.type != RobotType.ARCHON && enemies.length > 1) {
 						action = Action.FIRE_PENTAD;
+					}
+					else {
+						action = Action.FIRE;
 					}
 				}
 
