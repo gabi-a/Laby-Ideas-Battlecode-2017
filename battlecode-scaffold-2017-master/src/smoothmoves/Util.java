@@ -6,7 +6,7 @@ public class Util {
 	static boolean reportedDeath = false;
 	
 	public static void reportIfDead(RobotController rc) throws GameActionException {
-		if(!reportedDeath && rc.getHealth() <= 5f) {
+		if(!reportedDeath && rc.getHealth() <= Math.max(rc.getType().maxHealth / 5, 5f)) {
 			Comms.ourBotCount.decrementNumBots(rc, rc.getType());
     		reportedDeath = true;
     	}
