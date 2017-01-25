@@ -118,44 +118,43 @@ public class BotSoldier {
 					trackedEnemy = enemyToAttack;
 				}
 				
-				// We have a lock!
+				float lateralMovement;
+				
 				if(enemies[0].ID == trackedEnemy.ID) {
-					
 					float H = myLocation.distanceTo(enemies[0].location);
 					float d = myLocation.distanceTo(trackedEnemy.location);
 					float theta = myLocation.directionTo(enemyToAttack.location).radiansBetween(myLocation.directionTo(trackedEnemy.location));
-					float lateralMovement = Math.abs((float) (H * Math.sin(theta)));
-					
-					rc.setIndicatorDot(trackedEnemy.location, 255, 0, 0);
-					rc.setIndicatorDot(enemyToAttack.location, 255, 0, 0);
-					
-					// If not moving laterally relative to us, fire at will!
-					if(lateralMovement < 0.5f || myLocation.distanceTo(enemyToAttack.location) < 4f || enemies.length > 1) {
-						rc.setIndicatorDot(myLocation, 0, 255, 0);
-						shootDirection  = myLocation.directionTo(enemyToAttack.location);
-						if(enemyToAttack.type == RobotType.ARCHON) {
-							action = Action.FIRE;
-						} else {
-							action = Action.FIRE_PENTAD;
-						}
-					}
-					
-					// Otherwise do a bit of cheeky herding
-					else {
-						rc.setIndicatorDot(myLocation, 0, 0, 255);
-						fireOffsetDegrees = -fireOffsetDegrees;
-						shootDirection  = myLocation.directionTo(enemyToAttack.location).rotateLeftDegrees(fireOffsetDegrees);
-						if(shootCooldown <= 0) {
-							action = Action.FIRE;
-						}
-					}
-					
+					lateralMovement = Math.abs((float) (H * Math.sin(theta)));
 				}
-				
 				else {
-					
+					// Always fire pentad on first lock
+					lateralMovement = 0f;
 				}
-				
+
+				rc.setIndicatorDot(trackedEnemy.location, 255, 0, 0);
+				rc.setIndicatorDot(enemyToAttack.location, 255, 0, 0);
+
+				// If not moving laterally relative to us, fire at will!
+				if(lateralMovement < 0.5f || myLocation.distanceTo(enemyToAttack.location) < 4f || enemies.length > 1) {
+					rc.setIndicatorDot(myLocation, 0, 255, 0);
+					shootDirection  = myLocation.directionTo(enemyToAttack.location);
+					if(enemyToAttack.type == RobotType.ARCHON) {
+						action = Action.FIRE;
+					} else {
+						action = Action.FIRE_PENTAD;
+					}
+				}
+
+				// Otherwise do a bit of cheeky herding
+				else {
+					rc.setIndicatorDot(myLocation, 0, 0, 255);
+					fireOffsetDegrees = -fireOffsetDegrees;
+					shootDirection  = myLocation.directionTo(enemyToAttack.location).rotateLeftDegrees(fireOffsetDegrees);
+					if(shootCooldown <= 0) {
+						action = Action.FIRE;
+					}
+				}
+
 				trackedEnemy = enemyToAttack;
 			}
 		}
