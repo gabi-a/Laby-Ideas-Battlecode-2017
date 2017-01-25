@@ -63,6 +63,7 @@ public class BotArchon {
 						default:
 							archonDesignation = Archon.EXTRA;
 					}
+					Comms.archonTreeCount.write(rc, i, trees.length);
 				}
 			}
 			

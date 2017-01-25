@@ -18,6 +18,8 @@ public class Comms {
 	
 	public static final CommsBotArray ourLumberjackAndSoldiers;
 	
+	public static final CommsArray archonTreeCount;
+	
 	static {
 		ourBotCount = new CommsBotCount(0,6);
 		theirBotCount = new CommsBotCount(7,13);
@@ -25,6 +27,7 @@ public class Comms {
 		enemyArchonsArray = new CommsBotArray(25, 35);
 		enemiesAttackingUs = new CommsBotArray(36,46);
 		ourLumberjackAndSoldiers = new CommsBotArray(47,67);
+		archonTreeCount = new CommsArray(68,71);
 	}
 	
 	public static int packLocation(RobotController rc, MapLocation location) {
