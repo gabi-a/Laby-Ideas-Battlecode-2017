@@ -46,7 +46,7 @@ public class BotGardener {
 		RobotInfo[] bots = rc.senseNearbyRobots();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		TreeInfo[] trees = rc.senseNearbyTrees();
-		BulletInfo[] bullets = rc.senseNearbyBullets();
+		BulletInfo[] bullets = rc.senseNearbyBullets(3f);
 		myLocation = rc.getLocation();
 		
 		Direction moveDirection = null;
@@ -98,7 +98,7 @@ public class BotGardener {
 			settled = settleHere();
 			
 		} else {
-
+			System.out.println("Settled");
 			if(rc.senseTreeAtLocation(myLocation.add(spawnDirection)) != null) spawnDirection = setSpawnDirection();
 			
 			if(spawnDirection == null) {
@@ -199,7 +199,7 @@ public class BotGardener {
 		Direction buildDirection = spawnDirection.rotateLeftDegrees(60);
 		for(int i = 5; i-->0;) {
 			rc.setIndicatorDot(rc.getLocation().add(buildDirection,2f), 255, 0, 0);
-			if(!rc.isLocationOccupiedByTree(rc.getLocation().add(buildDirection,2f))) {
+			if( rc.senseNearbyTrees(rc.getLocation().add(buildDirection,2f), 1f, Team.NEUTRAL).length == 0) {
 				treesCanPlant++;
 			}
 			buildDirection = buildDirection.rotateLeftDegrees(60);
