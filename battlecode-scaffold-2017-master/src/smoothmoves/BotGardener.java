@@ -14,6 +14,7 @@ public class BotGardener {
 	static MapLocation myLocation;
 	
 	static boolean lotsOfTrees = false;
+	static boolean treeCountFlag = false;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
@@ -21,7 +22,7 @@ public class BotGardener {
 		/*
 		 * Get an idea for how many trees on the map based on the archons perceptions
 		 */
-		if(rc.getRoundNum() < 10) {
+		if(!treeCountFlag) {
 			int[] archonTrees = Comms.archonTreeCount.array(rc);
 			int count = 0;
 			for(int i = archonTrees.length;i-->0;) {
@@ -30,6 +31,7 @@ public class BotGardener {
 			if(count/3f > 4f) {
 				lotsOfTrees = true;
 			}
+			treeCountFlag = true;
 			System.out.println("Tree count: "+count);
 		}
 		
