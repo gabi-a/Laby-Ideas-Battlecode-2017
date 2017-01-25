@@ -11,6 +11,15 @@ public strictfp class RobotPlayer {
 		while(true) {
 			Util.reportIfDead(rc);
 			Util.updateMyPostion(rc);
+			
+			if(rc.getRoundNum() > rc.getRoundLimit() - 2) {
+				rc.donate(rc.getTeamBullets());
+			}
+			
+			if(rc.getTeamBullets() > 1000 * (7.5f + rc.getRoundNum() * 0.0041666666f)) {
+				rc.donate(rc.getTeamBullets());
+			}
+			
 			try {
 				switch (rc.getType()) {
 				case ARCHON:
