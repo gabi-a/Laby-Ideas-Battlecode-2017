@@ -32,7 +32,7 @@ public class BotScout {
 			
 			MapLocation dodgeBulletsLocation = Nav.awayFromBullets(rc, myLocation, bullets, enemies);
 			
-			if(dodgeBulletsLocation != null || (enemies.length > 0 && enemies[0].type == RobotType.LUMBERJACK && enemies[0].location.distanceTo(myLocation) < 4f)) {
+			if(dodgeBulletsLocation != null || (enemies.length > 0 && enemies[0].type == RobotType.LUMBERJACK)) {
 				boolean hideInTree = false;
 				
 				// Hide in a tree if possible
@@ -67,7 +67,7 @@ public class BotScout {
 			
 			boolean attackGardener = false;
 			System.out.format("Enemies around: %b\n", enemies.length > 0);
-			if(enemies.length > 0) {
+			if(enemies.length > 0 && enemies[0].type != RobotType.LUMBERJACK) {
 				RobotInfo enemyGardener = Util.getGardenerAndAllPassive(enemies);
 				System.out.format("There is a safe gardener: %b\n", enemyGardener != null);
 				if(enemyGardener != null && (enemyGardener.location.distanceTo(myLocation) > 3f || !Util.goodToShootNotTrees(rc, myLocation, enemyGardener))) {
