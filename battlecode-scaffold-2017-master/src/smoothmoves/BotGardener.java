@@ -267,10 +267,6 @@ public class BotGardener {
 
 		if(turnsAlive >= 60) return false;
 		
-		if(units[RobotType.SCOUT.ordinal()] == 0){
-			tryToBuild(RobotType.SCOUT); 
-			return true;
-		}
 		if(units[RobotType.SOLDIER.ordinal()] <= 1){
 			tryToBuild(RobotType.SOLDIER); 
 			return true;
@@ -279,6 +275,10 @@ public class BotGardener {
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
 				if(tryToBuild(RobotType.LUMBERJACK)) return true;
 			}
+		}
+		if(units[RobotType.SCOUT.ordinal()] == 0){
+			tryToBuild(RobotType.SCOUT); 
+			return true;
 		}
 		
 		return false;
