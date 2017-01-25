@@ -48,7 +48,7 @@ public class BotLumberjack {
 					float newScore = rateTree(trees[i]);
 					if(newScore > score){
 						score = newScore;
-						goalLocation = goalLocation.add(myLocation.directionTo(trees[i].getLocation()));
+						goalLocation = trees[i].getLocation();
 					}
 				}
 			} 
@@ -169,6 +169,6 @@ public class BotLumberjack {
 	}
 
 	public static float rateTree(TreeInfo tree) throws GameActionException {
-				return (7-rc.getLocation().distanceTo(tree.getLocation())) + (tree.getContainedRobot() != null ? 1f: 0f) /* + health */;
+		return (7f-rc.getLocation().distanceTo(tree.getLocation())) + (tree.getContainedRobot() != null ? 3f: 0f) /* + health */;
 	}
 }
