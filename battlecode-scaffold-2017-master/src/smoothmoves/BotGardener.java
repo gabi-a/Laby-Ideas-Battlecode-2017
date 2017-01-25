@@ -112,13 +112,14 @@ public class BotGardener {
 		byte action = Action.DIE_EXCEPTION;
 
 		int[] units = Comms.ourBotCount.array(rc);
-		
-		buildUnit(units);
-		waterTrees();
+
 		
 		if(settled && !firstUnits(units)/*&& rc.getTeamBullets() > 100*/) {
 			plantTrees();
 		}
+		
+		buildUnit(units);
+		waterTrees();
 		
 		/************* Do Move ***********************************/
 		
@@ -251,7 +252,7 @@ public class BotGardener {
 		//if(units[RobotType.LUMBERJACK.ordinal()] < units[RobotType.SOLDIER.ordinal()]){
 		//	tryToBuild(RobotType.LUMBERJACK);
 		//} else {
-		if( (lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 20) || (Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 3 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)) ) {
+		if( (lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 10) || (Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 6 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)) ) {
 			tryToBuild(RobotType.LUMBERJACK);
 		} else {
 			tryToBuild(RobotType.SOLDIER);
@@ -269,13 +270,12 @@ public class BotGardener {
 			tryToBuild(RobotType.SOLDIER); 
 			return true;
 		}
-		/*
-		if(lotsOfTrees){
+		if(lotsOfTrees && !settled){
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
 				if(tryToBuild(RobotType.LUMBERJACK)) return true;
 			}
 		}
-		*/
+		
 		return false;
 	}
 	

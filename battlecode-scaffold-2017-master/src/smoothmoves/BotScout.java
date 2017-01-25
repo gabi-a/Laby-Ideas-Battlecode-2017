@@ -14,7 +14,7 @@ public class BotScout {
 		BotScout.rc = rc;
 
 		//RobotInfo[] bots = rc.senseNearbyRobots();
-		RobotInfo[] enemies = rc.senseNearbyRobots(5f, them);
+		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		BulletInfo[] bullets = rc.senseNearbyBullets();
 		myLocation = rc.getLocation();
@@ -28,35 +28,36 @@ public class BotScout {
 
 		boolean dodgeBullets = false;
 		
-		if(bullets.length > 0 || (enemies.length > 0 && enemies[0].type == RobotType.LUMBERJACK && enemies[0].location.distanceTo(myLocation) < 4f)) {
+		if(bullets.length > 0) {
 			
-			boolean hideInTree = false;
+			MapLocation dodgeBulletsLocation = Nav.awayFromBullets(rc, myLocation, bullets, enemies);
 			
-			// Hide in a tree if possible
-			if(trees.length > 0) {
-				TreeInfo bestTree = null;
-				for(int i = trees.length; i-->0;) {
-					if(trees[i].radius > 1f) {
-						bestTree = trees[i];
+			if(dodgeBulletsLocation != null || (enemies.length > 0 && enemies[0].type == RobotType.LUMBERJACK && enemies[0].location.distanceTo(myLocation) < 4f)) {
+				boolean hideInTree = false;
+				
+				// Hide in a tree if possible
+				if(trees.length > 0) {
+					TreeInfo bestTree = null;
+					for(int i = trees.length; i-->0;) {
+						if(trees[i].radius > 1f) {
+							bestTree = trees[i];
+						}
+					}
+					if(bestTree != null && bestTree.location.distanceTo(myLocation) < 5f) {
+						MapLocation moveLocation = Nav.pathTo(rc, bestTree.location, bullets);
+						if(moveLocation != null) {
+							moveDirection = myLocation.directionTo(moveLocation);
+							moveStride = myLocation.distanceTo(moveLocation);
+							hideInTree = moveDirection != null && rc.canMove(moveDirection, moveStride);
+							dodgeBullets = hideInTree;
+						}
 					}
 				}
-				if(bestTree != null && bestTree.location.distanceTo(myLocation) < 5f) {
-					MapLocation moveLocation = Nav.pathTo(rc, bestTree.location, bullets);
-					if(moveLocation != null) {
-						moveDirection = myLocation.directionTo(moveLocation);
-						moveStride = myLocation.distanceTo(moveLocation);
-						hideInTree = moveDirection != null && rc.canMove(moveDirection, moveStride);
-						dodgeBullets = hideInTree;
-					}
-				}
-			}
-			
-			// Otherwise dodge bullets
-			if(!hideInTree && bullets.length > 0) {
-				MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, enemies);
-				if(moveLocation != null) {
-					moveDirection = myLocation.directionTo(moveLocation);
-					moveStride = myLocation.distanceTo(moveLocation);
+				
+				// Otherwise dodge bullets
+				if(dodgeBulletsLocation != null && !hideInTree && bullets.length > 0) {
+					moveDirection = myLocation.directionTo(dodgeBulletsLocation);
+					moveStride = myLocation.distanceTo(dodgeBulletsLocation);
 					dodgeBullets = moveDirection != null && rc.canMove(moveDirection, moveStride);
 				}
 			}
@@ -65,9 +66,10 @@ public class BotScout {
 		if(!dodgeBullets) {
 			
 			boolean attackGardener = false;
-			
+			System.out.format("Enemies around: %b\n", enemies.length > 0);
 			if(enemies.length > 0) {
 				RobotInfo enemyGardener = Util.getGardenerAndAllPassive(enemies);
+				System.out.format("There is a safe gardener: %b\n", enemyGardener != null);
 				if(enemyGardener != null && (enemyGardener.location.distanceTo(myLocation) > 3f || !Util.goodToShootNotTrees(rc, myLocation, enemyGardener))) {
 					MapLocation moveLocation = Nav.pathTo(rc, enemyGardener.location, bullets);
 					if(moveLocation != null) {
