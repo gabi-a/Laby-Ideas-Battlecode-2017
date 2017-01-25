@@ -36,7 +36,7 @@ public class BotGardener {
 			for(int i = archonTrees.length;i-->0;) {
 				count += archonTrees[i];
 			}
-			if(count/3f > 4f) {
+			if(count/Comms.archonCount.read(rc) > 4f) {
 				lotsOfTrees = true;
 			}
 			treeCountFlag = true;
@@ -255,7 +255,7 @@ public class BotGardener {
 		//if(units[RobotType.LUMBERJACK.ordinal()] < units[RobotType.SOLDIER.ordinal()]){
 		//	tryToBuild(RobotType.LUMBERJACK);
 		//} else {
-		if( (lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 10) || (Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 6 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)) ) {
+		if( (lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 10) || (Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 4 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)) ) {
 			tryToBuild(RobotType.LUMBERJACK);
 		} else {
 			tryToBuild(RobotType.SOLDIER);

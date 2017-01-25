@@ -66,7 +66,7 @@ public class BotArchon {
 					Comms.archonTreeCount.write(rc, i, trees.length);
 				}
 			}
-			
+			Comms.archonCount.increment(rc, 1);
 			float longestDistance = 0f;
 			MapLocation bestArchonLocation = myLocation;
 			for(int i = ourArchonLocs.length;i-->0;) {
@@ -126,7 +126,7 @@ public class BotArchon {
 		
 		byte action = Action.DIE_EXCEPTION;
 		
-		if(rc.getTreeCount() >= 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) || (Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100 && rc.getTeamBullets() > 130))
+		if(rc.getTreeCount() >= 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) || (Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100 && rc.getTeamBullets() > 200))
 			action = Action.SPAWN_UNIT;
 		
 		/************* Do Move ***********************************/
