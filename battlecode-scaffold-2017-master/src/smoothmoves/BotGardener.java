@@ -16,8 +16,14 @@ public class BotGardener {
 	static boolean lotsOfTrees = false;
 	static boolean treeCountFlag = false;
 	
+	static int settleThreshold = 3;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
+		
+		if(rc.getRoundNum() % 10 == 0) {
+			settleThreshold = Math.max(0, settleThreshold - 1);
+		}
 		
 		/*
 		 * Get an idea for how many trees on the map based on the archons perceptions
@@ -91,8 +97,7 @@ public class BotGardener {
 			
 		} else {
 
-			spawnDirection = setSpawnDirection(myLocation);
-			
+			spawnDirection = setSpawnDirection();
 			
 			if(spawnDirection == null) {
 				settled = false;
@@ -140,6 +145,16 @@ public class BotGardener {
 	
 	public static boolean settleHere() throws GameActionException {
 		
+		spawnDirection = setSpawnDirection();
+		if(spawnDirection == null) return false;
+		
+		int treesCanPlant = getMaxTrees();
+		
+		if(treesCanPlant > settleThreshold) {
+			return true;
+		}
+		
+		/*
 		TreeInfo[] closeTrees = rc.senseNearbyTrees(2f);
 		RobotInfo[] closeRobots = rc.senseNearbyRobots(2f);
 		
@@ -153,33 +168,53 @@ public class BotGardener {
 		if(bigTrees < 2 && closeRobots.length == 0 && (rc.onTheMap(rc.getLocation(), 3f))) {
 			return true;
 		}
+		*/
 		
 		return false;
 	}
 	
-	public static Direction setSpawnDirection(MapLocation myLocation) throws GameActionException {
+	public static Direction setSpawnDirection() throws GameActionException {
 		Direction testDirection = myLocation.directionTo(rc.getInitialArchonLocations(them)[0]);
-		for(int i = 72;i-->0;) {
-			rc.setIndicatorDot(rc.getLocation().add(testDirection,2f), 0, 255, 0);
-			if(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection, 2f), 1f) || !rc.onTheMap(rc.getLocation().add(testDirection, 2f), 1f)) {
-				testDirection = testDirection.rotateLeftDegrees(5f);
-				continue;
-			} 
-			else {
-				return testDirection;
-			}	
+		for(int i = 36;i-->0;) {
+			rc.setIndicatorDot(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i),2f), 0, 255, 0);
+			if( !(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i), 2f), 1f) || !rc.onTheMap(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i), 2f), 1f))) {			
+				return testDirection.rotateLeftDegrees(5f * i);
+			}
+			rc.setIndicatorDot(rc.getLocation().add(testDirection.rotateRightDegrees(5f * i),2f), 0, 255, 0);
+			if( !(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection.rotateRightDegrees(5f * i), 2f), 1f) || !rc.onTheMap(rc.getLocation().add(testDirection.rotateRightDegrees(5f * i), 2f), 1f))) {			
+				return testDirection.rotateRightDegrees(5f * i);
+			}
 		}
 		return null;
 	}
 	
-	public static void plantTrees() throws GameActionException {
+	public static int getMaxTrees() throws GameActionException {
+		int treesCanPlant = 0;
 		Direction buildDirection = spawnDirection.rotateLeftDegrees(60);
 		for(int i = 5; i-->0;) {
 			rc.setIndicatorDot(rc.getLocation().add(buildDirection,2f), 255, 0, 0);
 			if(rc.canPlantTree(buildDirection)) {
-				rc.plantTree(buildDirection);
+				treesCanPlant++;
 			}
 			buildDirection = buildDirection.rotateLeftDegrees(60);
+		}
+		return treesCanPlant;
+	}
+	
+	public static void plantTrees() throws GameActionException {
+		Direction buildDirection = spawnDirection.rotateLeftDegrees(180);
+		if(rc.canPlantTree(buildDirection)) {
+			rc.plantTree(buildDirection);
+		}
+		for(int i = 3; i-->0;) {
+			rc.setIndicatorDot(rc.getLocation().add(buildDirection.rotateLeftDegrees(60f * i),2f), 255, 0, 0);
+			if(rc.canPlantTree(buildDirection.rotateLeftDegrees(60f * i))) {
+				rc.plantTree(buildDirection.rotateLeftDegrees(60f * i));
+			}
+			rc.setIndicatorDot(rc.getLocation().add(buildDirection.rotateRightDegrees(60f * i),2f), 255, 0, 0);
+			if(rc.canPlantTree(buildDirection.rotateRightDegrees(60f * i))) {
+				rc.plantTree(buildDirection.rotateRightDegrees(60f * i));
+			}
 		}
 	}
 	
@@ -214,7 +249,7 @@ public class BotGardener {
 		//if(units[RobotType.LUMBERJACK.ordinal()] < units[RobotType.SOLDIER.ordinal()]){
 		//	tryToBuild(RobotType.LUMBERJACK);
 		//} else {
-		if( lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 20 /*Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 3 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)*/) {
+		if( (lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 20) || (Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 3 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)) ) {
 			tryToBuild(RobotType.LUMBERJACK);
 		} else {
 			tryToBuild(RobotType.SOLDIER);
@@ -240,17 +275,20 @@ public class BotGardener {
 	}
 	
 	public static boolean tryToBuild(RobotType typeToBuild) throws GameActionException {
-		if(spawnDirection == null) spawnDirection = setSpawnDirection(myLocation);
+		if(spawnDirection == null) spawnDirection = setSpawnDirection();
 		if(spawnDirection == null) return false;
 		Direction buildDirection = spawnDirection;
-		for(int i = 6; i-->0;) {
-			if(rc.canBuildRobot(typeToBuild, buildDirection)) {
-				rc.buildRobot(typeToBuild, buildDirection);
+		for(int i = 3; i-->0;) {
+			if(rc.canBuildRobot(typeToBuild, buildDirection.rotateLeftDegrees(10f * i))) {
+				rc.buildRobot(typeToBuild, buildDirection.rotateLeftDegrees(10f * i));
 				Comms.ourBotCount.incrementNumBots(rc, typeToBuild);
 				return true;
 			}
-			buildDirection = buildDirection.rotateLeftDegrees(60);
-			continue;
+			if(rc.canBuildRobot(typeToBuild, buildDirection.rotateRightDegrees(10f * i))) {
+				rc.buildRobot(typeToBuild, buildDirection.rotateRightDegrees(10f * i));
+				Comms.ourBotCount.incrementNumBots(rc, typeToBuild);
+				return true;
+			}
  		}
 	return false;
 	}
