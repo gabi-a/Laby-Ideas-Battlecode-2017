@@ -77,7 +77,7 @@ public class BotGardener {
 			}
 			if(trees.length > 0) {
 				for(int i = trees.length;i-->0;) {
-					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation));
+					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), (float) Math.pow(1f/(1f+trees[i].location.distanceTo(myLocation)), 2));
 				}
 			}
 			
@@ -154,7 +154,7 @@ public class BotGardener {
 		if(spawnDirection == null) return false;
 		
 		int treesCanPlant = getMaxTrees();
-		
+		System.out.println("Trees can plant:" +treesCanPlant );
 		if(treesCanPlant > settleThreshold) {
 			return true;
 		}
@@ -199,7 +199,7 @@ public class BotGardener {
 		Direction buildDirection = spawnDirection.rotateLeftDegrees(60);
 		for(int i = 5; i-->0;) {
 			rc.setIndicatorDot(rc.getLocation().add(buildDirection,2f), 255, 0, 0);
-			if(rc.canPlantTree(buildDirection)) {
+			if(!rc.isLocationOccupiedByTree(rc.getLocation().add(buildDirection,2f))) {
 				treesCanPlant++;
 			}
 			buildDirection = buildDirection.rotateLeftDegrees(60);
