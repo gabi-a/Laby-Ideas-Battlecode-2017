@@ -28,7 +28,7 @@ public class BotLumberjack {
 		 */
 		if(bullets.length > 0) {
 			rc.setIndicatorDot(myLocation, 0, 255, 0);
-			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);	
 			if(moveLocation != null) {
 				moveDirection = myLocation.directionTo(moveLocation);
 				moveStride = myLocation.distanceTo(moveLocation);

@@ -30,7 +30,7 @@ public class BotScout {
 		
 		if(bullets.length > 0) {
 			
-			MapLocation dodgeBulletsLocation = Nav.awayFromBullets(rc, myLocation, bullets, enemies);
+			MapLocation dodgeBulletsLocation = Nav.awayFromBullets(rc, myLocation, bullets);
 			
 			if(dodgeBulletsLocation != null || (enemies.length > 0 && enemies[0].type == RobotType.LUMBERJACK)) {
 				boolean hideInTree = false;

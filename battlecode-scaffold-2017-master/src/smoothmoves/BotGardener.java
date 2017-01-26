@@ -57,7 +57,7 @@ public class BotGardener {
 		/************* Determine where to move *******************/
 
 		if(bullets.length > 0) {
-			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);
 			if (moveLocation != null) {
 				moveDirection = myLocation.directionTo(moveLocation);
 				moveStride = myLocation.distanceTo(moveLocation);
@@ -102,7 +102,7 @@ public class BotGardener {
 			
 			if(spawnDirection == null) {
 				settled = false;
-				MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees, bots);
+				MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);
 				moveDirection = myLocation.directionTo(moveLocation);
 				moveStride = myLocation.distanceTo(myLocation);
 			}

@@ -24,8 +24,6 @@ public class BotArchon {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 		
-		
-		
 		RobotInfo[] bots = rc.senseNearbyRobots();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		TreeInfo[] trees = rc.senseNearbyTrees();
@@ -82,7 +80,7 @@ public class BotArchon {
 		
 		// Keep a distance from archons and gardeners
 		if(bullets.length > 0) {
-			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees, bots);
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);
 			moveDirection = myLocation.directionTo(moveLocation);
 			moveStride = myLocation.distanceTo(myLocation);
 		}
