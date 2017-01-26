@@ -98,7 +98,6 @@ public class BotGardener {
 			settled = settleHere();
 			
 		} else {
-			System.out.println("Settled");
 			if(rc.senseTreeAtLocation(myLocation.add(spawnDirection)) != null) spawnDirection = setSpawnDirection();
 			
 			if(spawnDirection == null) {

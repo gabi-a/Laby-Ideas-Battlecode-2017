@@ -5,8 +5,7 @@ public class Nav {
 	
 	static Direction heading = randomDirection();
 	
-	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets, TreeInfo[] trees, RobotInfo[] bots) throws GameActionException {
-		
+	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets, TreeInfo[] trees, RobotInfo[] bots) throws GameActionException {		
 		// Time step all the bullets forward by 1 turn
 		BulletInfo[] futureBullets = new BulletInfo[bullets.length];
 		for(int i = bullets.length;i-->0;) {
@@ -74,6 +73,47 @@ public class Nav {
 	}
 	
 	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets, TreeInfo[] trees) throws GameActionException {
+/*		System.out.format("%d bullets in range | ", bullets.length);
+		for(int i = bullets.length; i --> 0;) {
+			System.out.format("Considering bullet at %f, %f: angle is at %f\n",
+					  bullets[i].location.x,
+					  bullets[i].location.y,
+					  Math.abs(bullets[i].dir.radiansBetween(bullets[i].location.directionTo(myLocation))));
+					
+			if (Math.abs(bullets[i].dir.radiansBetween(bullets[i].location.directionTo(myLocation))) < 0.1) {
+				rc.setIndicatorDot(bullets[i].location, 100, 100, 100);
+			}
+		}*/
+		System.out.println("Soldier is going to try avoid bullets");
+		float bulletX, bulletY;
+		int leastIntersections = 1000;
+		Direction leastRay = Direction.getNorth();
+		for (float rayAng = 6.2831853f; (rayAng -= 0.5235988f) > 0;) {
+			Direction rayDir = new Direction(rayAng);
+			float rayX = rayDir.getDeltaX(1);
+			float rayY = rayDir.getDeltaY(1);
+			int intersections = 0;
+			for (int i = bullets.length; i --> 0;) {
+				bulletX = bullets[i].dir.getDeltaX(1f);
+				bulletY = bullets[i].dir.getDeltaY(1f);
+				Direction relDir = myLocation.directionTo(bullets[i].location);
+				float relX = relDir.getDeltaX(1);
+				float relY = relDir.getDeltaY(1);
+				if (Math.pow(bulletX - rayX + relX, 2) + Math.pow(bulletY - rayY + relY, 2) < 1) intersections++;
+			}
+			if (intersections < leastIntersections) {
+				leastRay = rayDir;
+				leastIntersections = intersections;
+			}
+		}
+		if (1 == 1) return myLocation.add(leastRay, rc.getType().strideRadius);
+				
+			
+				
+				
+			
+			
+
 		
 		// Time step all the bullets forward by 1 turn
 		BulletInfo[] futureBullets = new BulletInfo[bullets.length];

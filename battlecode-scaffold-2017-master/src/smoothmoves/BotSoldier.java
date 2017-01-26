@@ -32,8 +32,8 @@ public class BotSoldier {
 
 		boolean dodgeBullets = false;
 		
-		if(bullets.length > 0 && closeEnemies.length > 0) {
-			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);	
+		if(bullets.length > 0) {
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets, trees);
 			if(moveLocation != null) {
 				//System.out.println("Dodging bullets");
 				moveDirection = myLocation.directionTo(moveLocation);
