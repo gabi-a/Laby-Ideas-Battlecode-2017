@@ -81,8 +81,10 @@ public class BotArchon {
 		// Keep a distance from archons and gardeners
 		if(bullets.length > 0) {
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);
-			moveDirection = myLocation.directionTo(moveLocation);
-			moveStride = myLocation.distanceTo(myLocation);
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(myLocation);
+			}
 		}
 		
 		else {

@@ -3,11 +3,15 @@ import battlecode.common.*;
 
 public class Nav {
 	
+	static final int maxBulletsToAvoid = 10;
+	
 	static Direction heading = randomDirection();
 	
 	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets) throws GameActionException {
 
-		int numBullets = Math.min(12, bullets.length);
+		BulletInfo[] bulletsCouldHit = bullets.clone();
+		
+		int numBullets = Math.min(10, bullets.length);
 		BulletInfo[] bulletsToAvoid = new BulletInfo[numBullets];
 		for(int i = 0; i < numBullets; i++) {
 			bulletsToAvoid[i] = bullets[i];
@@ -17,14 +21,16 @@ public class Nav {
 		float bulletX, bulletY;
 		float leastIntersections = 1000f;
 		Direction leastRay = Direction.getNorth();
-		for (float rayAng = 6.2831853f; (rayAng -= Math.PI/6f) > 0;) {
+		int bulletsNeededToDodge = 0;
+		for (float rayAng = 6.2831853f; (rayAng -= Math.PI/4f) > 0;) {
 			Direction rayDir = new Direction(rayAng);
 			if ( !rc.canMove(myLocation.add(rayDir, 2f)) || rc.senseNearbyBullets(myLocation.add(rayDir, 2f), 2f).length != 0 ) continue;
 			float rayX = rayDir.getDeltaX(1);
 			float rayY = rayDir.getDeltaY(1);
 			float intersections = 0;
 			for (int i = bulletsToAvoid.length; i --> 0;) {
-				System.out.format("i: %d rayAng: %f bytecodes: %d\n", i, rayAng, Clock.getBytecodeNum());
+				
+				if(Clock.getBytecodeNum() >= 10000) System.out.format("bullets: %d, bytecodes: %d\n", bulletsToAvoid.length, Clock.getBytecodeNum());
 				bulletX = bulletsToAvoid[i].dir.getDeltaX(1f);
 				bulletY = bulletsToAvoid[i].dir.getDeltaY(1f);
 				Direction relDir = myLocation.directionTo(bulletsToAvoid[i].location);
@@ -35,7 +41,10 @@ public class Nav {
 				if (Math.pow(bulletX - rayX + relX, 2) + Math.pow(bulletY - rayY + relY, 2) < 1) {
 					intersections += 1f/(myLocation.add(rayDir, 2f).distanceTo(bulletsToAvoid[i].location));
 					System.out.println((myLocation.add(rayDir, 2f).distanceTo(bulletsToAvoid[i].location)));
+					bulletsNeededToDodge++;
 					//rc.setIndicatorLine(myLocation.add(rayDir, 2f), bullets[i].location, 50, 10, 10);
+				} else {
+					rc.setIndicatorDot(bulletsToAvoid[i].location, 0, 200, 100);
 				}
 			}
 			//rc.setIndicatorLine(myLocation, myLocation.add(rayDir, 2f), (int) (100/intersections), (int) (100/intersections),(int) (100/intersections));
@@ -44,7 +53,8 @@ public class Nav {
 				leastIntersections = intersections;
 			}
 		}
-		return myLocation.add(leastRay, rc.getType().strideRadius);
+		if(bulletsNeededToDodge == 0) return null;
+		return myLocation.add(Nav.tryMove(rc, leastRay, 5f, 24, bullets), rc.getType().strideRadius);
 		
 	}
 	
@@ -254,3 +264,19 @@ public class Nav {
 	
 	
 }
+
+/*	
+// Get an array containing only the bullets that might hit us
+int numBulletsCouldHit = 0;
+for(int i = 0; i < bullets.length; i++) {
+	boolean goingAway = (Math.cos(myLocation.directionTo(bullets[i].location).radiansBetween(bullets[i].dir)) > 0);
+	boolean couldHit = bullets[i].location.distanceTo(myLocation) < 3f;
+	if(goingAway && !couldHit) {
+		rc.setIndicatorDot(bullets[i].location, 0, 200, 100);
+		bulletsCouldHit[i] = null;
+		continue;
+	}
+	numBulletsCouldHit++;
+}
+*/
+

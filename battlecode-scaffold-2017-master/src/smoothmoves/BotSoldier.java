@@ -200,6 +200,8 @@ public class BotSoldier {
 		 * have taken place
 		 */
 		
+		System.out.println(action);
+		
 		switch(action) {
 		case Action.FIRE_PENTAD:
 			if(rc.canFirePentadShot()) {
