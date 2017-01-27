@@ -36,6 +36,14 @@ public class BotLumberjack {
 			}
 		}
 		
+		else if(bullets.length > 0) {
+			rc.setIndicatorDot(myLocation, 0, 255, 0);
+			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);	
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
+			}
+		} 
 		/* 
 		 * Otherwise move to target, trees, away from enemies
 		 */
