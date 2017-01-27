@@ -7,6 +7,7 @@ public class BotArchon {
 	
 	static Team us = RobotPlayer.rc.getTeam();
 	static Team them = us.opponent();
+	static MapLocation enemyBase;
 	
 	static int numInitialArchons = 0;
 	
@@ -38,7 +39,8 @@ public class BotArchon {
 		/************* Setup game variables    *******************/
 		if(rc.getRoundNum() == 1) {
 			MapLocation[] ourArchonLocs = rc.getInitialArchonLocations(us); 
-			MapLocation[] theirArchonLocs = rc.getInitialArchonLocations(them); 
+			MapLocation[] theirArchonLocs = rc.getInitialArchonLocations(them);
+			enemyBase = theirArchonLocs[0];
 			numInitialArchons = ourArchonLocs.length;
 			for(int i = 0; i < ourArchonLocs.length; i++) {
 				if(ourArchonLocs[i] == rc.getLocation()) {
@@ -108,7 +110,7 @@ public class BotArchon {
 			if (!rc.onTheMap(myLocation.add(Direction.EAST, 4f))) moveLocation=moveLocation.add(Direction.WEST, 5f);
 			
 			// Stay away from the enemy base
-			moveLocation = moveLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]).opposite(), 1/myLocation.distanceTo(rc.getInitialArchonLocations(them)[0]));
+			moveLocation = moveLocation.add(myLocation.directionTo(enemyBase).opposite(), 1/myLocation.distanceTo(enemyBase));
 			rc.setIndicatorDot(moveLocation, 100, 0, 100);
 			
 			moveDirection = myLocation.directionTo(moveLocation);
