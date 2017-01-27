@@ -17,7 +17,7 @@ public class Nav {
 			bulletsToAvoid[i] = bullets[i];
 		}
 		
-		System.out.println("Soldier is going to try avoid bullets");
+		//System.out.println("Soldier is going to try avoid bullets");
 		float bulletX, bulletY;
 		float leastIntersections = 1000f;
 		Direction leastRay = Direction.getNorth();
@@ -40,11 +40,12 @@ public class Nav {
 				// You are not expected to understand this.
 				if (Math.pow(bulletX - rayX + relX, 2) + Math.pow(bulletY - rayY + relY, 2) < 1) {
 					intersections += 1f/(myLocation.add(rayDir, 2f).distanceTo(bulletsToAvoid[i].location));
-					System.out.println((myLocation.add(rayDir, 2f).distanceTo(bulletsToAvoid[i].location)));
+					//System.out.println((myLocation.add(rayDir, 2f).distanceTo(bulletsToAvoid[i].location)));
 					bulletsNeededToDodge++;
 					//rc.setIndicatorLine(myLocation.add(rayDir, 2f), bullets[i].location, 50, 10, 10);
+					rc.setIndicatorDot(bulletsToAvoid[i].location, 100, 200, 0);
 				} else {
-					rc.setIndicatorDot(bulletsToAvoid[i].location, 0, 200, 100);
+					rc.setIndicatorDot(bulletsToAvoid[i].location, 0, 100, 200);
 				}
 			}
 			//rc.setIndicatorLine(myLocation, myLocation.add(rayDir, 2f), (int) (100/intersections), (int) (100/intersections),(int) (100/intersections));
