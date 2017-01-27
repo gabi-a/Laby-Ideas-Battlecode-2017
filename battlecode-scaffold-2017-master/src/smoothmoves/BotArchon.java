@@ -57,7 +57,11 @@ public class BotArchon {
 						default:
 							archonDesignation = Archon.EXTRA;
 					}
-					Comms.archonTreeCount.write(rc, i, trees.length);
+					float treeArea = 0;
+					for(int j=0; j < trees.length; j++) {
+						treeArea += trees[j].radius * trees[j].radius * (float) Math.PI;
+					} 
+					Comms.archonTreeCount.write(rc, i, (int) treeArea);
 				}
 			}
 			Comms.archonCount.increment(rc, 1);

@@ -8,6 +8,7 @@ public class BotGardener {
 	static Team us = RobotPlayer.rc.getTeam();
 	static Team them = us.opponent();
 	
+	static int numInitialArchons = RobotPlayer.rc.getInitialArchonLocations(us).length;
 	static Direction spawnDirection = RobotPlayer.rc.getLocation().directionTo(RobotPlayer.rc.getInitialArchonLocations(them)[0]);
 	static boolean settled = false;
 
@@ -32,15 +33,16 @@ public class BotGardener {
 		 */
 		if(!treeCountFlag) {
 			int[] archonTrees = Comms.archonTreeCount.array(rc);
-			int count = 0;
-			for(int i = archonTrees.length;i-->0;) {
-				count += archonTrees[i];
+			int minArea = 10000;
+			for(int i = numInitialArchons-1;i-->0;) {
+				if(archonTrees[i] < minArea) {
+					minArea = archonTrees[i];
+				}
 			}
-			if(count/Comms.archonCount.read(rc) > 10f) {
+			if((float) minArea > RobotType.ARCHON.sensorRadius * RobotType.ARCHON.sensorRadius * (float) Math.PI * 0.2f) {
 				lotsOfTrees = true;
 			}
 			treeCountFlag = true;
-			System.out.format("Tree count: %d Lots of trees: %b\n",count,lotsOfTrees);
 		}
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();
