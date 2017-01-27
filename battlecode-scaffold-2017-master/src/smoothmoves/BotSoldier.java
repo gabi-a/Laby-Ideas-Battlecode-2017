@@ -7,6 +7,7 @@ public class BotSoldier {
 	
 	static Team us = RobotPlayer.rc.getTeam();
 	static Team them = us.opponent();
+	static MapLocation enemyBase;
 	
 	static boolean trapped = false;
 	static RobotInfo trackedEnemy;
@@ -15,6 +16,9 @@ public class BotSoldier {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
+		if (enemyBase == null) {
+			enemyBase = rc.getInitialArchonLocations(them)[0];
+		}
 		
 		Direction shootDirection = null;
 		Direction moveDirection = null;
@@ -45,7 +49,7 @@ public class BotSoldier {
 		if(!dodgeBullets) {
 			boolean protectGardener = false;
 			RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
-			moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
+			moveDirection = Nav.tryMove(rc, myLocation.directionTo(enemyBase), 5f, 24, bullets);
 			for(int i = enemiesAttackingUs.length;i-->0;) {
 				if(enemiesAttackingUs[i] != null) {
 					MapLocation moveLocation = Nav.pathTo(rc, enemiesAttackingUs[i].location, bullets);
@@ -58,7 +62,7 @@ public class BotSoldier {
 				}
 			}
 			if(!(protectGardener && leaveCurrentEngagement(enemies))) {
-				if(enemies.length > 0 ) {
+ 				if(enemies.length > 0 ) {
 					RobotInfo closestEnemy = enemies[0];
 					if(closestEnemy.type == RobotType.LUMBERJACK) {
 						if(myLocation.distanceTo(closestEnemy.location) < 3f) {
