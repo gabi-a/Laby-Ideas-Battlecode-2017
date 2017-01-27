@@ -24,6 +24,8 @@ public class BotLumberjack {
 		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 		TreeInfo bestTree = null;
 		
+		Util.shakeIfAble(rc, trees);
+		
 		if(bullets.length == 0) {
 			Util.updateMyPostion(rc);
 		}
