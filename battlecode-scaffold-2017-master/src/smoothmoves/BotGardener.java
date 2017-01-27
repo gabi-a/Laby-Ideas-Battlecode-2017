@@ -163,7 +163,7 @@ public class BotGardener {
 		
 		int treesCanPlant = getMaxTrees();
 		System.out.println("Trees can plant:" +treesCanPlant );
-		if(treesCanPlant > settleThreshold) {
+		if(treesCanPlant > settleThreshold && turnsAlive > 10) {
 			return true;
 		}
 		
