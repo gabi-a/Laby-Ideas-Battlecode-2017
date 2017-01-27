@@ -26,7 +26,17 @@ public class BotLumberjack {
 		/* If there are any bullets nearby, just dodge them and don't
 		 * worry about going to the target 
 		 */
-		if(bullets.length > 0) {
+		
+		if(enemies.length > 0) {
+			MapLocation closestEnemyLocation = enemies[0].location;
+			MapLocation moveLocation = Nav.pathTo(rc, closestEnemyLocation, bullets);
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceSquaredTo(moveLocation);
+			}
+		}
+		
+		else if(bullets.length > 0) {
 			rc.setIndicatorDot(myLocation, 0, 255, 0);
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);	
 			if(moveLocation != null) {
@@ -34,7 +44,6 @@ public class BotLumberjack {
 				moveStride = myLocation.distanceTo(moveLocation);
 			}
 		} 
-		
 		/* 
 		 * Otherwise move to target, trees, away from enemies
 		 */
@@ -80,11 +89,6 @@ public class BotLumberjack {
 				for(int i = allies.length;i-->0;) {
 					goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 0.2f);
 				}
-			}
-
-			// Move towards enemies
-			if(enemies.length > 0){
-				goalLocation = goalLocation.add(myLocation.directionTo(enemies[0].getLocation()), 3f);
 			}
 			
 			moveDirection = myLocation.directionTo(goalLocation);

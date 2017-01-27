@@ -94,13 +94,13 @@ public class BotArchon {
 			if(bots.length > 0) {
 				for(int i = bots.length;i-->0;) {
 					if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
-						moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation));
+						moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation), 1f/(1f + bots[i].location.distanceTo(myLocation)));
 					}
 				}
 			}
 			if(trees.length > 0) {
 				for(int i = trees.length;i-->0;) {
-					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation));
+					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), 1f/(1f + trees[i].location.distanceTo(myLocation)));
 				}
 			}
 			
@@ -110,12 +110,12 @@ public class BotArchon {
 			if (!rc.onTheMap(myLocation.add(Direction.EAST, 4f))) moveLocation=moveLocation.add(Direction.WEST, 5f);
 			
 			// Stay away from the enemy base
-			moveLocation = moveLocation.add(myLocation.directionTo(enemyBase).opposite(), 1/myLocation.distanceTo(enemyBase));
+			moveLocation = moveLocation.add(myLocation.directionTo(enemyBase).opposite(), 10f/(myLocation.distanceTo(enemyBase)+1f));
 			rc.setIndicatorDot(moveLocation, 100, 0, 100);
 			
 			moveDirection = myLocation.directionTo(moveLocation);
 			moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
-			moveStride = myLocation.distanceTo(moveLocation) * RobotType.GARDENER.strideRadius / (trees.length + bots.length);
+			moveStride = myLocation.distanceTo(moveLocation);
 		}
 		
 		/************* Determine what action to take *************/
