@@ -14,9 +14,9 @@ public class Nav {
 		int numBullets = Math.min(20, bullets.length);
 		BulletInfo[] bulletsToAvoid = new BulletInfo[numBullets];
 		for(int i = 0; i < numBullets; i++) {
-			if (Math.abs(bullets[i].dir.radiansBetween(bullets[i].location.directionTo(myLocation))) < 0.5) {
+			//if (Math.abs(bullets[i].dir.radiansBetween(bullets[i].location.directionTo(myLocation))) < 0.5 || bullets[i].location.distanceTo(myLocation) < 4f) {
 				bulletsToAvoid[i] = bullets[i];
-			}
+			//}
 		}
 		
 		//System.out.println("Soldier is going to try avoid bullets");
