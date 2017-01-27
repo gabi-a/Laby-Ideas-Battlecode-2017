@@ -36,11 +36,11 @@ public class BotGardener {
 			for(int i = archonTrees.length;i-->0;) {
 				count += archonTrees[i];
 			}
-			if(count/Comms.archonCount.read(rc) > 4f) {
+			if(count/Comms.archonCount.read(rc) > 10f) {
 				lotsOfTrees = true;
 			}
 			treeCountFlag = true;
-			System.out.println("Tree count: "+count);
+			System.out.format("Tree count: %d Lots of trees: %b\n",count,lotsOfTrees);
 		}
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();
@@ -265,15 +265,16 @@ public class BotGardener {
 	public static boolean firstUnits(int[] units) throws GameActionException {
 
 		if(turnsAlive >= 60) return false;
-		
+
+		if(lotsOfTrees && !settled){
+			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
+				tryToBuild(RobotType.LUMBERJACK);
+				return true;
+			}
+		}
 		if(units[RobotType.SOLDIER.ordinal()] <= 1){
 			tryToBuild(RobotType.SOLDIER); 
 			return true;
-		}
-		if(lotsOfTrees && !settled){
-			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
-				if(tryToBuild(RobotType.LUMBERJACK)) return true;
-			}
 		}
 		if(units[RobotType.SCOUT.ordinal()] == 0){
 			tryToBuild(RobotType.SCOUT); 

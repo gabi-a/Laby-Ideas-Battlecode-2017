@@ -85,7 +85,7 @@ public class BotArchon {
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);
 			if(moveLocation != null) {
 				moveDirection = myLocation.directionTo(moveLocation);
-				moveStride = myLocation.distanceTo(myLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
 			}
 		}
 		
