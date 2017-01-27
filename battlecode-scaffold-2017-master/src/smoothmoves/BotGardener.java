@@ -266,7 +266,7 @@ public class BotGardener {
 
 		if(turnsAlive >= 60) return false;
 
-		if(lotsOfTrees && !settled){
+		if(lotsOfTrees || !settled){
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
 				tryToBuild(RobotType.LUMBERJACK);
 				return true;

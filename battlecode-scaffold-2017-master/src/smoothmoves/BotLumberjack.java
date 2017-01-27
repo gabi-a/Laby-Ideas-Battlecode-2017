@@ -26,7 +26,17 @@ public class BotLumberjack {
 		/* If there are any bullets nearby, just dodge them and don't
 		 * worry about going to the target 
 		 */
-		if(bullets.length > 0) {
+		
+		if(enemies.length > 0) {
+			MapLocation closestEnemyLocation = enemies[0].location;
+			MapLocation moveLocation = Nav.pathTo(rc, closestEnemyLocation, bullets);
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceSquaredTo(moveLocation);
+			}
+		}
+		
+		else if(bullets.length > 0) {
 			rc.setIndicatorDot(myLocation, 0, 255, 0);
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);	
 			if(moveLocation != null) {
@@ -34,7 +44,6 @@ public class BotLumberjack {
 				moveStride = myLocation.distanceTo(moveLocation);
 			}
 		} 
-		
 		/* 
 		 * Otherwise move to target, trees, away from enemies
 		 */
@@ -81,19 +90,13 @@ public class BotLumberjack {
 					goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 0.2f);
 				}
 			}
-
-			// Move towards enemies
-			if(enemies.length > 0){
-				goalLocation = goalLocation.add(myLocation.directionTo(enemies[0].getLocation()), 3f);
-			}
 			
 			moveDirection = myLocation.directionTo(goalLocation);
 			if(moveDirection != null) moveDirection = Nav.tryMove(rc, myLocation.directionTo(goalLocation), 10f, 24, bullets);
 			moveStride = myLocation.distanceTo(goalLocation);
 			
 			// Rescale stride distance
-			float moveEnemyStride = enemies.length > 0 ? Math.min(RobotType.LUMBERJACK.strideRadius, myLocation.distanceTo(goalLocation) - 2f) : RobotType.LUMBERJACK.strideRadius;
-			moveStride = Math.max(moveEnemyStride, moveStride * RobotType.LUMBERJACK.strideRadius / (((trees.length == 0) ? 0.001f : 1f) + allies.length));
+			moveStride = Math.max(RobotType.LUMBERJACK.strideRadius, moveStride * RobotType.LUMBERJACK.strideRadius / (((trees.length == 0) ? 0.001f : 1f) + allies.length));
 
 		}
 		
