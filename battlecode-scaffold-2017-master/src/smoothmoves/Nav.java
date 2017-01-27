@@ -11,10 +11,12 @@ public class Nav {
 
 		BulletInfo[] bulletsCouldHit = bullets.clone();
 		
-		int numBullets = Math.min(10, bullets.length);
+		int numBullets = Math.min(20, bullets.length);
 		BulletInfo[] bulletsToAvoid = new BulletInfo[numBullets];
 		for(int i = 0; i < numBullets; i++) {
-			bulletsToAvoid[i] = bullets[i];
+			if (Math.abs(bullets[i].dir.radiansBetween(bullets[i].location.directionTo(myLocation))) < 0.5) {
+				bulletsToAvoid[i] = bullets[i];
+			}
 		}
 		
 		//System.out.println("Soldier is going to try avoid bullets");
@@ -29,7 +31,7 @@ public class Nav {
 			float rayY = rayDir.getDeltaY(1);
 			float intersections = 0;
 			for (int i = bulletsToAvoid.length; i --> 0;) {
-				
+				if (bulletsToAvoid[i] == null) continue;
 				if(Clock.getBytecodeNum() >= 10000) System.out.format("bullets: %d, bytecodes: %d\n", bulletsToAvoid.length, Clock.getBytecodeNum());
 				bulletX = bulletsToAvoid[i].dir.getDeltaX(1f);
 				bulletY = bulletsToAvoid[i].dir.getDeltaY(1f);
