@@ -16,6 +16,8 @@ public class BotTank {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotTank.rc = rc;
 		
+		Util.updateMyPostion(rc);
+		
 		Direction shootDirection = null;
 		Direction moveDirection = null;
 		float moveStride = RobotType.TANK.strideRadius;

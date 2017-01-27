@@ -15,7 +15,7 @@ public class Nav {
 		BulletInfo[] bulletsToAvoid = new BulletInfo[numBullets];
 		for(int i = 0; i < numBullets; i++) {
 			//System.out.format("Angle: %f Bullet location:"+bullets[i].location+"\n", Math.abs(bullets[i].dir.degreesBetween(bullets[i].location.directionTo(myLocation))));
-			if (Math.abs(bullets[i].dir.degreesBetween(bullets[i].location.directionTo(myLocation))) < 70 /*&& bullets[i].location.distanceTo(myLocation) > 3f*/) {
+			if (Math.abs(bullets[i].dir.degreesBetween(bullets[i].location.directionTo(myLocation))) < 70 || bullets[i].location.distanceTo(myLocation) < 4f) {
 				bulletsToAvoid[i] = bullets[i];
 			}
 		}

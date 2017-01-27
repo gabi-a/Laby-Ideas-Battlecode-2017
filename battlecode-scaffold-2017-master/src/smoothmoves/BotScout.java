@@ -13,6 +13,8 @@ public class BotScout {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotScout.rc = rc;
 
+		Util.updateMyPostion(rc);
+		
 		//RobotInfo[] bots = rc.senseNearbyRobots();
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		TreeInfo[] trees = rc.senseNearbyTrees();

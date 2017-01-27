@@ -24,6 +24,10 @@ public class BotLumberjack {
 		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 		TreeInfo bestTree = null;
 		
+		if(bullets.length == 0) {
+			Util.updateMyPostion(rc);
+		}
+		
 		/************* Determine where to move *******************/
 		Direction moveDirection = null;
 		float moveStride = RobotType.LUMBERJACK.strideRadius;

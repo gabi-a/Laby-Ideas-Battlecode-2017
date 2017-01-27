@@ -29,6 +29,8 @@ public class BotGardener {
 		if(turnsAlive % 10 == 0) {
 			settleThreshold = Math.max(0, settleThreshold - 1);
 		}
+
+		Util.updateMyPostion(rc);
 		
 		/*
 		 * Get an idea for how many trees on the map based on the archons perceptions

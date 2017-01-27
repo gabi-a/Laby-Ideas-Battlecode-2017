@@ -9,11 +9,8 @@ public strictfp class RobotPlayer {
 	public static void run(RobotController rc) throws GameActionException {
 		RobotPlayer.rc = rc;
 		while(true) {
-			System.out.println("Bytecodes used before utils: "+Clock.getBytecodeNum());
 			Util.reportIfDead(rc);
-			System.out.println("Bytecodes after death report: "+Clock.getBytecodeNum());
-			Util.updateMyPostion(rc);
-			System.out.println("Bytecodes used after utils: "+Clock.getBytecodeNum());
+			
 			if(rc.getRoundNum() > rc.getRoundLimit() - 2) {
 				rc.donate(rc.getTeamBullets());
 			}
