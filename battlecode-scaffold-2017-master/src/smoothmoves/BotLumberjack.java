@@ -92,7 +92,8 @@ public class BotLumberjack {
 			moveStride = myLocation.distanceTo(goalLocation);
 			
 			// Rescale stride distance
-			moveStride = Math.max(RobotType.LUMBERJACK.strideRadius, moveStride * RobotType.LUMBERJACK.strideRadius / (((trees.length == 0) ? 0.001f : 1f) + allies.length));
+			float moveEnemyStride = enemies.length > 0 ? Math.min(RobotType.LUMBERJACK.strideRadius, myLocation.distanceTo(goalLocation) - 2f) : RobotType.LUMBERJACK.strideRadius;
+			moveStride = Math.max(moveEnemyStride, moveStride * RobotType.LUMBERJACK.strideRadius / (((trees.length == 0) ? 0.001f : 1f) + allies.length));
 
 		}
 		
