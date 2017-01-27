@@ -164,7 +164,7 @@ public class Nav {
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
 		
-		//rc.setIndicatorLine(myLocation, goal, 0, 0, 0);
+		//rc.setIndicatorLine(myLocation, myLocation.add(heading), 0, 0, 255);
 		
 		// If this is the first time going here, clear our pathing memory
 		if (goal.distanceTo(goalCache) > 5f) {
@@ -175,7 +175,7 @@ public class Nav {
 		
 		goalCache = goal;
 
-		float degreeOffset = 30f;
+		float degreeOffset = 31f;
 		int tries = 6;
 		Direction trial;
 
@@ -186,6 +186,7 @@ public class Nav {
 					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
 				dMin = myLocation.add(trial, stride).distanceTo(goal);
 				moveState = chooseMoveState();
+				heading = trial;
 				return myLocation.add(trial, stride);
 			}
 			trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
@@ -193,6 +194,7 @@ public class Nav {
 					&& !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
 				dMin = myLocation.add(trial, stride).distanceTo(goal);
 				moveState = chooseMoveState();
+				heading = trial;
 				return myLocation.add(trial, stride);
 			}
 		}
@@ -216,8 +218,10 @@ public class Nav {
 			case LEFT:
 				for (int i = 0; i < tries; i++) {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
+					//rc.setIndicatorLine(myLocation, myLocation.add(trial), 255, 0, 0);
 					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+						heading = trial;
 						return myLocation.add(trial, stride);
 					}
 				}
@@ -225,8 +229,10 @@ public class Nav {
 			case RIGHT:
 				for (int i = 0; i < tries; i++) {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
+					//rc.setIndicatorLine(myLocation, myLocation.add(trial), 0, 255, 0);
 					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+						heading = trial;
 						myLocation.add(trial, stride);
 						return myLocation.add(trial, stride);
 					}
