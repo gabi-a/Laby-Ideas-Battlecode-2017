@@ -10,8 +10,8 @@ public class Nav {
 	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets) throws GameActionException {
 
 		//BulletInfo[] bulletsCouldHit = bullets.clone();
-		
-		int numBullets = Math.min(20, bullets.length);
+		System.out.format("Start of dodge bytecodes: %d\n", Clock.getBytecodeNum());
+		int numBullets = Math.min(10, bullets.length);
 		BulletInfo[] bulletsToAvoid = new BulletInfo[numBullets];
 		for(int i = 0; i < numBullets; i++) {
 			//System.out.format("Angle: %f Bullet location:"+bullets[i].location+"\n", Math.abs(bullets[i].dir.degreesBetween(bullets[i].location.directionTo(myLocation))));
@@ -23,7 +23,8 @@ public class Nav {
 		float leastIntersections = 1000f;
 		Direction leastRay = Direction.getNorth();
 		int bulletsNeededToDodge = 0;
-		for (float rayAng = 6.2831853f; (rayAng -= Math.PI/4f) > 0;) {
+		outer:
+		for (float rayAng = 6.2831853f; (rayAng -= Math.PI/3f) > 0;) {
 			Direction rayDir = new Direction(rayAng);
 			if ( !rc.canMove(myLocation.add(rayDir, 2f)) || rc.senseNearbyBullets(myLocation.add(rayDir, 2f), 2f).length != 0 ) continue;
 			float rayX = rayDir.getDeltaX(1);
@@ -31,7 +32,7 @@ public class Nav {
 			float intersections = 0;
 			for (int i = bulletsToAvoid.length; i --> 0;) {
 				if (bulletsToAvoid[i] == null) continue;
-				if(Clock.getBytecodeNum() >= 10000) System.out.format("bullets: %d, bytecodes: %d\n", bulletsToAvoid.length, Clock.getBytecodeNum());
+				if(Clock.getBytecodeNum() > 9000) System.out.format("Bytecodes: %d, bullets: %d\n",Clock.getBytecodeNum(),bulletsToAvoid.length);
 				bulletX = bulletsToAvoid[i].dir.getDeltaX(1f);
 				bulletY = bulletsToAvoid[i].dir.getDeltaY(1f);
 				Direction relDir = myLocation.directionTo(bulletsToAvoid[i].location);
@@ -49,7 +50,8 @@ public class Nav {
 				} else {
 					rc.setIndicatorDot(bulletsToAvoid[i].location, 0, 100, 200);
 				}
-				if(Clock.getBytecodeNum() > 9999) System.out.println("Hit bytecode limit, bullets: "+bulletsToAvoid.length);
+				if(Clock.getBytecodeNum() > 9000) System.out.format("Bytecodes: %d, bullets: %d\n",Clock.getBytecodeNum(),bulletsToAvoid.length);
+				//if(Clock.getBytecodesLeft() < 4000) break outer;
 			}
 			//rc.setIndicatorLine(myLocation, myLocation.add(rayDir, 2f), (int) (100/intersections), (int) (100/intersections),(int) (100/intersections));
 			if (intersections < leastIntersections) {

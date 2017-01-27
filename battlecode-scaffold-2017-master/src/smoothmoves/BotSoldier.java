@@ -17,7 +17,7 @@ public class BotSoldier {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
 		
-		//System.out.println("I'm alive");
+		System.out.println("Bytecodes used: "+Clock.getBytecodeNum());
 		
 		if (enemyBase == null) {
 			enemyBase = rc.getInitialArchonLocations(them)[0];
