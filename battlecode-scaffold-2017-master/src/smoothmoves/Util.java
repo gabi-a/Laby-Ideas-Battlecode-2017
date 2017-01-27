@@ -3,6 +3,9 @@ import battlecode.common.*;
 
 public class Util {
 	
+	static Team us = RobotPlayer.rc.getTeam();
+	static Team them = us.opponent();
+	
 	static boolean reportedDeath = false;
 	
 	public static void reportIfDead(RobotController rc) throws GameActionException {
@@ -84,7 +87,7 @@ public class Util {
 		// There is no space in between us so no point continuing
 		if(senseRadius < 0.5f) return true;
 		
-		RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, rc.getTeam());
+		RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, us);
 		TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
 		boolean goodToShoot = true;
 		for(int i = botsBetweenUs.length; i-->0;) {
@@ -112,7 +115,7 @@ public class Util {
 		// There is no space in between us so no point continuing
 		if(senseRadius < 0.5f) return true;
 		
-		RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, rc.getTeam());
+		RobotInfo[] botsBetweenUs = rc.senseNearbyRobots(halfwayLocation, senseRadius, us);
 		TreeInfo[] treesBetweenUs = rc.senseNearbyTrees(halfwayLocation, senseRadius, null);
 		boolean goodToShoot = true;
 		for(int i = botsBetweenUs.length; i-->0;) {
@@ -186,7 +189,7 @@ public class Util {
 				}
 			}
 		}
-		return null;
+		return new RobotInfo(0, them, RobotType.ARCHON, rc.getInitialArchonLocations(them)[0], 0, 0, 0);
 		
 	}
 		

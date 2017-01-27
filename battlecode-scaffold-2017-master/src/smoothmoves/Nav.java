@@ -158,9 +158,11 @@ public class Nav {
 	}
 
 	static MapLocation pathTo(RobotController rc, MapLocation goal, RobotType[] avoid, float stride, BulletInfo[] bullets) throws GameActionException {
-		
+				
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
+		
+		//rc.setIndicatorLine(myLocation, goal, 0, 0, 0);
 		
 		// If this is the first time going here, clear our pathing memory
 		if (goal.distanceTo(goalCache) > 5f) {

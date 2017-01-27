@@ -86,6 +86,7 @@ public class BotSoldier {
 					RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
 					MapLocation moveLocation = null;
 					if (passiveEnemy != null) {
+						System.out.println("Pathing to passive enemy");
 						moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
 					}
 
