@@ -153,13 +153,13 @@ public class BotArchon {
 	
 	public static boolean tryHireGardener() throws GameActionException {
 		Direction hireDirection = new Direction(0);
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 60; i++) {
 			if (rc.canHireGardener(hireDirection) && rc.onTheMap(rc.getLocation().add(hireDirection, 5f))) {
 				rc.hireGardener(hireDirection);
 				Comms.ourBotCount.incrementNumBots(rc, RobotType.GARDENER);
 				return true;
 			}
-			hireDirection = hireDirection.rotateLeftRads((float) Math.PI * 0.25f);
+			hireDirection = hireDirection.rotateLeftDegrees(6f);
 		}
 		return false;
 	}
