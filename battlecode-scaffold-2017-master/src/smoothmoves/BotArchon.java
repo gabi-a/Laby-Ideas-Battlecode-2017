@@ -102,11 +102,11 @@ public class BotArchon {
 					}
 				}
 			}
-			if(trees.length > 0) {
-				for(int i = trees.length;i-->0;) {
-					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), 1f/(1f + trees[i].location.distanceTo(myLocation)));
-				}
-			}
+			//if(trees.length > 0) {
+			//	for(int i = trees.length;i-->0;) {
+			//		moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), 1f/(1f + trees[i].location.distanceTo(myLocation)));
+			//	}
+			//}
 			
 			if (!rc.onTheMap(myLocation.add(Direction.NORTH, 4f))) moveLocation=moveLocation.add(Direction.SOUTH, 5f);
 			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 4f))) moveLocation=moveLocation.add(Direction.NORTH, 5f);

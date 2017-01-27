@@ -9,17 +9,16 @@ public class Nav {
 	
 	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets) throws GameActionException {
 
-		BulletInfo[] bulletsCouldHit = bullets.clone();
+		//BulletInfo[] bulletsCouldHit = bullets.clone();
 		
 		int numBullets = Math.min(20, bullets.length);
 		BulletInfo[] bulletsToAvoid = new BulletInfo[numBullets];
 		for(int i = 0; i < numBullets; i++) {
-			//if (Math.abs(bullets[i].dir.radiansBetween(bullets[i].location.directionTo(myLocation))) < 0.5 || bullets[i].location.distanceTo(myLocation) < 4f) {
+			//System.out.format("Angle: %f Bullet location:"+bullets[i].location+"\n", Math.abs(bullets[i].dir.degreesBetween(bullets[i].location.directionTo(myLocation))));
+			if (Math.abs(bullets[i].dir.degreesBetween(bullets[i].location.directionTo(myLocation))) < 70 /*&& bullets[i].location.distanceTo(myLocation) > 3f*/) {
 				bulletsToAvoid[i] = bullets[i];
-			//}
+			}
 		}
-		
-		//System.out.println("Soldier is going to try avoid bullets");
 		float bulletX, bulletY;
 		float leastIntersections = 1000f;
 		Direction leastRay = Direction.getNorth();
@@ -40,7 +39,8 @@ public class Nav {
 				float relY = relDir.getDeltaY(1);
 				
 				// You are not expected to understand this.
-				if (Math.pow(bulletX - rayX + relX, 2) + Math.pow(bulletY - rayY + relY, 2) < 1) {
+				double test = Math.pow(bulletX - rayX + relX, 2) + Math.pow(bulletY - rayY + relY, 2);
+				if (test < 1d && test > 0.3d) {
 					intersections += 1f/(myLocation.add(rayDir, 2f).distanceTo(bulletsToAvoid[i].location));
 					//System.out.println((myLocation.add(rayDir, 2f).distanceTo(bulletsToAvoid[i].location)));
 					bulletsNeededToDodge++;

@@ -3,6 +3,11 @@ package smoothmoves;
 import battlecode.common.*;
 import battlecode.schema.Action;
 
+/*
+ * TODO: Investigate bytecode usage issue
+ * 
+ */
+
 public class BotLumberjack {
 	static RobotController rc;
 	
@@ -54,7 +59,7 @@ public class BotLumberjack {
 			if(trees.length > 0) {
 				float score = 0;
 				for(int i = 0; i < trees.length; i++){
-					System.out.println("A" + Clock.getBytecodeNum());
+					//System.out.println("A" + Clock.getBytecodeNum());
 					float newScore = rateTree(trees[i]);
 					if(newScore > score){
 						score = newScore;
@@ -87,7 +92,7 @@ public class BotLumberjack {
 			
 			// Move away from ally bots
 			if(allies.length > 0) {
-				System.out.println("B" + Clock.getBytecodeNum());
+				//System.out.println("B" + Clock.getBytecodeNum());
 				for(int i = allies.length;i-->0;) {
 					goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 0.2f);
 				}

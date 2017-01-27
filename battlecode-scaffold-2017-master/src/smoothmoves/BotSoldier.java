@@ -16,6 +16,9 @@ public class BotSoldier {
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
+		
+		//System.out.println("I'm alive");
+		
 		if (enemyBase == null) {
 			enemyBase = rc.getInitialArchonLocations(them)[0];
 		}
@@ -36,7 +39,9 @@ public class BotSoldier {
 
 		boolean dodgeBullets = false;
 		
-		if(bullets.length > 0) {
+		//System.out.println("Deciding how to move");
+		
+		if(bullets.length > 0 ) {
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);
 			if(moveLocation != null) {
 				//System.out.println("Dodging bullets");
@@ -48,12 +53,14 @@ public class BotSoldier {
 		
 		if(!dodgeBullets) {
 			boolean protectGardener = false;
+			//System.out.println("Deciding whether to protect gardener");
 			RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
 			moveDirection = Nav.tryMove(rc, myLocation.directionTo(enemyBase), 5f, 24, bullets);
 			for(int i = enemiesAttackingUs.length;i-->0;) {
 				if(enemiesAttackingUs[i] != null) {
 					MapLocation moveLocation = Nav.pathTo(rc, enemiesAttackingUs[i].location, bullets);
 					if(moveLocation != null) {
+						//System.out.println("Protect archon or gardener, enemy at: "+enemiesAttackingUs[i].location);
 						moveDirection = myLocation.directionTo(moveLocation);
 						moveStride = myLocation.distanceTo(moveLocation);
 						protectGardener = true;
@@ -62,9 +69,11 @@ public class BotSoldier {
 				}
 			}
 			if(!(protectGardener && leaveCurrentEngagement(enemies))) {
+				//System.out.println("Enemies?");
  				if(enemies.length > 0 ) {
 					RobotInfo closestEnemy = enemies[0];
 					if(closestEnemy.type == RobotType.LUMBERJACK) {
+						//System.out.println("Lumberjacks.");
 						if(myLocation.distanceTo(closestEnemy.location) < 3f) {
 							moveDirection = closestEnemy.location.directionTo(myLocation);
 						} else if(myLocation.distanceTo(closestEnemy.location) > 4f) {
@@ -75,6 +84,7 @@ public class BotSoldier {
 							}
 						}
 					} else if (!Util.goodToShootNotTrees(rc, myLocation, closestEnemy)){
+						//System.out.println("Move to enemy");
 						MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
 						if(moveLocation != null) {
 							moveDirection = myLocation.directionTo(moveLocation);
@@ -90,7 +100,7 @@ public class BotSoldier {
 					RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
 					MapLocation moveLocation = null;
 					if (passiveEnemy != null) {
-						System.out.println("Pathing to passive enemy");
+						//System.out.println("Pathing to passive enemy");
 						moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
 					}
 
@@ -164,21 +174,21 @@ public class BotSoldier {
 						float triadHitRadius = distanceToEnemy * 0.3640f * 0.25f/*tan(20d)*/;
 						
 						if(pentadHitRadius < enemyToAttack.getRadius()) {
-							System.out.println("Gabi thinks all 5 will hit");
+							//System.out.println("Gabi thinks all 5 will hit");
 							action = Action.FIRE_PENTAD;
 						}
 						
 						else if(triadHitRadius < enemyToAttack.getRadius()) {
-							System.out.println("Gabi thinks all 3 will hit");
+							//System.out.println("Gabi thinks all 3 will hit");
 							action = Action.FIRE_TRIAD;
 						}
 						
 						else {
-							System.out.println("Gabi thinks 1 might hit if we're lucky");
+							//System.out.println("Gabi thinks 1 might hit if we're lucky");
 							action = Action.FIRE;
 						}
 						
-						
+						/*
 						float d = myLocation.distanceTo(enemyToAttack.location);
 						float rMe = rc.getType().bodyRadius;
 						float rEn = enemyToAttack.type.bodyRadius;
@@ -204,6 +214,7 @@ public class BotSoldier {
 						//	action = Action.FIRE;
 							System.out.println("Adam thinks 1 will hit");
 						}
+						*/
 						
 					}
 					else if (enemyToAttack.type != RobotType.ARCHON && enemies.length > 1) {

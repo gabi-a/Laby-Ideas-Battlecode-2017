@@ -21,6 +21,8 @@ public class BotGardener {
 	
 	static int turnsAlive = 0;
 	
+	static final float THRESHOLD_AREA = RobotType.ARCHON.sensorRadius * RobotType.ARCHON.sensorRadius * (float) Math.PI * 0.4f;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
 		turnsAlive++;
@@ -34,15 +36,18 @@ public class BotGardener {
 		if(!treeCountFlag) {
 			int[] archonTrees = Comms.archonTreeCount.array(rc);
 			int minArea = 10000;
-			for(int i = numInitialArchons-1;i-->0;) {
+			for(int i = numInitialArchons;i-->0;) {
 				if(archonTrees[i] < minArea) {
 					minArea = archonTrees[i];
 				}
 			}
-			if((float) minArea > RobotType.ARCHON.sensorRadius * RobotType.ARCHON.sensorRadius * (float) Math.PI * 0.2f) {
+			if((float) minArea > THRESHOLD_AREA) {
 				lotsOfTrees = true;
 			}
 			treeCountFlag = true;
+			System.out.format("Lots of trees: %b\n"
+							+ "min area: %d\n"
+							+ "threshold area: %f\n",lotsOfTrees,minArea,THRESHOLD_AREA);
 		}
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();
