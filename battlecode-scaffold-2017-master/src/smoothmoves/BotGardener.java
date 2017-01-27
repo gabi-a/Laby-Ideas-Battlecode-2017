@@ -73,13 +73,13 @@ public class BotGardener {
 			if(bots.length > 0) {
 				for(int i = bots.length;i-->0;) {
 					if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
-						moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation), 2f);
+						moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation), 2f/(1f + bots[i].location.distanceTo(myLocation)));
 					}
 				}
 			}
 			if(trees.length > 0) {
 				for(int i = trees.length;i-->0;) {
-					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), (float) (2f*Math.pow(1f/(1f+trees[i].location.distanceTo(myLocation)), 2)));
+					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), 1f/(1f+trees[i].location.distanceTo(myLocation)));
 				}
 			}
 			
@@ -90,7 +90,7 @@ public class BotGardener {
 
 			
 			// Stay away from the enemy base
-			moveLocation = moveLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]).opposite(), 1/myLocation.distanceTo(rc.getInitialArchonLocations(them)[0]));
+			moveLocation = moveLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]).opposite(), 10f/(1f + myLocation.distanceTo(rc.getInitialArchonLocations(them)[0])));
 			rc.setIndicatorDot(moveLocation, 100, 0, 100);
 			
 			moveDirection = myLocation.directionTo(moveLocation);
