@@ -162,7 +162,7 @@ public class Nav {
 		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
 		
-		rc.setIndicatorLine(myLocation, myLocation.add(heading), 0, 0, 255);
+		//rc.setIndicatorLine(myLocation, myLocation.add(heading), 0, 0, 255);
 		
 		// If this is the first time going here, clear our pathing memory
 		if (goal.distanceTo(goalCache) > 5f) {
@@ -216,7 +216,7 @@ public class Nav {
 			case LEFT:
 				for (int i = 0; i < tries; i++) {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
-					rc.setIndicatorLine(myLocation, myLocation.add(trial), 255, 0, 0);
+					//rc.setIndicatorLine(myLocation, myLocation.add(trial), 255, 0, 0);
 					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
 						heading = trial;
@@ -227,7 +227,7 @@ public class Nav {
 			case RIGHT:
 				for (int i = 0; i < tries; i++) {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
-					rc.setIndicatorLine(myLocation, myLocation.add(trial), 0, 255, 0);
+					//rc.setIndicatorLine(myLocation, myLocation.add(trial), 0, 255, 0);
 					if (rc.canMove(trial, stride) && !inEnemySight(rc, trial, avoid, enemyList, myLocation, stride)) {
 						dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
 						heading = trial;
