@@ -49,6 +49,7 @@ public class Nav {
 				} else {
 					rc.setIndicatorDot(bulletsToAvoid[i].location, 0, 100, 200);
 				}
+				if(Clock.getBytecodeNum() > 9999) System.out.println("Hit bytecode limit, bullets: "+bulletsToAvoid.length);
 			}
 			//rc.setIndicatorLine(myLocation, myLocation.add(rayDir, 2f), (int) (100/intersections), (int) (100/intersections),(int) (100/intersections));
 			if (intersections < leastIntersections) {
