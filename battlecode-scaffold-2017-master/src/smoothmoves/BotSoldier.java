@@ -12,7 +12,7 @@ public class BotSoldier {
 	static boolean trapped = false;
 	static RobotInfo trackedEnemy;
 	static float fireOffsetDegrees = 10f;
-	static int shootCooldown = 10;
+	//static int shootCooldown = 10;
 	
 	
 	static int turnsSinceLastSeen = 0;
@@ -290,11 +290,11 @@ public class BotSoldier {
 		case Action.FIRE:
 			if(rc.canFireSingleShot()) {
 				rc.fireSingleShot(shootDirection);
-				shootCooldown = 2;
+				//shootCooldown = 2;
 				break;
 			}
 		default:
-			shootCooldown--;
+			//shootCooldown--;
 			break;
 		}
 	}
