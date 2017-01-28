@@ -96,32 +96,36 @@ public class BotArchon {
 		}
 		
 		else {
-			MapLocation moveLocation = myLocation;
+			MapLocation goalLocation = myLocation;
+			
 			if(bots.length > 0) {
 				for(int i = bots.length;i-->0;) {
 					if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
-						moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation), 1f/(1f + bots[i].location.distanceTo(myLocation)));
+						goalLocation = goalLocation.add(bots[i].location.directionTo(myLocation), 10f/(1f + bots[i].location.distanceTo(myLocation)));
 					}
 				}
 			}
-			//if(trees.length > 0) {
-			//	for(int i = trees.length;i-->0;) {
-			//		moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), 1f/(1f + trees[i].location.distanceTo(myLocation)));
-			//	}
-			//}
 			
-			if (!rc.onTheMap(myLocation.add(Direction.NORTH, 4f))) moveLocation=moveLocation.add(Direction.SOUTH, 5f);
-			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 4f))) moveLocation=moveLocation.add(Direction.NORTH, 5f);
-			if (!rc.onTheMap(myLocation.add(Direction.WEST, 4f))) moveLocation=moveLocation.add(Direction.EAST, 5f);
-			if (!rc.onTheMap(myLocation.add(Direction.EAST, 4f))) moveLocation=moveLocation.add(Direction.WEST, 5f);
+			if(trees.length > 0) {
+				for(int i = trees.length;i-->0;) {
+					goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation), 10f/(1f + trees[i].location.distanceTo(myLocation)));
+				}
+			}
+			
+			if (!rc.onTheMap(myLocation.add(Direction.NORTH, 2f))) goalLocation=goalLocation.add(Direction.SOUTH, 3f);
+			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 2f))) goalLocation=goalLocation.add(Direction.NORTH, 3f);
+			if (!rc.onTheMap(myLocation.add(Direction.WEST, 2f))) goalLocation=goalLocation.add(Direction.EAST, 3f);
+			if (!rc.onTheMap(myLocation.add(Direction.EAST, 2f))) goalLocation=goalLocation.add(Direction.WEST, 3f);
 			
 			// Stay away from the enemy base
-			moveLocation = moveLocation.add(myLocation.directionTo(enemyBase).opposite(), 10f/(myLocation.distanceTo(enemyBase)+1f));
-			rc.setIndicatorDot(moveLocation, 100, 0, 100);
+			goalLocation = goalLocation.add(myLocation.directionTo(enemyBase).opposite(), 10f/(myLocation.distanceTo(enemyBase)+1f));
+			rc.setIndicatorDot(goalLocation, 100, 0, 100);
 			
-			moveDirection = myLocation.directionTo(moveLocation);
-			moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
-			moveStride = myLocation.distanceTo(moveLocation);
+			MapLocation moveLocation = Nav.pathTo(rc, goalLocation, bullets);
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
+			}
 		}
 		
 		/************* Determine what action to take *************/

@@ -83,10 +83,16 @@ public class BotScout {
 			}
 			
 			if(!attackGardener) {
-				MapLocation moveLocation = applyTreeGravity(myLocation, trees);
-				moveDirection = myLocation.directionTo(moveLocation);
-				if(moveDirection != null && myLocation.distanceTo(moveLocation) > 0.01f) {
-					moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
+				//MapLocation moveLocation = applyTreeGravity(myLocation, trees);
+				//moveDirection = myLocation.directionTo(moveLocation);
+				
+				MapLocation goalLocation = bestTree(trees);
+				MapLocation moveLocation = null;
+				if(goalLocation != null)
+					moveLocation = Nav.pathTo(rc, goalLocation, bullets);
+				if (moveLocation != null){
+					moveDirection = myLocation.directionTo(moveLocation);
+					moveStride = myLocation.distanceTo(moveLocation);
 				}
 				else {
 					moveDirection = Nav.explore(rc, bullets);
@@ -145,6 +151,15 @@ public class BotScout {
 		}
 	}
 	
+	private static MapLocation bestTree(TreeInfo[] trees) {
+		if(trees.length == 0) return null;
+		for(int i = 0; i < trees.length; i++) {
+			if(trees[i].containedBullets > 0)
+				return trees[i].location;
+		}
+		return null;
+	}
+
 	private static MapLocation applyTreeGravity(MapLocation myLocation, TreeInfo[] trees) {
 		MapLocation moveLocation = myLocation;
 		if(trees.length == 0) {
