@@ -125,7 +125,7 @@ public class BotScout {
 			}
 		}
 		
-		if(action != Action.SHAKE_TREE && enemies.length > 0 /*&& enemies[0].type == RobotType.SCOUT || enemies[0].type == RobotType.GARDENER*/) {
+		if(action != Action.SHAKE_TREE && enemies.length > 0 && (enemies[0].type == RobotType.GARDENER || enemies[0].health < 20)) {
 			if(rc.canFireSingleShot()) {
 				action = Action.FIRE;
 				shootDirection = myLocation.directionTo(enemies[0].location);
