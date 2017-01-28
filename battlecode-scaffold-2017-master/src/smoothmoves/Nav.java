@@ -11,7 +11,7 @@ public class Nav {
 
 		//BulletInfo[] bulletsCouldHit = bullets.clone();
 		//System.out.format("Start of dodge bytecodes: %d\n", Clock.getBytecodeNum());
-		int numBullets = Math.min(10, bullets.length);
+		int numBullets = Math.min(20, bullets.length);
 		BulletInfo[] bulletsToAvoid = new BulletInfo[numBullets];
 		for(int i = 0; i < numBullets; i++) {
 			//System.out.format("Angle: %f Bullet location:"+bullets[i].location+"\n", Math.abs(bullets[i].dir.degreesBetween(bullets[i].location.directionTo(myLocation))));

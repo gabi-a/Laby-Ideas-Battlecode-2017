@@ -21,7 +21,7 @@ public class BotGardener {
 	
 	static int turnsAlive = 0;
 	
-	static final float THRESHOLD_AREA = RobotType.ARCHON.sensorRadius * RobotType.ARCHON.sensorRadius * (float) Math.PI * 0.2f;
+	static final float THRESHOLD_AREA = RobotType.ARCHON.sensorRadius * RobotType.ARCHON.sensorRadius * (float) Math.PI * 0.3f;
 	
 	static MapLocation goalLocation;
 	static MapLocation enemyBase;

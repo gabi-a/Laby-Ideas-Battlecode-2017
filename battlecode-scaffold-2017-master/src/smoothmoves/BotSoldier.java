@@ -11,8 +11,12 @@ public class BotSoldier {
 	
 	static boolean trapped = false;
 	static RobotInfo trackedEnemy;
-	static float fireOffsetDegrees = 30f;
-	static int shootCooldown = 10;
+	static float fireOffsetDegrees = 10f;
+	//static int shootCooldown = 10;
+	
+	
+	static int turnsSinceLastSeen = 0;
+	static final int TURNS_SHOOT_UNSEEN = 20;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
@@ -35,10 +39,14 @@ public class BotSoldier {
 		
 		Util.shakeIfAble(rc, trees);
 		
+		Util.updateMyPostion(rc);
+		Util.reportEnemyBots(rc, enemies);
+		/*
 		if(bullets.length == 0) {
 			Util.updateMyPostion(rc);
 			Util.reportEnemyBots(rc, enemies);
 		}
+		*/
 		
 		/************* Determine where to move *******************/
 
@@ -152,6 +160,7 @@ public class BotSoldier {
 			}
 			
 			if(enemyToAttack != null) {
+				turnsSinceLastSeen = 0;
 				
 				if(trackedEnemy == null) {
 					trackedEnemy = enemyToAttack;
@@ -244,12 +253,26 @@ public class BotSoldier {
 					rc.setIndicatorDot(myLocation, 0, 0, 255);
 					fireOffsetDegrees = -fireOffsetDegrees;
 					shootDirection  = myLocation.directionTo(enemyToAttack.location).rotateLeftDegrees(fireOffsetDegrees);
-					if(shootCooldown <= 0) {
+					//if(shootCooldown <= 0) {
 						action = Action.FIRE;
-					}
+					//}
 				}
 
 				trackedEnemy = enemyToAttack;
+			}
+			
+			/*
+			 * Attempt to fire at an enemy we cannot see
+			 */
+			
+			else if(turnsSinceLastSeen < TURNS_SHOOT_UNSEEN && trackedEnemy != null){
+				turnsSinceLastSeen ++;
+				
+				if( Util.goodToShoot(rc, myLocation, trackedEnemy) ) {
+					action = Action.FIRE_TRIAD;
+					shootDirection = myLocation.directionTo(trackedEnemy.location);
+				}
+				
 			}
 		}
 		
@@ -264,23 +287,21 @@ public class BotSoldier {
 		case Action.FIRE_PENTAD:
 			if(rc.canFirePentadShot()) {
 				rc.firePentadShot(shootDirection);
-				shootCooldown = 15;
 				break;
 			}
 		case Action.FIRE_TRIAD:
 			if(rc.canFireTriadShot()) {
 				rc.fireTriadShot(shootDirection);
-				shootCooldown = 10;
 				break;
 			}
 		case Action.FIRE:
 			if(rc.canFireSingleShot()) {
 				rc.fireSingleShot(shootDirection);
-				shootCooldown = 5;
+				//shootCooldown = 2;
 				break;
 			}
 		default:
-			shootCooldown--;
+			//shootCooldown--;
 			break;
 		}
 	}
