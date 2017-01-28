@@ -40,7 +40,7 @@ public class BotGardener {
 				lotsOfTrees = true;
 			}
 			treeCountFlag = true;
-			System.out.println("Tree count: "+count);
+			//System.out.println("Tree count: "+count);
 		}
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();
@@ -98,7 +98,7 @@ public class BotGardener {
 			settled = settleHere();
 			
 		} else {
-			System.out.println("Settled");
+			//System.out.println("Settled");
 			if(rc.senseTreeAtLocation(myLocation.add(spawnDirection)) != null) spawnDirection = setSpawnDirection();
 			
 			if(spawnDirection == null) {
@@ -179,7 +179,7 @@ public class BotGardener {
 	}
 	
 	public static Direction setSpawnDirection() throws GameActionException {
-		System.out.println("Set spawn direction");
+		//System.out.println("Set spawn direction");
 		Direction testDirection = myLocation.directionTo(rc.getInitialArchonLocations(them)[0]);
 		for(int i = 0;i<36;i++) {
 			rc.setIndicatorDot(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i),2f), 0, 255, 0);

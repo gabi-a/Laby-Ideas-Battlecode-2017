@@ -9,7 +9,9 @@ public strictfp class RobotPlayer {
 	public static void run(RobotController rc) throws GameActionException {
 		RobotPlayer.rc = rc;
 		while(true) {
+			
 			Util.reportIfDead(rc);
+			Comms.readLocalComms(rc);
 			
 			if(rc.getRoundNum() > rc.getRoundLimit() - 2) {
 				rc.donate(rc.getTeamBullets());
@@ -42,6 +44,9 @@ public strictfp class RobotPlayer {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			Comms.writeLocalComms(rc);
+			
 			Clock.yield();
 		}
 	}

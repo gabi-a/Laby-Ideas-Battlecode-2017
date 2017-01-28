@@ -17,7 +17,7 @@ public class BotSoldier {
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
 		
-		System.out.println("Bytecodes used: "+Clock.getBytecodeNum());
+		//System.out.println("Bytecodes used: "+Clock.getBytecodeNum());
 		
 		if (enemyBase == null) {
 			enemyBase = rc.getInitialArchonLocations(them)[0];
@@ -139,7 +139,7 @@ public class BotSoldier {
 					enemyToAttack = enemies[i];
 					break;
 				}
-				System.out.println("Cannot shoot "+enemies[i].ID);
+				//System.out.println("Cannot shoot "+enemies[i].ID);
 			}
 			
 			if(enemyToAttack != null) {
@@ -222,11 +222,11 @@ public class BotSoldier {
 					}
 					else if (enemyToAttack.type != RobotType.ARCHON && enemies.length > 1) {
 						action = Action.FIRE_PENTAD;
-						System.out.println("Multiple bots, fire pentad");
+						//System.out.println("Multiple bots, fire pentad");
 					}
 					else {
 						action = Action.FIRE;
-						System.out.println("Only archon, fire single");
+						//System.out.println("Only archon, fire single");
 					}
 				}
 

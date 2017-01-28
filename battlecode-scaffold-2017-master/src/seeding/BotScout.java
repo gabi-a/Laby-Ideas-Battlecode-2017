@@ -66,10 +66,10 @@ public class BotScout {
 		if(!dodgeBullets) {
 			
 			boolean attackGardener = false;
-			System.out.format("Enemies around: %b\n", enemies.length > 0);
+			//System.out.format("Enemies around: %b\n", enemies.length > 0);
 			if(enemies.length > 0 && enemies[0].type != RobotType.LUMBERJACK) {
 				RobotInfo enemyGardener = Util.getGardenerAndAllPassive(enemies);
-				System.out.format("There is a safe gardener: %b\n", enemyGardener != null);
+				//System.out.format("There is a safe gardener: %b\n", enemyGardener != null);
 				if(enemyGardener != null && (enemyGardener.location.distanceTo(myLocation) > 3f || !Util.goodToShootNotTrees(rc, myLocation, enemyGardener))) {
 					MapLocation moveLocation = Nav.pathTo(rc, enemyGardener.location, bullets);
 					if(moveLocation != null) {

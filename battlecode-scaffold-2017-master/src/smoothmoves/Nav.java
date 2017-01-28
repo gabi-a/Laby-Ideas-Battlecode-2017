@@ -10,7 +10,7 @@ public class Nav {
 	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets) throws GameActionException {
 
 		//BulletInfo[] bulletsCouldHit = bullets.clone();
-		System.out.format("Start of dodge bytecodes: %d\n", Clock.getBytecodeNum());
+		//System.out.format("Start of dodge bytecodes: %d\n", Clock.getBytecodeNum());
 		int numBullets = Math.min(10, bullets.length);
 		BulletInfo[] bulletsToAvoid = new BulletInfo[numBullets];
 		for(int i = 0; i < numBullets; i++) {

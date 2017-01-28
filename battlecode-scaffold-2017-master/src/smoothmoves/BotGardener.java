@@ -47,9 +47,9 @@ public class BotGardener {
 				lotsOfTrees = true;
 			}
 			treeCountFlag = true;
-			System.out.format("Lots of trees: %b\n"
-							+ "min area: %d\n"
-							+ "threshold area: %f\n",lotsOfTrees,minArea,THRESHOLD_AREA);
+			//System.out.format("Lots of trees: %b\n"
+			//				+ "min area: %d\n"
+			//				+ "threshold area: %f\n",lotsOfTrees,minArea,THRESHOLD_AREA);
 		}
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();
@@ -162,7 +162,7 @@ public class BotGardener {
 		if(spawnDirection == null) return false;
 		
 		int treesCanPlant = getMaxTrees();
-		System.out.println("Trees can plant:" +treesCanPlant );
+		//System.out.println("Trees can plant:" +treesCanPlant );
 		if(treesCanPlant > settleThreshold && turnsAlive > 10) {
 			return true;
 		}
@@ -187,7 +187,7 @@ public class BotGardener {
 	}
 	
 	public static Direction setSpawnDirection() throws GameActionException {
-		System.out.println("Set spawn direction");
+		//System.out.println("Set spawn direction");
 		Direction testDirection = myLocation.directionTo(rc.getInitialArchonLocations(them)[0]);
 		for(int i = 0;i<36;i++) {
 			rc.setIndicatorDot(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i),2f), 0, 255, 0);

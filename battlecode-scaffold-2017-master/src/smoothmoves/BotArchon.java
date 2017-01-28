@@ -128,7 +128,7 @@ public class BotArchon {
 		
 		byte action = Action.DIE_EXCEPTION;
 		
-		if(rc.getTreeCount() >= 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) || (Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100 && rc.getTeamBullets() > 200))
+		if(rc.getTreeCount() >= 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) && rc.getTeamBullets() > 130)//|| (Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100 && rc.getTeamBullets() > 200))
 			action = Action.SPAWN_UNIT;
 		
 		/************* Do Move ***********************************/

@@ -3,6 +3,17 @@ import battlecode.common.*;
 
 public class Comms {
 
+	public static final int NumChannelsToReadEachRound = 5;
+	public static final int NumChannelsToWriteEachRound = 5;
+	
+	public static final int[] LocalComms;
+	public static final int[] ActualComms;
+	public static final int CommsStart = 0;
+	public static final int CommsEnd = 100;
+	
+	public static int currentReadChannel = 0;
+	public static int currentWriteChannel = 0;
+	
 	/* Example usage:
 	 * Comms.neutralTrees.push(RobotController rc, TreeInfo stuff);
 	 * TreeInfo stuff = Comms.neutralTrees.pop(RobotController rc);
@@ -22,6 +33,17 @@ public class Comms {
 	public static final CommsArray archonTreeCount;
 	
 	static {
+		
+		LocalComms = new int[CommsEnd];
+		ActualComms = new int[CommsEnd];
+		/*
+		 * IMPORTANT
+		 * 
+		 * Make sure the channels are all within the size of the local comms array!
+		 * e.g. CommsEnd = 100, so DO NOT initialize an int as 
+		 * new CommsInt(101);
+		 * 
+		 */
 		ourBotCount = new CommsBotCount(0,6);
 		theirBotCount = new CommsBotCount(7,13);
 		enemyGardenersArray = new CommsBotArray(14, 24);
@@ -30,6 +52,57 @@ public class Comms {
 		ourLumberjackAndSoldiers = new CommsBotArray(47,67);
 		archonTreeCount = new CommsArray(68,71);
 		archonCount = new CommsInt(72);
+	}
+	
+	public static void readLocalComms(RobotController rc) throws GameActionException {
+		
+		int stop = currentReadChannel + NumChannelsToReadEachRound;
+		
+		while(currentReadChannel++ < stop) {
+			// Uncomment the line below to crash your terminal
+			//System.out.println("\n The read channel is:"+currentReadChannel);
+			if(currentReadChannel == CommsEnd) {
+				stop -= currentReadChannel;
+				currentReadChannel = 0;
+			}
+			LocalComms[currentReadChannel] = rc.readBroadcast(currentReadChannel);
+			ActualComms[currentReadChannel] = LocalComms[currentReadChannel];
+		}
+		currentReadChannel--;
+	}
+	
+	public static void writeLocalComms(RobotController rc) throws GameActionException {
+		int updated = 0;
+		int stop = currentWriteChannel;
+		
+		while(updated < 5 && ++currentWriteChannel != stop) {
+			if(currentWriteChannel == CommsEnd) {
+				currentWriteChannel = 0;
+			}
+			if(ActualComms[currentWriteChannel] != LocalComms[currentWriteChannel]) {
+				rc.broadcast(currentWriteChannel, LocalComms[currentWriteChannel]);
+				System.out.println("Update channel "+currentWriteChannel);
+				updated++;
+			}
+		}
+		
+		/*
+		while(currentWriteChannel++ < stop) {
+			if(currentWriteChannel == CommsEnd) {
+				stop -= currentWriteChannel;
+				currentWriteChannel = 0;
+			}
+			if(ActualComms[currentWriteChannel] != LocalComms[currentWriteChannel]) {
+				rc.broadcast(currentWriteChannel, LocalComms[currentWriteChannel]);
+				System.out.println("Update channel "+currentWriteChannel);
+				updated++;
+			} else {
+				stop++;
+			}
+		}
+		currentWriteChannel--;
+		System.out.println(updated+" channels updated ");
+		*/
 	}
 	
 	public static int packLocation(RobotController rc, MapLocation location) {
@@ -71,19 +144,20 @@ class CommsInt {
 	}
 
 	public void write(RobotController rc, int data) throws GameActionException {
-		rc.broadcast(index, data);
+		Comms.LocalComms[index] = data;
 	}
 
 	public int read(RobotController rc) throws GameActionException {
-		return rc.readBroadcast(index);
+		return Comms.LocalComms[index];
+		//return Comms.LocalComms[index];
 	}
 
 	public void increment(RobotController rc, int increment) throws GameActionException {
-		rc.broadcast(index, rc.readBroadcast(index) + increment);
+		Comms.LocalComms[index] = Comms.LocalComms[index] + increment;
 	}
 
 	public void decrement(RobotController rc, int decrement) throws GameActionException {
-		rc.broadcast(index, rc.readBroadcast(index) - decrement);
+		Comms.LocalComms[index] = Comms.LocalComms[index] - decrement;
 	}
 }
 
@@ -98,19 +172,19 @@ class CommsStack {
 	}
 
 	public void push(RobotController rc, int data) throws GameActionException {
-		int stackPointer = rc.readBroadcast(stackStart);
+		int stackPointer = Comms.LocalComms[stackStart];
 		
 		if (stackStart + stackPointer + 1 > stackEnd) {
 			System.out.println("Oops! Exceeded stack limit.");
 			return;
 		}
 
-		rc.broadcast(stackStart + offset + stackPointer, data);
-		rc.broadcast(stackStart, stackPointer + 1);
+		Comms.LocalComms[stackStart + offset + stackPointer] = data;
+		Comms.LocalComms[stackStart] = stackPointer + 1;
 	}
 
 	public int pop(RobotController rc) throws GameActionException {
-		int stackPointer = rc.readBroadcast(stackStart);
+		int stackPointer = Comms.LocalComms[stackStart];
 		
 		if (stackPointer == 0) {
 			return -1;
@@ -118,27 +192,27 @@ class CommsStack {
 		
 		stackPointer--;
 		
-		int data = rc.readBroadcast(stackStart + offset + stackPointer);
+		int data = Comms.LocalComms[stackStart + offset + stackPointer];
 
-		rc.broadcast(stackStart + offset + stackPointer, 0);
-		rc.broadcast(stackStart, stackPointer);
+		Comms.LocalComms[stackStart + offset + stackPointer] = 0;
+		Comms.LocalComms[stackStart] = stackPointer;
 		
 		return data;
 	}
 
 	public int length(RobotController rc) throws GameActionException {
-		return rc.readBroadcast(stackStart);
+		return Comms.LocalComms[stackStart];
 	}
 
 	public int[] array(RobotController rc) throws GameActionException {
-		int stackPointer = rc.readBroadcast(stackStart);
+		int stackPointer = Comms.LocalComms[stackStart];
 		if (stackPointer == 0) {
 			return null;
 		}
 
 		int[] data = new int[stackPointer];
 		for(int i = 0; i < stackPointer; i++){
-			data[i] = rc.readBroadcast(stackStart + offset + i);
+			data[i] = Comms.LocalComms[stackStart + offset + i];
 		}
 
 		return data;
@@ -156,7 +230,7 @@ class CommsQueue {
 	}
 
 	public void push(RobotController rc, int data) throws GameActionException {
-		int queueData = rc.readBroadcast(queueStart);
+		int queueData = Comms.LocalComms[queueStart];
 		int head = (queueData & 0xFF00) >> 8;
 		int tail = queueData & 0x00FF;
 
@@ -168,14 +242,14 @@ class CommsQueue {
 			return;
 		}
 
-		rc.broadcast(queueStart + offset + tail, data);
+		Comms.LocalComms[queueStart + offset + tail] = data;
 
 		queueData = (head << 8) | (newTail);
-		rc.broadcast(queueStart, queueData);
+		Comms.LocalComms[queueStart] = queueData;
 	}
 
 	public int pop(RobotController rc) throws GameActionException {
-		int queueData = rc.readBroadcast(queueStart);
+		int queueData = Comms.LocalComms[queueStart];
 		int head = (queueData & 0xFF00) >> 8;
 		int tail = queueData & 0x00FF;
 
@@ -186,16 +260,16 @@ class CommsQueue {
 			return -1;	// queue is empty
 		}
 
-		int data = rc.readBroadcast(queueStart + offset + head);
+		int data = Comms.LocalComms[queueStart + offset + head];
 
 		queueData = (newHead << 8) | (tail);
-		rc.broadcast(queueStart, queueData);
+		Comms.LocalComms[queueStart] = queueData;
 
 		return data;
 	}
 
 	public int length(RobotController rc) throws GameActionException {
-		int queueData = rc.readBroadcast(queueStart);
+		int queueData = Comms.LocalComms[queueStart];
 		int head = (queueData & 0xFF00) >> 8;
 		int tail = queueData & 0x00FF;
 
@@ -203,7 +277,7 @@ class CommsQueue {
 	}
 
 	public int[] array(RobotController rc) throws GameActionException {
-		int queueData = rc.readBroadcast(queueStart);
+		int queueData = Comms.LocalComms[queueStart];
 		int head = (queueData & 0xFF00) >> 8;
 		int tail = queueData & 0x00FF;
 
@@ -216,7 +290,7 @@ class CommsQueue {
 		int[] data = new int[length];
 		for(int i = 0; i < length; i++){
 			if(head > queueEnd) head = queueStart + offset;
-			data[i] = rc.readBroadcast(queueStart + offset + head);
+			data[i] = Comms.LocalComms[queueStart + offset + head];
 		}
 
 		return data;
@@ -244,7 +318,7 @@ class CommsArray {
 			return;
 		}
 
-		rc.broadcast(arrayStart + index, data);
+		Comms.LocalComms[arrayStart + index] = data;
 		// array[index] = data;
 		// lastUpdated[index] = rc.getRoundNum();
 	}
@@ -255,10 +329,10 @@ class CommsArray {
 			return -1;
 		}
 
-		return rc.readBroadcast(arrayStart + index);
+		return Comms.LocalComms[arrayStart + index];
 
 		// if(lastUpdated[index] != rc.getRoundNum()){
-			// array[index] = rc.readBroadcast(arrayStart + index);
+			// array[index] = Comms.LocalComms[arrayStart + index];
 			// lastUpdated[index] = rc.getRoundNum();
 		// }
 
@@ -268,7 +342,7 @@ class CommsArray {
 	public int[] array(RobotController rc) throws GameActionException {
 		int[] data = new int[arrayEnd - arrayStart];
 		for(int i = 0; i < arrayEnd - arrayStart; i++){
-			data[i] = rc.readBroadcast(arrayStart + i);
+			data[i] = Comms.LocalComms[arrayStart + i];
 		}
 
 		return data;
