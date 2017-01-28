@@ -305,7 +305,7 @@ public class BotSoldier {
 		if(count[RobotType.GARDENER.ordinal()] > 0) {
 			return false;
 		}
-		if(count[RobotType.SOLDIER.ordinal()] >= 3) {
+		if(count[RobotType.SOLDIER.ordinal()] >= 1) {
 			return false;
 		}
 		return true;
