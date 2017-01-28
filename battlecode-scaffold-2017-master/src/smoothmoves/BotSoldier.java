@@ -134,14 +134,21 @@ public class BotSoldier {
 		if(enemies.length > 0) {
 			
 			RobotInfo enemyToAttack = null;
+			RobotInfo enemyArchonCache = null;
 			
 			// Find an enemy that we can safely attack
 			for(int i = 0; i < enemies.length; i++) {
-				if(Util.goodToShoot(rc, myLocation, enemies[i])) {
+				if(enemies[i].type == RobotType.ARCHON) {
+					enemyArchonCache = enemies[i];
+				}
+				else if(Util.goodToShoot(rc, myLocation, enemies[i])) {
 					enemyToAttack = enemies[i];
 					break;
 				}
-				System.out.println("Cannot shoot "+enemies[i].ID);
+			}
+			
+			if(enemyToAttack == null && enemyArchonCache != null) {
+				enemyToAttack = enemyArchonCache;
 			}
 			
 			if(enemyToAttack != null) {
