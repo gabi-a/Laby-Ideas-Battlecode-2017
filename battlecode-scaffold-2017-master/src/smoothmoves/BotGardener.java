@@ -297,14 +297,14 @@ public class BotGardener {
 		if(spawnDirection == null) spawnDirection = setSpawnDirection();
 		if(spawnDirection == null) return false;
 		Direction buildDirection = spawnDirection;
-		for(int i = 3; i-->0;) {
-			if(rc.canBuildRobot(typeToBuild, buildDirection.rotateLeftDegrees(10f * i))) {
-				rc.buildRobot(typeToBuild, buildDirection.rotateLeftDegrees(10f * i));
+		for(int i = 0; i < 2; i++) {
+			if(rc.canBuildRobot(typeToBuild, buildDirection.rotateLeftDegrees(60f * i))) {
+				rc.buildRobot(typeToBuild, buildDirection.rotateLeftDegrees(60f * i));
 				Comms.ourBotCount.incrementNumBots(rc, typeToBuild);
 				return true;
 			}
-			if(rc.canBuildRobot(typeToBuild, buildDirection.rotateRightDegrees(10f * i))) {
-				rc.buildRobot(typeToBuild, buildDirection.rotateRightDegrees(10f * i));
+			if(rc.canBuildRobot(typeToBuild, buildDirection.rotateRightDegrees(60f * i))) {
+				rc.buildRobot(typeToBuild, buildDirection.rotateRightDegrees(60f * i));
 				Comms.ourBotCount.incrementNumBots(rc, typeToBuild);
 				return true;
 			}

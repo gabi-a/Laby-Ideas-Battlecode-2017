@@ -205,4 +205,10 @@ public class Util {
 		}
 		return gardener;
 	}
+	
+	static void shakeIfAble(RobotController rc, TreeInfo[] trees) throws GameActionException{
+		if(trees.length > 0 && trees[0] != null && rc.canShake(trees[0].ID)) {
+			rc.shake(trees[0].ID);
+		}
+	}
 }
