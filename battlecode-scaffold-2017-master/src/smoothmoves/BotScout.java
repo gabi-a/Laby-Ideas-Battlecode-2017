@@ -67,36 +67,37 @@ public class BotScout {
 		
 		if(!dodgeBullets) {
 			
+			MapLocation goalLocation = bestTree(trees);
+			MapLocation moveLocation = null;
 			boolean attackGardener = false;
-			System.out.format("Enemies around: %b\n", enemies.length > 0);
-			if(enemies.length > 0 && enemies[0].type != RobotType.LUMBERJACK) {
-				RobotInfo enemyGardener = Util.getGardenerAndAllPassive(enemies);
-				System.out.format("There is a safe gardener: %b\n", enemyGardener != null);
-				if(enemyGardener != null && (enemyGardener.location.distanceTo(myLocation) > 3f || !Util.goodToShootNotTrees(rc, myLocation, enemyGardener))) {
-					MapLocation moveLocation = Nav.pathTo(rc, enemyGardener.location, bullets);
-					if(moveLocation != null) {
-						moveDirection = myLocation.directionTo(moveLocation);
-						moveStride = myLocation.distanceTo(moveLocation);
-						attackGardener = true;
+			
+			if(goalLocation != null) {
+				moveLocation = Nav.pathTo(rc, goalLocation, bullets);
+			}
+			if (moveLocation != null){
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
+			}
+			
+			else {
+				System.out.format("Enemies around: %b\n", enemies.length > 0);
+				if(enemies.length > 0 && enemies[0].type != RobotType.LUMBERJACK) {
+					RobotInfo enemyGardener = Util.getGardenerAndAllPassive(enemies);
+					System.out.format("There is a safe gardener: %b\n", enemyGardener != null);
+					if(enemyGardener != null && (enemyGardener.location.distanceTo(myLocation) > 3f || !Util.goodToShootNotTrees(rc, myLocation, enemyGardener))) {
+						moveLocation = Nav.pathTo(rc, enemyGardener.location, bullets);
+						if(moveLocation != null) {
+							moveDirection = myLocation.directionTo(moveLocation);
+							moveStride = myLocation.distanceTo(moveLocation);
+							attackGardener = true;
+						}
 					}
 				}
 			}
 			
 			if(!attackGardener) {
-				//MapLocation moveLocation = applyTreeGravity(myLocation, trees);
-				//moveDirection = myLocation.directionTo(moveLocation);
-				
-				MapLocation goalLocation = bestTree(trees);
-				MapLocation moveLocation = null;
-				if(goalLocation != null)
-					moveLocation = Nav.pathTo(rc, goalLocation, bullets);
-				if (moveLocation != null){
-					moveDirection = myLocation.directionTo(moveLocation);
-					moveStride = myLocation.distanceTo(moveLocation);
-				}
-				else {
-					moveDirection = Nav.explore(rc, bullets);
-				}
+				moveDirection = Nav.explore(rc, bullets);
+				moveStride = rc.getType().strideRadius;
 			}
 		}
 		
