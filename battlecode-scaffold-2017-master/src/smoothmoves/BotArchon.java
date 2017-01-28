@@ -22,6 +22,8 @@ public class BotArchon {
 	
 	static boolean initialSpawningArchon = false;
 	
+	static MapLocation goalLocation;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 
@@ -40,6 +42,7 @@ public class BotArchon {
 		
 		/************* Setup game variables    *******************/
 		if(rc.getRoundNum() == 1) {
+			goalLocation = myLocation;
 			MapLocation[] ourArchonLocs = rc.getInitialArchonLocations(us); 
 			MapLocation[] theirArchonLocs = rc.getInitialArchonLocations(them);
 			enemyBase = theirArchonLocs[0];
@@ -96,31 +99,31 @@ public class BotArchon {
 		}
 		
 		else {
-			MapLocation goalLocation = myLocation;
-			
-			if(bots.length > 0) {
-				for(int i = bots.length;i-->0;) {
-					if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
-						goalLocation = goalLocation.add(bots[i].location.directionTo(myLocation), 10f/(1f + bots[i].location.distanceTo(myLocation)));
+			//if(myLocation.distanceTo(goalLocation) < 0.01f) {
+				if(bots.length > 0) {
+					for(int i = bots.length;i-->0;) {
+						if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
+							goalLocation = goalLocation.add(bots[i].location.directionTo(myLocation), 5f);//, 10f/(1f + bots[i].location.distanceTo(myLocation)));
+						}
 					}
 				}
-			}
-			
-			if(trees.length > 0) {
-				for(int i = trees.length;i-->0;) {
-					goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation), 10f/(1f + trees[i].location.distanceTo(myLocation)));
+				
+				if(trees.length > 0) {
+					for(int i = trees.length;i-->0;) {
+						goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation), 0.5f);//, 10f/(1f + trees[i].location.distanceTo(myLocation)));
+					}
 				}
-			}
-			
-			if (!rc.onTheMap(myLocation.add(Direction.NORTH, 2f))) goalLocation=goalLocation.add(Direction.SOUTH, 3f);
-			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 2f))) goalLocation=goalLocation.add(Direction.NORTH, 3f);
-			if (!rc.onTheMap(myLocation.add(Direction.WEST, 2f))) goalLocation=goalLocation.add(Direction.EAST, 3f);
-			if (!rc.onTheMap(myLocation.add(Direction.EAST, 2f))) goalLocation=goalLocation.add(Direction.WEST, 3f);
-			
-			// Stay away from the enemy base
-			goalLocation = goalLocation.add(myLocation.directionTo(enemyBase).opposite(), 10f/(myLocation.distanceTo(enemyBase)+1f));
+				
+				if (!rc.onTheMap(myLocation.add(Direction.NORTH, 5f))) goalLocation=goalLocation.add(Direction.SOUTH, 10f);
+				if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 5f))) goalLocation=goalLocation.add(Direction.NORTH, 10f);
+				if (!rc.onTheMap(myLocation.add(Direction.WEST, 5f))) goalLocation=goalLocation.add(Direction.EAST, 10f);
+				if (!rc.onTheMap(myLocation.add(Direction.EAST, 5f))) goalLocation=goalLocation.add(Direction.WEST, 10f);
+				
+				// Stay away from the enemy base
+				goalLocation = goalLocation.add(myLocation.directionTo(enemyBase).opposite(), 3f);//, 10f/(myLocation.distanceTo(enemyBase)+1f));
+				
+			//}
 			rc.setIndicatorDot(goalLocation, 100, 0, 100);
-			
 			MapLocation moveLocation = Nav.pathTo(rc, goalLocation, bullets);
 			if(moveLocation != null) {
 				moveDirection = myLocation.directionTo(moveLocation);
@@ -132,7 +135,7 @@ public class BotArchon {
 		
 		byte action = Action.DIE_EXCEPTION;
 		
-		if(rc.getTreeCount() >= 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) && rc.getTeamBullets() > 130)//|| (Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100 && rc.getTeamBullets() > 200))
+		if(rc.getTeamBullets() > 130 && (rc.getTreeCount() >= 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) && rc.getTeamBullets() > 130 || Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100 ))
 			action = Action.SPAWN_UNIT;
 		
 		/************* Do Move ***********************************/

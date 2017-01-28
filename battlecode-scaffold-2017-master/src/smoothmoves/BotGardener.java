@@ -21,7 +21,10 @@ public class BotGardener {
 	
 	static int turnsAlive = 0;
 	
-	static final float THRESHOLD_AREA = RobotType.ARCHON.sensorRadius * RobotType.ARCHON.sensorRadius * (float) Math.PI * 0.4f;
+	static final float THRESHOLD_AREA = RobotType.ARCHON.sensorRadius * RobotType.ARCHON.sensorRadius * (float) Math.PI * 0.2f;
+	
+	static MapLocation goalLocation;
+	static MapLocation enemyBase;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
@@ -36,6 +39,8 @@ public class BotGardener {
 		 * Get an idea for how many trees on the map based on the archons perceptions
 		 */
 		if(!treeCountFlag) {
+			MapLocation[] theirArchonLocs = rc.getInitialArchonLocations(them);
+			enemyBase = theirArchonLocs[0];
 			int[] archonTrees = Comms.archonTreeCount.array(rc);
 			int minArea = 10000;
 			for(int i = numInitialArchons;i-->0;) {
@@ -57,6 +62,8 @@ public class BotGardener {
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		BulletInfo[] bullets = rc.senseNearbyBullets(3f);
 		myLocation = rc.getLocation();
+
+		if(goalLocation == null) goalLocation = myLocation;
 		
 		Direction moveDirection = null;
 		float moveStride = RobotType.GARDENER.strideRadius;
@@ -75,35 +82,34 @@ public class BotGardener {
 		
 		else if(!settled) {
 			
-			// Keep a distance from archons and gardeners
-			MapLocation moveLocation = myLocation;
 			if(bots.length > 0) {
 				for(int i = bots.length;i-->0;) {
 					if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
-						moveLocation = moveLocation.add(bots[i].location.directionTo(myLocation), 2f/(1f + bots[i].location.distanceTo(myLocation)));
+						goalLocation = goalLocation.add(bots[i].location.directionTo(myLocation), 5f);//, 10f/(1f + bots[i].location.distanceTo(myLocation)));
 					}
 				}
 			}
+			
 			if(trees.length > 0) {
 				for(int i = trees.length;i-->0;) {
-					moveLocation = moveLocation.add(trees[i].location.directionTo(myLocation), 1f/(1f+trees[i].location.distanceTo(myLocation)));
+					goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation), 2f);//, 10f/(1f + trees[i].location.distanceTo(myLocation)));
 				}
 			}
 			
-			if (!rc.onTheMap(myLocation.add(Direction.NORTH, 5f))) moveLocation=moveLocation.add(Direction.SOUTH, 3f);
-			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 5f))) moveLocation=moveLocation.add(Direction.NORTH, 3f);
-			if (!rc.onTheMap(myLocation.add(Direction.WEST, 5f))) moveLocation=moveLocation.add(Direction.EAST, 3f);
-			if (!rc.onTheMap(myLocation.add(Direction.EAST, 5f))) moveLocation=moveLocation.add(Direction.WEST, 3f);
-
+			if (!rc.onTheMap(myLocation.add(Direction.NORTH, 5f))) goalLocation=goalLocation.add(Direction.SOUTH, 10f);
+			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 5f))) goalLocation=goalLocation.add(Direction.NORTH, 10f);
+			if (!rc.onTheMap(myLocation.add(Direction.WEST, 5f))) goalLocation=goalLocation.add(Direction.EAST, 10f);
+			if (!rc.onTheMap(myLocation.add(Direction.EAST, 5f))) goalLocation=goalLocation.add(Direction.WEST, 10f);
 			
 			// Stay away from the enemy base
-			moveLocation = moveLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]).opposite(), 10f/(1f + myLocation.distanceTo(rc.getInitialArchonLocations(them)[0])));
-			rc.setIndicatorDot(moveLocation, 100, 0, 100);
+			goalLocation = goalLocation.add(myLocation.directionTo(enemyBase).opposite(), 3f);//, 10f/(myLocation.distanceTo(enemyBase)+1f));
 			
-			moveDirection = myLocation.directionTo(moveLocation);
-			moveDirection = Nav.tryMove(rc, moveDirection, 5f, 24, bullets);
-			moveStride = myLocation.distanceTo(moveLocation); //* RobotType.GARDENER.strideRadius / (trees.length + bots.length);
-			
+			rc.setIndicatorDot(goalLocation, 100, 0, 100);
+			MapLocation moveLocation = Nav.pathTo(rc, goalLocation, bullets);
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
+			}
 			settled = settleHere();
 			
 		} else {
@@ -163,7 +169,7 @@ public class BotGardener {
 		
 		int treesCanPlant = getMaxTrees();
 		//System.out.println("Trees can plant:" +treesCanPlant );
-		if(treesCanPlant > settleThreshold && turnsAlive > 10) {
+		if(treesCanPlant > settleThreshold && turnsAlive > 30) {
 			return true;
 		}
 		
