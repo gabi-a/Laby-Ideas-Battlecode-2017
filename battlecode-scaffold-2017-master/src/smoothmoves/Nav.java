@@ -23,7 +23,7 @@ public class Nav {
 		float leastIntersections = 1000f;
 		Direction leastRay = Direction.getNorth();
 		int bulletsNeededToDodge = 0;
-		outer:
+		//outer:
 		for (float rayAng = 6.2831853f; (rayAng -= Math.PI/3f) > 0;) {
 			Direction rayDir = new Direction(rayAng);
 			if ( !rc.canMove(myLocation.add(rayDir, 2f)) || rc.senseNearbyBullets(myLocation.add(rayDir, 2f), 2f).length != 0 ) continue;
@@ -44,7 +44,7 @@ public class Nav {
 				if (test < 1d && test > 0.3d) {
 					intersections += 1f/(myLocation.add(rayDir, 2f).distanceTo(bulletsToAvoid[i].location));
 					//System.out.println((myLocation.add(rayDir, 2f).distanceTo(bulletsToAvoid[i].location)));
-					bulletsNeededToDodge++;
+					if(myLocation.distanceTo(bulletsToAvoid[i].location) < 4f) bulletsNeededToDodge++;
 					//rc.setIndicatorLine(myLocation.add(rayDir, 2f), bullets[i].location, 50, 10, 10);
 					rc.setIndicatorDot(bulletsToAvoid[i].location, 100, 200, 0);
 				} else {
