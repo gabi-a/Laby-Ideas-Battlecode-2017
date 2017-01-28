@@ -141,7 +141,7 @@ public class BotSoldier {
 					enemyToAttack = enemies[i];
 					break;
 				}
-				//System.out.println("Cannot shoot "+enemies[i].ID);
+				System.out.println("Cannot shoot "+enemies[i].ID);
 			}
 			
 			if(enemyToAttack != null) {

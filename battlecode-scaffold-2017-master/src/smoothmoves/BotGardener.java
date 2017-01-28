@@ -47,9 +47,9 @@ public class BotGardener {
 				lotsOfTrees = true;
 			}
 			treeCountFlag = true;
-			//System.out.format("Lots of trees: %b\n"
-			//				+ "min area: %d\n"
-			//				+ "threshold area: %f\n",lotsOfTrees,minArea,THRESHOLD_AREA);
+			System.out.format("Lots of trees: %b\n"
+							+ "min area: %d\n"
+							+ "threshold area: %f\n",lotsOfTrees,minArea,THRESHOLD_AREA);
 		}
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();

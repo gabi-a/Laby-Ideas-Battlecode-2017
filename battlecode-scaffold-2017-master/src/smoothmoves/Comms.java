@@ -11,8 +11,8 @@ public class Comms {
 	public static final int CommsStart = 0;
 	public static final int CommsEnd = 73;
 	
-	public static int currentReadChannel = 0;
-	public static int currentWriteChannel = 0;
+	public static int currentReadChannel = 67; // start off at archon tree channel
+	public static int currentWriteChannel = 67;
 	
 	/* Example usage:
 	 * Comms.neutralTrees.push(RobotController rc, TreeInfo stuff);
