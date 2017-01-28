@@ -9,7 +9,7 @@ public class Comms {
 	public static final int[] LocalComms;
 	public static final int[] ActualComms;
 	public static final int CommsStart = 0;
-	public static final int CommsEnd = 100;
+	public static final int CommsEnd = 73;
 	
 	public static int currentReadChannel = 0;
 	public static int currentWriteChannel = 0;
@@ -73,17 +73,20 @@ public class Comms {
 	
 	public static void writeLocalComms(RobotController rc) throws GameActionException {
 		int updated = 0;
-		int stop = currentWriteChannel;
-		
-		while(updated < 5 && ++currentWriteChannel != stop) {
+		int stop = currentWriteChannel - 1;
+		if(stop <= 0) stop = CommsEnd;
+		//System.out.println("\n The stop channel is:"+stop);
+		while(updated < 5 && currentWriteChannel != stop) {
+			//System.out.println("\n The write channel is:"+currentWriteChannel);
 			if(currentWriteChannel == CommsEnd) {
 				currentWriteChannel = 0;
 			}
 			if(ActualComms[currentWriteChannel] != LocalComms[currentWriteChannel]) {
 				rc.broadcast(currentWriteChannel, LocalComms[currentWriteChannel]);
-				System.out.println("Update channel "+currentWriteChannel);
+				//System.out.println("Update channel "+currentWriteChannel);
 				updated++;
 			}
+			currentWriteChannel++;
 		}
 		
 		/*
