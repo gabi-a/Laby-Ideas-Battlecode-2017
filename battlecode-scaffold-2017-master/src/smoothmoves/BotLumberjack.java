@@ -23,6 +23,7 @@ public class BotLumberjack {
 		BulletInfo[] bullets = rc.senseNearbyBullets(4);
 		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 		TreeInfo bestTree = null;
+		float moveTreeRadius = 0f;
 		
 		Util.shakeIfAble(rc, trees);
 		
@@ -70,6 +71,7 @@ public class BotLumberjack {
 					if(newScore > score){
 						score = newScore;
 						goalLocation = trees[i].getLocation();
+						moveTreeRadius = trees[i].radius;
 					}
 				}
 			} 
@@ -104,7 +106,7 @@ public class BotLumberjack {
 				}
 			}
 			
-			moveDirection = myLocation.directionTo(Nav.pathTo(rc, goalLocation));
+			moveDirection = myLocation.directionTo(Nav.pathTo(rc, goalLocation, moveTreeRadius));
 			moveStride = myLocation.distanceTo(goalLocation);
 			
 			// Rescale stride distance
