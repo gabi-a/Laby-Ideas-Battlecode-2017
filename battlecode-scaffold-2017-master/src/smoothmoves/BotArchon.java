@@ -18,7 +18,7 @@ public class BotArchon {
 		EXTRA
 	}
 	
-	static enum MapSize {
+	public static enum MapSize {
 		SMALL,
 		MEDIUM,
 		LARGE

@@ -1,6 +1,7 @@
 package smoothmoves;
 import battlecode.common.*;
 import battlecode.schema.Action;
+import smoothmoves.BotArchon.MapSize;
 
 public class BotSoldier {
 	static RobotController rc;
@@ -21,6 +22,8 @@ public class BotSoldier {
 	
 	//static MapLocation nextEnemyLocation;
 	
+	static MapSize mapSize;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
 		
@@ -28,6 +31,9 @@ public class BotSoldier {
 		
 		if (enemyBase == null) {
 			enemyBase = rc.getInitialArchonLocations(them)[0];
+		}
+		if(mapSize == null) {
+			mapSize = MapSize.values()[Comms.mapSize.read(rc)];
 		}
 		
 		Direction shootDirection = null;
@@ -69,7 +75,6 @@ public class BotSoldier {
 		
 		if(!dodgeBullets) {
 			boolean protectGardener = false;
-			if(enemies.length == 0) {
 			//System.out.println("Deciding whether to protect gardener");
 			RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
 			moveDirection = Nav.tryMove(rc, myLocation.directionTo(enemyBase), 5f, 24, bullets);
@@ -120,18 +125,25 @@ public class BotSoldier {
 					//	moveLocation = Nav.pathTo(rc, nextEnemyLocation, bullets);
 					//}
 					
+					System.out.println(mapSize);
+					
 					if(moveLocation == null) {
-						RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
-						if (passiveEnemy != null) {
-							//System.out.println("Pathing to passive enemy");
-							moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
+						switch(mapSize) {
+						//case LARGE:
+						//	break;
+						default:
+							RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
+							if (passiveEnemy != null) {
+								//System.out.println("Pathing to passive enemy");
+								moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
+							}
 						}
 					}
-
 					if(moveLocation != null) {
 						moveDirection = myLocation.directionTo(moveLocation);
 						moveStride = myLocation.distanceTo(moveLocation);
 					}
+					
 				}
 			}
 		}
