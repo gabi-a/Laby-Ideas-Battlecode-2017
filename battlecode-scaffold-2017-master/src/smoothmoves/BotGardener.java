@@ -36,6 +36,7 @@ public class BotGardener {
 			settleThreshold = Math.max(0, settleThreshold - 1);
 		}
 		if(mapSize == null) {
+			System.out.println("Comms map Size: "+Comms.mapSize.read(rc));
 			mapSize = MapSize.values()[Comms.mapSize.read(rc)];
 		}
 		Util.updateMyPostion(rc);
@@ -101,10 +102,10 @@ public class BotGardener {
 				}
 			}
 			
-			if (!rc.onTheMap(myLocation.add(Direction.NORTH, 5f))) goalLocation=goalLocation.add(Direction.SOUTH, 10f);
-			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 5f))) goalLocation=goalLocation.add(Direction.NORTH, 10f);
-			if (!rc.onTheMap(myLocation.add(Direction.WEST, 5f))) goalLocation=goalLocation.add(Direction.EAST, 10f);
-			if (!rc.onTheMap(myLocation.add(Direction.EAST, 5f))) goalLocation=goalLocation.add(Direction.WEST, 10f);
+			if (!rc.onTheMap(myLocation.add(Direction.NORTH, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.SOUTH, 20f);
+			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.NORTH, 20f);
+			if (!rc.onTheMap(myLocation.add(Direction.WEST, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.EAST, 20f);
+			if (!rc.onTheMap(myLocation.add(Direction.EAST, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.WEST, 20f);
 			
 			// Stay away from the enemy base
 			goalLocation = goalLocation.add(myLocation.directionTo(enemyBase).opposite(), 3f);//, 10f/(myLocation.distanceTo(enemyBase)+1f));
