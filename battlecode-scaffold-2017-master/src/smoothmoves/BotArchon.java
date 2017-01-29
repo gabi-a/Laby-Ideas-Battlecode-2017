@@ -31,13 +31,15 @@ public class BotArchon {
 	static MapLocation goalLocation;
 	
 	static MapSize mapSize;
+
+	static MapLocation[] theirArchonLocs;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
 
 		Util.updateMyPostion(rc);
 		
-		RobotInfo[] bots = rc.senseNearbyRobots();
+		RobotInfo[] bots = rc.senseNearbyRobots(-1, us);
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		TreeInfo[] trees = rc.senseNearbyTrees();
 		BulletInfo[] bullets = rc.senseNearbyBullets();
@@ -52,7 +54,7 @@ public class BotArchon {
 		if(rc.getRoundNum() == 1) {
 			goalLocation = myLocation;
 			MapLocation[] ourArchonLocs = rc.getInitialArchonLocations(us); 
-			MapLocation[] theirArchonLocs = rc.getInitialArchonLocations(them);
+			theirArchonLocs = rc.getInitialArchonLocations(them);
 			enemyBase = theirArchonLocs[0];
 			numInitialArchons = ourArchonLocs.length;
 			for(int i = 0; i < ourArchonLocs.length; i++) {
@@ -101,7 +103,6 @@ public class BotArchon {
 					}
 				}
 			}
-			
 			if(mapDist < 50f) {
 				mapSize = MapSize.SMALL;
 			}
@@ -111,6 +112,7 @@ public class BotArchon {
 			else {
 				mapSize = MapSize.LARGE;
 			}
+			System.out.println(mapDist + "," + mapSize.ordinal());
 			Comms.mapSize.write(rc, mapSize.ordinal());
 		}
 		
@@ -128,30 +130,56 @@ public class BotArchon {
 		
 		else {
 			//if(myLocation.distanceTo(goalLocation) < 0.01f) {
-				if(bots.length > 0) {
-					for(int i = bots.length;i-->0;) {
-						if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
-							goalLocation = goalLocation.add(bots[i].location.directionTo(myLocation), 5f);//, 10f/(1f + bots[i].location.distanceTo(myLocation)));
-						}
+			if(bots.length > 0) {
+				for(int i = bots.length;i-->0;) {
+					if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
+						goalLocation = goalLocation.add(bots[i].location.directionTo(myLocation), 5f);//, 10f/(1f + bots[i].location.distanceTo(myLocation)));
 					}
 				}
-				
-				if(trees.length > 0) {
-					for(int i = trees.length;i-->0;) {
-						goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation), 0.5f);//, 10f/(1f + trees[i].location.distanceTo(myLocation)));
+			}
+			
+			if(enemies.length > 0) {
+				for(int i = enemies.length; i --> 0;) {
+					if(enemies[i].getType() == RobotType.LUMBERJACK) { 
+						goalLocation = goalLocation.add(enemies[i].location.directionTo(myLocation), 15f);
 					}
 				}
-				
-				if (!rc.onTheMap(myLocation.add(Direction.NORTH, 5f))) goalLocation=goalLocation.add(Direction.SOUTH, 10f);
-				if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 5f))) goalLocation=goalLocation.add(Direction.NORTH, 10f);
-				if (!rc.onTheMap(myLocation.add(Direction.WEST, 5f))) goalLocation=goalLocation.add(Direction.EAST, 10f);
-				if (!rc.onTheMap(myLocation.add(Direction.EAST, 5f))) goalLocation=goalLocation.add(Direction.WEST, 10f);
-				
-				// Stay away from the enemy base
-				goalLocation = goalLocation.add(myLocation.directionTo(enemyBase).opposite(), 3f);//, 10f/(myLocation.distanceTo(enemyBase)+1f));
+			}
+			
+			if(trees.length > 0) {
+				for(int i = trees.length;i-->0;) {
+					goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation), 0.5f);//, 10f/(1f + trees[i].location.distanceTo(myLocation)));
+				}
+			}
+			
+			if (!rc.onTheMap(myLocation.add(Direction.NORTH, 5f))) goalLocation=goalLocation.add(Direction.SOUTH, 20f);
+			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, 5f))) goalLocation=goalLocation.add(Direction.NORTH, 20f);
+			if (!rc.onTheMap(myLocation.add(Direction.WEST, 5f))) goalLocation=goalLocation.add(Direction.EAST, 20f);
+			if (!rc.onTheMap(myLocation.add(Direction.EAST, 5f))) goalLocation=goalLocation.add(Direction.WEST, 20f);
+			
+			if(enemies.length > 0) {
+				for(int i = enemies.length; i --> 0;) {
+					goalLocation = goalLocation.add(myLocation.directionTo(enemies[i].location).opposite(), 15f);
+				}
+			}
+			
+			else {
+				/*// Spy on the enemy!
+				RobotInfo enemyToSpyOn = Util.getBestPassiveEnemy(rc);
+				MapLocation spyLocation = null;
+				if(enemyToSpyOn != null) {
+					spyLocation = enemyToSpyOn.location;
+				}
+				else {
+					spyLocation = theirArchonLocs[archonDesignation.ordinal()];
+				}
+				if(myLocation.distanceTo(spyLocation) > 20f)
+					goalLocation = goalLocation.add(myLocation.directionTo(spyLocation), 5f);
+					//, 10f/(myLocation.distanceTo(enemyBase)+1f));*/
+			}
 				
 			//}
-			rc.setIndicatorDot(goalLocation, 100, 0, 100);
+			rc.setIndicatorDot(myLocation.add(myLocation.directionTo(goalLocation), 10f), 100, 0, 100);
 			MapLocation moveLocation = Nav.pathTo(rc, goalLocation);
 			if(moveLocation != null) {
 				moveDirection = myLocation.directionTo(moveLocation);

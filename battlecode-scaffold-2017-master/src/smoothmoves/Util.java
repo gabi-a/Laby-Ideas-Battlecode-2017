@@ -17,11 +17,12 @@ public class Util {
 	
 	public static void reportEnemyBots(RobotController rc, RobotInfo[] enemies) throws GameActionException {
 		
+		MapLocation myLocation = rc.getLocation();
 		RobotInfo[] enemyGardeners = Comms.enemyGardenersArray.arrayBots(rc);
 		
 		for(int i = enemyGardeners.length;i-->0;) {
 			if(enemyGardeners[i] != null) rc.setIndicatorDot(enemyGardeners[i].location, 0, 0, 255);
-			if(enemyGardeners[i] != null && rc.canSenseLocation(enemyGardeners[i].location) && !rc.canSenseRobot(enemyGardeners[i].ID)) {
+			if(enemyGardeners[i] != null && myLocation.distanceTo(enemyGardeners[i].location) < 3f && !rc.canSenseRobot(enemyGardeners[i].ID)) {
 				Comms.enemyGardenersArray.deleteBot(rc, enemyGardeners[i]);
 			}
 		}
@@ -30,7 +31,7 @@ public class Util {
 		
 		for(int i = enemyArchons.length;i-->0;) {
 			if(enemyArchons[i] != null) rc.setIndicatorDot(enemyArchons[i].location, 0, 0, 255);
-			if(enemyArchons[i] != null && rc.canSenseLocation(enemyArchons[i].location) && !rc.canSenseRobot(enemyArchons[i].ID)) {
+			if(enemyArchons[i] != null && myLocation.distanceTo(enemyArchons[i].location) < 3f && !rc.canSenseRobot(enemyArchons[i].ID)) {
 				Comms.enemyArchonsArray.deleteBot(rc, enemyArchons[i]);
 			}
 		}
@@ -39,7 +40,7 @@ public class Util {
 		
 		for(int i = enemiesAttackingGardenersOrArchons.length;i-->0;) {
 			if(enemiesAttackingGardenersOrArchons[i] != null) rc.setIndicatorDot(enemiesAttackingGardenersOrArchons[i].location, 0, 0, 255);
-			if(enemiesAttackingGardenersOrArchons[i] != null && rc.canSenseLocation(enemiesAttackingGardenersOrArchons[i].location) && !rc.canSenseRobot(enemiesAttackingGardenersOrArchons[i].ID)) {
+			if(enemiesAttackingGardenersOrArchons[i] != null && myLocation.distanceTo(enemiesAttackingGardenersOrArchons[i].location) < 3f && !rc.canSenseRobot(enemiesAttackingGardenersOrArchons[i].ID)) {
 				Comms.enemiesAttackingGardenersOrArchons.deleteBot(rc, enemiesAttackingGardenersOrArchons[i]);
 			}
 		}
@@ -48,7 +49,7 @@ public class Util {
 		
 		for(int i = enemiesSighted.length;i-->0;) {
 			if(enemiesSighted[i] != null) rc.setIndicatorDot(enemiesSighted[i].location, 0, 0, 255);
-			if(enemiesSighted[i] != null && rc.canSenseLocation(enemiesSighted[i].location) && !rc.canSenseRobot(enemiesSighted[i].ID)) {
+			if(enemiesSighted[i] != null && myLocation.distanceTo(enemiesSighted[i].location) < 3f && !rc.canSenseRobot(enemiesSighted[i].ID)) {
 				Comms.enemiesSighted.deleteBot(rc, enemiesSighted[i]);
 			}
 		}

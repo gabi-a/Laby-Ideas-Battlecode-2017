@@ -33,15 +33,15 @@ public class Comms {
 	
 	static {
 		ourBotCount = new CommsBotCount(0,6);
-		theirBotCount = new CommsBotCount(7,13);
-		enemyGardenersArray = new CommsBotArray(14, 24);
-		enemyArchonsArray = new CommsBotArray(25, 35);
-		enemiesAttackingGardenersOrArchons = new CommsBotArray(36,46);
-		ourLumberjackAndSoldiers = new CommsBotArray(47,67);
-		archonTreeCount = new CommsArray(68,71);
-		archonCount = new CommsInt(72);
-		mapSize = new CommsInt(73);
-		enemiesSighted = new CommsBotArray(74,84);
+		theirBotCount = new CommsBotCount(10,20);
+		enemyGardenersArray = new CommsBotArray(30, 40);
+		enemyArchonsArray = new CommsBotArray(50, 60);
+		enemiesAttackingGardenersOrArchons = new CommsBotArray(70,80);
+		ourLumberjackAndSoldiers = new CommsBotArray(90,100);
+		archonTreeCount = new CommsArray(110,113);
+		archonCount = new CommsInt(120);
+		mapSize = new CommsInt(125);
+		enemiesSighted = new CommsBotArray(130,140);
 	}
 	
 	public static int packLocation(RobotController rc, MapLocation location) {
