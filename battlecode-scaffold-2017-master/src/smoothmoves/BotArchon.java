@@ -111,7 +111,7 @@ public class BotArchon {
 			else {
 				mapSize = MapSize.LARGE;
 			}
-			
+			Comms.mapSize.write(rc, mapSize.ordinal());
 		}
 		
 		
