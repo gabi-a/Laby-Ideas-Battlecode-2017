@@ -17,12 +17,20 @@ public class BotArchon {
 		THIRD,
 		EXTRA
 	}
+	
+	static enum MapSize {
+		SMALL,
+		MEDIUM,
+		LARGE
+	}
 
 	static Archon archonDesignation;
 	
 	static boolean initialSpawningArchon = false;
 	
 	static MapLocation goalLocation;
+	
+	static MapSize mapSize;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
@@ -84,6 +92,26 @@ public class BotArchon {
 			if(bestArchonLocation == myLocation) {
 				initialSpawningArchon = true;
 			}
+			float mapDist = 0f;
+			for(int i=0; i < numInitialArchons; i++) {
+				for(int j=0; j < numInitialArchons; j++) {
+					float dist = ourArchonLocs[i].distanceTo(theirArchonLocs[j]);
+					if(dist > mapDist) {
+						mapDist = dist;
+					}
+				}
+			}
+			
+			if(mapDist < 50f) {
+				mapSize = MapSize.SMALL;
+			}
+			else if(mapDist < 100f) {
+				mapSize = MapSize.MEDIUM;
+			}
+			else {
+				mapSize = MapSize.LARGE;
+			}
+			
 		}
 		
 		
