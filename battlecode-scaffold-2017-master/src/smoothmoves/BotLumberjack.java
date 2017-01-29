@@ -40,7 +40,7 @@ public class BotLumberjack {
 		
 		if(enemies.length > 0) {
 			MapLocation closestEnemyLocation = enemies[0].location;
-			MapLocation moveLocation = Nav.pathTo(rc, closestEnemyLocation, bullets);
+			MapLocation moveLocation = Nav.pathTo(rc, closestEnemyLocation);
 			if(moveLocation != null) {
 				moveDirection = myLocation.directionTo(moveLocation);
 				moveStride = myLocation.distanceSquaredTo(moveLocation);
@@ -104,7 +104,7 @@ public class BotLumberjack {
 				}
 			}
 			
-			moveDirection = myLocation.directionTo(Nav.pathTo(rc, goalLocation, bullets));
+			moveDirection = myLocation.directionTo(Nav.pathTo(rc, goalLocation));
 			moveStride = myLocation.distanceTo(goalLocation);
 			
 			// Rescale stride distance

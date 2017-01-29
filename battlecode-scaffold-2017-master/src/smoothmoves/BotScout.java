@@ -46,7 +46,7 @@ public class BotScout {
 						}
 					}
 					if(bestTree != null && bestTree.location.distanceTo(myLocation) < 5f) {
-						MapLocation moveLocation = Nav.pathTo(rc, bestTree.location, bullets);
+						MapLocation moveLocation = Nav.pathTo(rc, bestTree.location);
 						if(moveLocation != null) {
 							moveDirection = myLocation.directionTo(moveLocation);
 							moveStride = myLocation.distanceTo(moveLocation);
@@ -72,7 +72,7 @@ public class BotScout {
 			boolean attackGardener = false;
 			
 			if(goalLocation != null) {
-				moveLocation = Nav.pathTo(rc, goalLocation, bullets);
+				moveLocation = Nav.pathTo(rc, goalLocation);
 			}
 			if (moveLocation != null){
 				moveDirection = myLocation.directionTo(moveLocation);
@@ -85,7 +85,7 @@ public class BotScout {
 					RobotInfo enemyGardener = Util.getGardenerAndAllPassive(enemies);
 					System.out.format("There is a safe gardener: %b\n", enemyGardener != null);
 					if(enemyGardener != null && (enemyGardener.location.distanceTo(myLocation) > 3f || !Util.goodToShootNotTrees(rc, myLocation, enemyGardener))) {
-						moveLocation = Nav.pathTo(rc, enemyGardener.location, bullets);
+						moveLocation = Nav.pathTo(rc, enemyGardener.location);
 						if(moveLocation != null) {
 							moveDirection = myLocation.directionTo(moveLocation);
 							moveStride = myLocation.distanceTo(moveLocation);

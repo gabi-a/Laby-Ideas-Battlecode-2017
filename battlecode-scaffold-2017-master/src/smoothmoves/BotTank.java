@@ -50,7 +50,7 @@ public class BotTank {
 			moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
 			for(int i = enemiesAttackingUs.length;i-->0;) {
 				if(enemiesAttackingUs[i] != null) {
-					MapLocation moveLocation = Nav.pathTo(rc, enemiesAttackingUs[i].location, bullets);
+					MapLocation moveLocation = Nav.pathTo(rc, enemiesAttackingUs[i].location);
 					if(moveLocation != null) {
 						moveDirection = myLocation.directionTo(moveLocation);
 						moveStride = myLocation.distanceTo(moveLocation);
@@ -66,14 +66,14 @@ public class BotTank {
 						if(myLocation.distanceTo(closestEnemy.location) < 3f) {
 							moveDirection = closestEnemy.location.directionTo(myLocation);
 						} else if(myLocation.distanceTo(closestEnemy.location) > 4f) {
-							MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location.add(closestEnemy.location.directionTo(myLocation), 3f), bullets);
+							MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location.add(closestEnemy.location.directionTo(myLocation), 3f));
 							if(moveLocation != null) {
 								moveDirection = myLocation.directionTo(moveLocation);
 								moveStride = myLocation.distanceTo(moveLocation);
 							}
 						}
 					} else if (!Util.goodToShootNotTrees(rc, myLocation, closestEnemy)){
-						MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
+						MapLocation moveLocation = Nav.pathTo(rc, closestEnemy.location);
 						if(moveLocation != null) {
 							moveDirection = myLocation.directionTo(moveLocation);
 							moveStride = myLocation.distanceTo(moveLocation);
@@ -88,7 +88,7 @@ public class BotTank {
 					RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
 					MapLocation moveLocation = null;
 					if (passiveEnemy != null) {
-						moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
+						moveLocation = Nav.pathTo(rc, passiveEnemy.location);
 					}
 
 					if(moveLocation != null) {

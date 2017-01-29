@@ -153,16 +153,13 @@ public class Nav {
 		TOWARD_RIGHT
 	}
 	
-	static MapLocation pathTo(RobotController rc, MapLocation goal, BulletInfo[] bullets) throws GameActionException {
-		return pathTo(rc, goal, rc.getType().strideRadius, bullets); 
+	static MapLocation pathTo(RobotController rc, MapLocation goal) throws GameActionException {
+		return pathTo(rc, goal, rc.getType().strideRadius); 
 	}
 	
-	static MapLocation pathTo(RobotController rc, MapLocation goal, float stride, BulletInfo[] bullets) throws GameActionException {
+	static MapLocation pathTo(RobotController rc, MapLocation goal, float stride) throws GameActionException {
 				
 		MapLocation myLocation = rc.getLocation();
-		RobotInfo[] enemyList = rc.senseNearbyRobots(rc.getType().sensorRadius, myTeam.opponent());
-		
-		//rc.setIndicatorLine(myLocation, myLocation.add(heading), 0, 0, 255);
 		
 		// If this is the first time going here, clear our pathing memory
 		if (goal.distanceTo(goalCache) > 5f) {

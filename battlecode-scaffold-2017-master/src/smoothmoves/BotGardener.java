@@ -110,7 +110,7 @@ public class BotGardener {
 			goalLocation = goalLocation.add(myLocation.directionTo(enemyBase).opposite(), 3f);//, 10f/(myLocation.distanceTo(enemyBase)+1f));
 			
 			rc.setIndicatorDot(goalLocation, 100, 0, 100);
-			MapLocation moveLocation = Nav.pathTo(rc, goalLocation, bullets);
+			MapLocation moveLocation = Nav.pathTo(rc, goalLocation);
 			if(moveLocation != null) {
 				moveDirection = myLocation.directionTo(moveLocation);
 				moveStride = myLocation.distanceTo(moveLocation);

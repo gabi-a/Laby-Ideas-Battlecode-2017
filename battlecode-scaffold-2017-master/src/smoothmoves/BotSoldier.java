@@ -80,7 +80,7 @@ public class BotSoldier {
 				if(myLocation.distanceTo(closestEnemy.location) < 3f) {
 					moveDirection = closestEnemy.location.directionTo(myLocation);
 				} else if(myLocation.distanceTo(closestEnemy.location) > 4f) {
-					moveLocation = Nav.pathTo(rc, closestEnemy.location.add(closestEnemy.location.directionTo(myLocation), 3f), bullets);
+					moveLocation = Nav.pathTo(rc, closestEnemy.location.add(closestEnemy.location.directionTo(myLocation), 3f));
 					if(moveLocation != null) {
 						moveDirection = myLocation.directionTo(moveLocation);
 						moveStride = myLocation.distanceTo(moveLocation);
@@ -88,7 +88,7 @@ public class BotSoldier {
 				}
 			} else if (!Util.goodToShootNotTrees(rc, myLocation, closestEnemy)){
 				//System.out.println("Move to enemy");
-				moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
+				moveLocation = Nav.pathTo(rc, closestEnemy.location);
 				if(moveLocation != null) {
 					moveDirection = myLocation.directionTo(moveLocation);
 					moveStride = myLocation.distanceTo(moveLocation);
@@ -112,7 +112,7 @@ public class BotSoldier {
 		if(moveDirection == null) {		
 			RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
 			if (passiveEnemy != null) {
-				moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
+				moveLocation = Nav.pathTo(rc, passiveEnemy.location);
 				if(moveLocation != null) {
 					moveDirection = myLocation.directionTo(moveLocation);
 					moveStride = myLocation.distanceTo(moveLocation);
@@ -126,7 +126,7 @@ public class BotSoldier {
 			RobotInfo[] enemiesSighted = Comms.enemiesSighted.arrayBots(rc);
 			for(int i = enemiesSighted.length;i-->0;) {
 				if(enemiesSighted[i] != null) {
-					moveLocation = Nav.pathTo(rc, enemiesSighted[i].location, bullets);
+					moveLocation = Nav.pathTo(rc, enemiesSighted[i].location);
 					if(moveLocation != null) {
 						moveDirection = myLocation.directionTo(moveLocation);
 						moveStride = myLocation.distanceTo(moveLocation);
@@ -142,7 +142,7 @@ public class BotSoldier {
 				if(myLocation.distanceTo(enemyBase) < RobotType.SOLDIER.sensorRadius) {
 					beenToEnemyArchon = true;
 				}
-				moveLocation = Nav.pathTo(rc, enemyBase, bullets);
+				moveLocation = Nav.pathTo(rc, enemyBase);
 				if(moveLocation != null) {
 					moveDirection = myLocation.directionTo(moveLocation);
 					moveStride = myLocation.distanceTo(moveLocation);
@@ -158,7 +158,7 @@ public class BotSoldier {
 				for(int i = trees.length; i --> 0;) {
 					goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation));
 				}
-				moveLocation = Nav.pathTo(rc, goalLocation, bullets);
+				moveLocation = Nav.pathTo(rc, goalLocation);
 				if(moveLocation != null) {
 					moveDirection = myLocation.directionTo(moveLocation);
 					moveStride = myLocation.distanceTo(moveLocation);
@@ -466,7 +466,7 @@ public class BotSoldier {
 	static MapLocation findClosestBotLocationToPathTo(RobotInfo[] bots, BulletInfo[] bullets) throws GameActionException {
 		for(int i = bots.length;i-->0;) {
 			if(bots[i] != null) {
-				MapLocation moveLocation = Nav.pathTo(rc, bots[i].location, bullets);
+				MapLocation moveLocation = Nav.pathTo(rc, bots[i].location);
 				if(moveLocation != null) {
 					return moveLocation;
 				}
