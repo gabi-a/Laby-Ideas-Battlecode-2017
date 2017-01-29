@@ -104,8 +104,7 @@ public class BotLumberjack {
 				}
 			}
 			
-			moveDirection = myLocation.directionTo(goalLocation);
-			if(moveDirection != null) moveDirection = Nav.tryMove(rc, myLocation.directionTo(goalLocation), 10f, 24, bullets);
+			moveDirection = myLocation.directionTo(Nav.pathTo(rc, goalLocation, bullets));
 			moveStride = myLocation.distanceTo(goalLocation);
 			
 			// Rescale stride distance
