@@ -160,8 +160,8 @@ public class Nav {
 	static MapLocation pathTo(RobotController rc, MapLocation goal, float goalRadius) throws GameActionException {
 				
 		MapLocation myLocation = rc.getLocation();
-		float stride = rc.getType().strideRadius;
 		float bodyRadius = rc.getType().bodyRadius;
+		float stride = Math.min(rc.getType().strideRadius, Math.max(myLocation.distanceTo(goal) - bodyRadius - goalRadius, 0f));
 		
 		// If this is the first time going here, clear our pathing memory
 		if (goal.distanceTo(goalCache) > 5f) {
@@ -177,7 +177,7 @@ public class Nav {
 		Direction trial;
 		
 		// Don't move if we're at where we want to be
-		if(myLocation.distanceTo(goal) <= bodyRadius + goalRadius + 0.1f) {
+		if(myLocation.distanceTo(goal) <= bodyRadius + goalRadius + 0.01f) {
 			rc.setIndicatorDot(myLocation, 255, 255, 255);
 			return myLocation;
 		}
