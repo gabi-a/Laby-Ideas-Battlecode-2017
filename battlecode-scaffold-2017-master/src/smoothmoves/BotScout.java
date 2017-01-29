@@ -152,10 +152,10 @@ public class BotScout {
 		}
 	}
 	
-	private static MapLocation bestTree(TreeInfo[] trees) {
+	private static MapLocation bestTree(TreeInfo[] trees) throws GameActionException {
 		if(trees.length == 0) return null;
 		for(int i = 0; i < trees.length; i++) {
-			if(trees[i].containedBullets > 0)
+			if(trees[i].containedBullets > 0 && rc.senseNearbyRobots(trees[i].location, 1f, null).length == 0)
 				return trees[i].location;
 		}
 		return null;

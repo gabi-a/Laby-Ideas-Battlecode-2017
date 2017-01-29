@@ -17,6 +17,9 @@ public class BotSoldier {
 	
 	static int turnsSinceLastSeen = 0;
 	static final int TURNS_SHOOT_UNSEEN = 20;
+	//static final int TURNS_MOVE_UNSEEN = 5;
+	
+	//static MapLocation nextEnemyLocation;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
@@ -66,6 +69,7 @@ public class BotSoldier {
 		
 		if(!dodgeBullets) {
 			boolean protectGardener = false;
+			if(enemies.length == 0) {
 			//System.out.println("Deciding whether to protect gardener");
 			RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
 			moveDirection = Nav.tryMove(rc, myLocation.directionTo(enemyBase), 5f, 24, bullets);
@@ -110,11 +114,18 @@ public class BotSoldier {
 				
 				else {
 
-					RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
 					MapLocation moveLocation = null;
-					if (passiveEnemy != null) {
-						//System.out.println("Pathing to passive enemy");
-						moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
+					
+					//if(nextEnemyLocation != null && turnsSinceLastSeen < TURNS_MOVE_UNSEEN) {
+					//	moveLocation = Nav.pathTo(rc, nextEnemyLocation, bullets);
+					//}
+					
+					if(moveLocation == null) {
+						RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
+						if (passiveEnemy != null) {
+							//System.out.println("Pathing to passive enemy");
+							moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
+						}
 					}
 
 					if(moveLocation != null) {
@@ -160,6 +171,9 @@ public class BotSoldier {
 			}
 			
 			if(enemyToAttack != null) {
+				
+				//nextEnemyLocation = Util.predictNextEnemyLocation(enemyToAttack);
+				
 				turnsSinceLastSeen = 0;
 				
 				if(trackedEnemy == null) {
@@ -170,7 +184,7 @@ public class BotSoldier {
 				
 				if(enemies[0].ID == trackedEnemy.ID) {
 					float H = myLocation.distanceTo(enemies[0].location);
-					float d = myLocation.distanceTo(trackedEnemy.location);
+					//float d = myLocation.distanceTo(trackedEnemy.location);
 					float theta = myLocation.directionTo(enemyToAttack.location).radiansBetween(myLocation.directionTo(trackedEnemy.location));
 					lateralMovement = Math.abs((float) (H * Math.sin(theta)));
 				}
