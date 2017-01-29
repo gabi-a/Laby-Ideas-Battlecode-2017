@@ -154,12 +154,14 @@ public class Nav {
 	}
 	
 	static MapLocation pathTo(RobotController rc, MapLocation goal) throws GameActionException {
-		return pathTo(rc, goal, rc.getType().strideRadius); 
+		return pathTo(rc, goal, 0f); 
 	}
 	
-	static MapLocation pathTo(RobotController rc, MapLocation goal, float stride) throws GameActionException {
+	static MapLocation pathTo(RobotController rc, MapLocation goal, float goalRadius) throws GameActionException {
 				
 		MapLocation myLocation = rc.getLocation();
+		float stride = rc.getType().strideRadius;
+		float bodyRadius = rc.getType().bodyRadius;
 		
 		// If this is the first time going here, clear our pathing memory
 		if (goal.distanceTo(goalCache) > 5f) {
@@ -174,7 +176,8 @@ public class Nav {
 		int tries = 6;
 		Direction trial;
 		
-		if(myLocation.distanceTo(goal) <= 2.1f) {
+		// Don't move if we're at where we want to be
+		if(myLocation.distanceTo(goal) <= bodyRadius + goalRadius + 0.1f) {
 			rc.setIndicatorDot(myLocation, 255, 255, 255);
 			return myLocation;
 		}
