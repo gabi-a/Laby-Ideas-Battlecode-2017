@@ -24,6 +24,8 @@ public class BotSoldier {
 	
 	static MapSize mapSize;
 	
+	static boolean beenToEnemyArchon = false;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotSoldier.rc = rc;
 		
@@ -59,10 +61,121 @@ public class BotSoldier {
 		
 		/************* Determine where to move *******************/
 
-		boolean dodgeBullets = false;
+		MapLocation moveLocation = null;
+		
+		if(bullets.length > 0) {
+			moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
+			}
+		}
+		
+		// If we haven't needed to dodge bullets, look for nearby enemies
+		if(moveDirection == null && enemies.length > 0) {
+			
+			RobotInfo closestEnemy = enemies[0];
+			if(closestEnemy.type == RobotType.LUMBERJACK) {
+				//System.out.println("Lumberjacks.");
+				if(myLocation.distanceTo(closestEnemy.location) < 3f) {
+					moveDirection = closestEnemy.location.directionTo(myLocation);
+				} else if(myLocation.distanceTo(closestEnemy.location) > 4f) {
+					moveLocation = Nav.pathTo(rc, closestEnemy.location.add(closestEnemy.location.directionTo(myLocation), 3f), bullets);
+					if(moveLocation != null) {
+						moveDirection = myLocation.directionTo(moveLocation);
+						moveStride = myLocation.distanceTo(moveLocation);
+					}
+				}
+			} else if (!Util.goodToShootNotTrees(rc, myLocation, closestEnemy)){
+				//System.out.println("Move to enemy");
+				moveLocation = Nav.pathTo(rc, closestEnemy.location, bullets);
+				if(moveLocation != null) {
+					moveDirection = myLocation.directionTo(moveLocation);
+					moveStride = myLocation.distanceTo(moveLocation);
+				}
+			}
+			
+		}
+		
+		// If theres no enemies nearby and we haven't had to dodge bullets, look for enemies in comms
+		if(moveDirection == null) {
+			
+			RobotInfo[] enemiesAttackingGardenersOrArchons = Comms.enemiesAttackingGardenersOrArchons.arrayBots(rc);
+			moveLocation = findClosestBotLocationToPathTo(enemiesAttackingGardenersOrArchons, bullets);
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(moveLocation);
+			}
+		}
+		
+		//  If we don't have any gardeners to protect, look for passive enemies
+		if(moveDirection == null) {		
+			RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
+			if (passiveEnemy != null) {
+				moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
+				if(moveLocation != null) {
+					moveDirection = myLocation.directionTo(moveLocation);
+					moveStride = myLocation.distanceTo(moveLocation);
+				}
+			}
+			
+		}
+		
+		// If no passives, look for active enemies
+		if(moveDirection == null) {
+			RobotInfo[] enemiesSighted = Comms.enemiesSighted.arrayBots(rc);
+			for(int i = enemiesSighted.length;i-->0;) {
+				if(enemiesSighted[i] != null) {
+					moveLocation = Nav.pathTo(rc, enemiesSighted[i].location, bullets);
+					if(moveLocation != null) {
+						moveDirection = myLocation.directionTo(moveLocation);
+						moveStride = myLocation.distanceTo(moveLocation);
+					}
+				}
+			}
+		}
+		
+		// If no active enemies, go to initial archon location, unless already arrived there
+		if(moveDirection == null) {
+			
+			if(!beenToEnemyArchon) {
+				if(myLocation.distanceTo(enemyBase) < RobotType.SOLDIER.sensorRadius) {
+					beenToEnemyArchon = true;
+				}
+				moveLocation = Nav.pathTo(rc, enemyBase, bullets);
+				if(moveLocation != null) {
+					moveDirection = myLocation.directionTo(moveLocation);
+					moveStride = myLocation.distanceTo(moveLocation);
+				}
+			}
+			
+		}
+		
+		if(moveDirection == null) {
+			
+			if(trees.length > 0) {
+				MapLocation goalLocation = myLocation;
+				for(int i = trees.length; i --> 0;) {
+					goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation));
+				}
+				moveLocation = Nav.pathTo(rc, goalLocation, bullets);
+				if(moveLocation != null) {
+					moveDirection = myLocation.directionTo(moveLocation);
+					moveStride = myLocation.distanceTo(moveLocation);
+				}
+			}
+		}
+		
+		if(moveDirection == null) {
+			moveDirection = Nav.explore(rc, bullets);
+		}
+		
+		//if(moveDirection != null) moveDirection = Nav.tryMove(rc, moveDirection, 10f, 24, bullets);
 		
 		//System.out.println("Deciding how to move");
 		
+		/*
+		boolean dodgeBullets = false;
 		if(bullets.length > 0 ) {
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);
 			if(moveLocation != null) {
@@ -76,11 +189,11 @@ public class BotSoldier {
 		if(!dodgeBullets) {
 			boolean protectGardener = false;
 			//System.out.println("Deciding whether to protect gardener");
-			RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
+			RobotInfo[] enemiesAttackingGardenersOrArchons = Comms.enemiesAttackingGardenersOrArchons.arrayBots(rc);
 			moveDirection = Nav.tryMove(rc, myLocation.directionTo(enemyBase), 5f, 24, bullets);
-			for(int i = enemiesAttackingUs.length;i-->0;) {
-				if(enemiesAttackingUs[i] != null) {
-					MapLocation moveLocation = Nav.pathTo(rc, enemiesAttackingUs[i].location, bullets);
+			for(int i = enemiesAttackingGardenersOrArchons.length;i-->0;) {
+				if(enemiesAttackingGardenersOrArchons[i] != null) {
+					MapLocation moveLocation = Nav.pathTo(rc, enemiesAttackingGardenersOrArchons[i].location, bullets);
 					if(moveLocation != null) {
 						//System.out.println("Protect archon or gardener, enemy at: "+enemiesAttackingUs[i].location);
 						moveDirection = myLocation.directionTo(moveLocation);
@@ -118,7 +231,6 @@ public class BotSoldier {
 				}
 				
 				else {
-
 					MapLocation moveLocation = null;
 					
 					//if(nextEnemyLocation != null && turnsSinceLastSeen < TURNS_MOVE_UNSEEN) {
@@ -133,9 +245,16 @@ public class BotSoldier {
 						//	break;
 						default:
 							RobotInfo passiveEnemy = Util.getBestPassiveEnemy(rc);
-							if (passiveEnemy != null) {
+							if (passiveEnemy != null && myLocation.distanceTo(passiveEnemy.location) > 5f) {
 								//System.out.println("Pathing to passive enemy");
 								moveLocation = Nav.pathTo(rc, passiveEnemy.location, bullets);
+							} else {
+								RobotInfo[] enemiesSighted = Comms.enemiesSighted.arrayBots(rc);
+								for(int i = enemiesSighted.length;i-->0;) {
+									if(enemiesSighted[i] != null) {
+										moveLocation = Nav.pathTo(rc, enemiesSighted[i].location, bullets);
+									}
+								}
 							}
 						}
 					}
@@ -147,7 +266,7 @@ public class BotSoldier {
 				}
 			}
 		}
-		
+		*/
 		
 		
 		/************* Do Move ***********************************/
@@ -342,6 +461,18 @@ public class BotSoldier {
 			return false;
 		}
 		return true;
+	}
+	
+	static MapLocation findClosestBotLocationToPathTo(RobotInfo[] bots, BulletInfo[] bullets) throws GameActionException {
+		for(int i = bots.length;i-->0;) {
+			if(bots[i] != null) {
+				MapLocation moveLocation = Nav.pathTo(rc, bots[i].location, bullets);
+				if(moveLocation != null) {
+					return moveLocation;
+				}
+			}
+		}
+		return null;
 	}
 	
 }

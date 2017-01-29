@@ -1,6 +1,7 @@
 package smoothmoves;
 import battlecode.common.*;
 import battlecode.schema.Action;
+import smoothmoves.BotArchon.MapSize;
 
 public class BotGardener {
 	static RobotController rc;
@@ -21,10 +22,12 @@ public class BotGardener {
 	
 	static int turnsAlive = 0;
 	
-	static final float THRESHOLD_AREA = 80;
+	static final float THRESHOLD_AREA = 100;
 	
 	static MapLocation goalLocation;
 	static MapLocation enemyBase;
+	
+	static MapSize mapSize;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
@@ -32,7 +35,9 @@ public class BotGardener {
 		if(turnsAlive % 10 == 0) {
 			settleThreshold = Math.max(0, settleThreshold - 1);
 		}
-
+		if(mapSize == null) {
+			mapSize = MapSize.values()[Comms.mapSize.read(rc)];
+		}
 		Util.updateMyPostion(rc);
 		
 		/*
@@ -269,7 +274,16 @@ public class BotGardener {
 		//if(units[RobotType.LUMBERJACK.ordinal()] < units[RobotType.SOLDIER.ordinal()]){
 		//	tryToBuild(RobotType.LUMBERJACK);
 		//} else {
-		if( (lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 10) || (Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 4 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)) ) {
+		if(mapSize == MapSize.LARGE) {
+			if(rc.getTeamBullets() > 100) {
+				if( (lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 10) ) {
+					tryToBuild(RobotType.LUMBERJACK);
+				} else {
+					tryToBuild(RobotType.SOLDIER);
+				}
+			}
+		}
+		else if( (lotsOfTrees &&  Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) < 10) || (Comms.ourBotCount.readNumBots(rc, RobotType.SOLDIER) > 4 * Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)) ) {
 			tryToBuild(RobotType.LUMBERJACK);
 		} else {
 			tryToBuild(RobotType.SOLDIER);
@@ -280,7 +294,9 @@ public class BotGardener {
 	public static boolean firstUnits(int[] units) throws GameActionException {
 
 		if(turnsAlive >= 60) return false;
-
+		
+		if(mapSize == MapSize.LARGE) return false;
+		
 		if(lotsOfTrees && !settled){
 			if(units[RobotType.LUMBERJACK.ordinal()] == 0){
 				tryToBuild(RobotType.LUMBERJACK);

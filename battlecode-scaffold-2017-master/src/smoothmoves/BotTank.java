@@ -46,7 +46,7 @@ public class BotTank {
 		
 		if(!dodgeBullets) {
 			boolean protectGardener = false;
-			RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
+			RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingGardenersOrArchons.arrayBots(rc);
 			moveDirection = Nav.tryMove(rc, myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 5f, 24, bullets);
 			for(int i = enemiesAttackingUs.length;i-->0;) {
 				if(enemiesAttackingUs[i] != null) {

@@ -20,7 +20,9 @@ public class Comms {
 	public static final CommsBotArray enemyGardenersArray;
 	public static final CommsBotArray enemyArchonsArray;
 	
-	public static final CommsBotArray enemiesAttackingUs;
+	public static final CommsBotArray enemiesAttackingGardenersOrArchons;
+	
+	public static final CommsBotArray enemiesSighted;
 	
 	public static final CommsBotArray ourLumberjackAndSoldiers;
 	
@@ -34,11 +36,12 @@ public class Comms {
 		theirBotCount = new CommsBotCount(7,13);
 		enemyGardenersArray = new CommsBotArray(14, 24);
 		enemyArchonsArray = new CommsBotArray(25, 35);
-		enemiesAttackingUs = new CommsBotArray(36,46);
+		enemiesAttackingGardenersOrArchons = new CommsBotArray(36,46);
 		ourLumberjackAndSoldiers = new CommsBotArray(47,67);
 		archonTreeCount = new CommsArray(68,71);
 		archonCount = new CommsInt(72);
 		mapSize = new CommsInt(73);
+		enemiesSighted = new CommsBotArray(74,84);
 	}
 	
 	public static int packLocation(RobotController rc, MapLocation location) {

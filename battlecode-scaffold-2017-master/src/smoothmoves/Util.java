@@ -35,12 +35,21 @@ public class Util {
 			}
 		}
 		
-		RobotInfo[] enemiesAttackingUs = Comms.enemiesAttackingUs.arrayBots(rc);
+		RobotInfo[] enemiesAttackingGardenersOrArchons = Comms.enemiesAttackingGardenersOrArchons.arrayBots(rc);
 		
-		for(int i = enemiesAttackingUs.length;i-->0;) {
-			if(enemiesAttackingUs[i] != null) rc.setIndicatorDot(enemiesAttackingUs[i].location, 0, 0, 255);
-			if(enemiesAttackingUs[i] != null && rc.canSenseLocation(enemiesAttackingUs[i].location) && !rc.canSenseRobot(enemiesAttackingUs[i].ID)) {
-				Comms.enemiesAttackingUs.deleteBot(rc, enemiesAttackingUs[i]);
+		for(int i = enemiesAttackingGardenersOrArchons.length;i-->0;) {
+			if(enemiesAttackingGardenersOrArchons[i] != null) rc.setIndicatorDot(enemiesAttackingGardenersOrArchons[i].location, 0, 0, 255);
+			if(enemiesAttackingGardenersOrArchons[i] != null && rc.canSenseLocation(enemiesAttackingGardenersOrArchons[i].location) && !rc.canSenseRobot(enemiesAttackingGardenersOrArchons[i].ID)) {
+				Comms.enemiesAttackingGardenersOrArchons.deleteBot(rc, enemiesAttackingGardenersOrArchons[i]);
+			}
+		}
+		
+		RobotInfo[] enemiesSighted = Comms.enemiesSighted.arrayBots(rc);
+		
+		for(int i = enemiesSighted.length;i-->0;) {
+			if(enemiesSighted[i] != null) rc.setIndicatorDot(enemiesSighted[i].location, 0, 0, 255);
+			if(enemiesSighted[i] != null && rc.canSenseLocation(enemiesSighted[i].location) && !rc.canSenseRobot(enemiesSighted[i].ID)) {
+				Comms.enemiesSighted.deleteBot(rc, enemiesSighted[i]);
 			}
 		}
 		
@@ -52,7 +61,10 @@ public class Util {
 				Comms.enemyArchonsArray.writeBot(rc, enemies[i]);
 			}
 			else if(rc.getType() == RobotType.GARDENER || rc.getType() == RobotType.ARCHON) {
-				Comms.enemiesAttackingUs.writeBot(rc, enemies[i]);
+				Comms.enemiesAttackingGardenersOrArchons.writeBot(rc, enemies[i]);
+			}
+			else {
+				Comms.enemiesSighted.writeBot(rc, enemies[i]);
 			}
 		}
 		
@@ -189,7 +201,7 @@ public class Util {
 				}
 			}
 		}
-		return new RobotInfo(0, them, RobotType.ARCHON, rc.getInitialArchonLocations(them)[0], 0, 0, 0);
+		return null;//new RobotInfo(0, them, RobotType.ARCHON, rc.getInitialArchonLocations(them)[0], 0, 0, 0);
 		
 	}
 		
