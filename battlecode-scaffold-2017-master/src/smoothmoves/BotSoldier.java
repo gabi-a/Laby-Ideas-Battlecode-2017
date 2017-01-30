@@ -88,7 +88,7 @@ public class BotSoldier {
 				}
 			} else if (!Util.goodToShootNotTrees(rc, myLocation, closestEnemy)){
 				//System.out.println("Move to enemy");
-				moveLocation = Nav.pathTo(rc, closestEnemy.location);
+				moveLocation = Nav.pathTo(rc, closestEnemy.location, closestEnemy.type.bodyRadius);
 				if(moveLocation != null) {
 					moveDirection = myLocation.directionTo(moveLocation);
 					moveStride = myLocation.distanceTo(moveLocation);
@@ -401,6 +401,11 @@ public class BotSoldier {
 					//if(shootCooldown <= 0) {
 						action = Action.FIRE;
 					//}
+				}
+				
+				//Don't waste bullets on a scout hiding in trees
+				if(enemyToAttack.type == RobotType.SCOUT && !Util.goodToShoot(rc, myLocation, enemyToAttack)) {
+					action = Action.DIE_EXCEPTION;
 				}
 
 				trackedEnemy = enemyToAttack;

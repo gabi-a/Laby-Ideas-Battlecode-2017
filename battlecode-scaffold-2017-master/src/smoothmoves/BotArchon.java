@@ -164,7 +164,7 @@ public class BotArchon {
 			}
 			
 			else {
-				// Spy on the enemy!
+				/*// Spy on the enemy!
 				RobotInfo enemyToSpyOn = Util.getBestPassiveEnemy(rc);
 				MapLocation spyLocation = null;
 				if(enemyToSpyOn != null) {
@@ -175,7 +175,7 @@ public class BotArchon {
 				}
 				if(myLocation.distanceTo(spyLocation) > 20f)
 					goalLocation = goalLocation.add(myLocation.directionTo(spyLocation), 5f);
-					//, 10f/(myLocation.distanceTo(enemyBase)+1f));
+					//, 10f/(myLocation.distanceTo(enemyBase)+1f));*/
 			}
 				
 			//}
