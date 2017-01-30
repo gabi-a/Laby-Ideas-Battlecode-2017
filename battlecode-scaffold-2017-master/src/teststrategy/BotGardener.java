@@ -22,7 +22,7 @@ public class BotGardener {
 	
 	static int turnsAlive = 0;
 	
-	static final float TREE_HEURISTIC_THRESHOLD = 60;
+	static final float TREE_HEURISTIC_THRESHOLD = 70;
 	
 	static MapLocation goalLocation;
 	static MapLocation enemyBase;
@@ -48,17 +48,12 @@ public class BotGardener {
 			MapLocation[] theirArchonLocs = rc.getInitialArchonLocations(them);
 			enemyBase = theirArchonLocs[0];
 			int[] archonTrees = Comms.archonTreeCount.array(rc);
-			int heuristic = 0;
+			int heuristic = 100;
 			for(int i = numInitialArchons;i-->0;) {
-				heuristic += archonTrees[i];
+				if(archonTrees[i] < heuristic) {
+					heuristic = archonTrees[i];
+				}
 			}
-			heuristic /= numInitialArchons;
-			//int minArea = 10000;
-			//for(int i = numInitialArchons;i-->0;) {
-			//	if(archonTrees[i] < minArea) {
-			//		minArea = archonTrees[i];
-			//	}
-			//}
 			if(heuristic > TREE_HEURISTIC_THRESHOLD) {
 				lotsOfTrees = true;
 			}
