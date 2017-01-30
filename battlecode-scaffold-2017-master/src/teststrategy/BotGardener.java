@@ -22,7 +22,7 @@ public class BotGardener {
 	
 	static int turnsAlive = 0;
 	
-	static final float TREE_HEURISTIC_THRESHOLD = 70;
+	static final float TREE_HEURISTIC_THRESHOLD = 77;
 	
 	static MapLocation goalLocation;
 	static MapLocation enemyBase;
