@@ -42,7 +42,7 @@ public class BotLumberjack {
 		if(enemies.length > 0) {
 			MapLocation closestEnemyLocation = enemies[0].location;
 			MapLocation moveLocation = Nav.pathTo(rc, closestEnemyLocation);
-			if(moveLocation != null) {
+			if(moveLocation != null && moveLocation != myLocation) {
 				moveDirection = myLocation.directionTo(moveLocation);
 				moveStride = myLocation.distanceSquaredTo(moveLocation);
 			}
@@ -51,7 +51,7 @@ public class BotLumberjack {
 		else if(bullets.length > 0) {
 			rc.setIndicatorDot(myLocation, 0, 255, 0);
 			MapLocation moveLocation = Nav.awayFromBullets(rc, myLocation, bullets);	
-			if(moveLocation != null) {
+			if(moveLocation != null && moveLocation != myLocation) {
 				moveDirection = myLocation.directionTo(moveLocation);
 				moveStride = myLocation.distanceTo(moveLocation);
 			}
@@ -106,12 +106,15 @@ public class BotLumberjack {
 				}
 			}
 			
-			moveDirection = myLocation.directionTo(Nav.pathTo(rc, goalLocation, moveTreeRadius));
-			moveStride = myLocation.distanceTo(goalLocation);
+			MapLocation moveLocation = Nav.pathTo(rc, goalLocation, moveTreeRadius);
 			
-			// Rescale stride distance
-			moveStride = Math.max(RobotType.LUMBERJACK.strideRadius, moveStride * RobotType.LUMBERJACK.strideRadius / (((trees.length == 0) ? 0.001f : 1f) + allies.length));
-
+			if(moveLocation != null) {
+				moveDirection = myLocation.directionTo(moveLocation);
+				moveStride = myLocation.distanceTo(goalLocation);
+			
+				// Rescale stride distance
+				moveStride = Math.max(RobotType.LUMBERJACK.strideRadius, moveStride * RobotType.LUMBERJACK.strideRadius / (((trees.length == 0) ? 0.001f : 1f) + allies.length));
+			}
 		}
 		
 		/************* Determine what action to take *************/

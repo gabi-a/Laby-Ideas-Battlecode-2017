@@ -179,7 +179,7 @@ public class Nav {
 		// Don't move if we're at where we want to be
 		if(myLocation.distanceTo(goal) <= bodyRadius + goalRadius + 0.01f) {
 			rc.setIndicatorDot(myLocation, 255, 255, 255);
-			return myLocation;
+			return null;
 		}
 
 		// Idea: if we can go closer to the goal than we ever have before, do so.
