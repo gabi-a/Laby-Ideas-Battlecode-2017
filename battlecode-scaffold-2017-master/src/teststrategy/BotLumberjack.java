@@ -126,9 +126,6 @@ public class BotLumberjack {
 			if(moveLocation != null) moveDirection = myLocation.directionTo(moveLocation);
 		}
 		
-		System.out.println("Move stride:"+moveStride);
-		System.out.println("Move direction:"+moveDirection);
-		
 		/************* Determine what action to take *************/
 		byte action = Action.DIE_EXCEPTION;
 		int chopID = 0;
