@@ -1,7 +1,7 @@
 package teststrategy;
 import battlecode.common.*;
 import battlecode.schema.Action;
-import smoothmoves.BotArchon.MapSize;
+import teststrategy.BotArchon.MapSize;
 
 public class BotSoldier {
 	static RobotController rc;
