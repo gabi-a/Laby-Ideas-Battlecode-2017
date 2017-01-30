@@ -1,5 +1,6 @@
 package teststrategy;
 import battlecode.common.*;
+import java.util.*;
 
 public class Comms {
 
@@ -231,61 +232,63 @@ class CommsQueue {
 class CommsArray {
 	private int arrayStart;
 	private int arrayEnd;
+	int length;
+	int cacheRounds = 10;
 	private int[] array;
 	private int[] lastUpdated;
 
 	public CommsArray(int start, int end){
 		arrayStart = start;
 		arrayEnd = end;
-	}
-
-	public int length() {
-		return arrayEnd - arrayStart;
+		length = end - start + 1;
+		array = new int[length];
+		lastUpdated = new int[length];
+		Arrays.fill(array, 0);
+		Arrays.fill(lastUpdated, -1);
 	}
 
 	public void write(RobotController rc, int index, int data) throws GameActionException {
-		if(index > arrayEnd - arrayStart){
+		if(index > length || index < 0){
 			System.out.println("error: out of comms array bounds");
 			return;
 		}
 
 		rc.broadcast(arrayStart + index, data);
-		// array[index] = data;
-		// lastUpdated[index] = rc.getRoundNum();
+		array[index] = data;
+		lastUpdated[index] = rc.getRoundNum();
 	}
 
 	public int read(RobotController rc, int index) throws GameActionException {
-		if(index > arrayEnd - arrayStart){
+		if(index > length || index < 0){
 			System.out.println("error: out of comms array bounds");
 			return -1;
 		}
 
-		return rc.readBroadcast(arrayStart + index);
+		if(lastUpdated[index] < rc.getRoundNum() - cacheRounds){
+			array[index] = rc.readBroadcast(arrayStart + index);
+			lastUpdated[index] = rc.getRoundNum();
+		}
 
-		// if(lastUpdated[index] != rc.getRoundNum()){
-			// array[index] = rc.readBroadcast(arrayStart + index);
-			// lastUpdated[index] = rc.getRoundNum();
-		// }
-
-		// return array[index];
+		return array[index];
 	}
 
 	public int[] array(RobotController rc) throws GameActionException {
-		int[] data = new int[arrayEnd - arrayStart];
-		for(int i = 0; i < arrayEnd - arrayStart; i++){
-			data[i] = rc.readBroadcast(arrayStart + i);
+		for(int i = 0; i < length; i++){
+			if(lastUpdated[i] < rc.getRoundNum() - cacheRounds){
+				array[i] = rc.readBroadcast(arrayStart + i);
+				lastUpdated[i] = rc.getRoundNum();
+			}
 		}
 
-		return data;
+		return array;
 	}
 }
 
 class CommsBotCount extends CommsArray {
-	
 	CommsBotCount(int start, int end) {
 		super(start, end);
 	}
-	
+
 	public void writeNumBots(RobotController rc, RobotType type, int count) throws GameActionException {
 		write(rc, type.ordinal(), count);
 	}
@@ -307,28 +310,52 @@ class CommsBotCount extends CommsArray {
 }
 
 class CommsBotArray extends CommsArray {
+	int cacheSize = 10;
+	int[] recentBots;
+	int[] recentBotsIndex;
+	
 	CommsBotArray(int start, int end) {
 		super(start, end);
+		recentBots = new int[cacheSize];
+		recentBotsIndex = new int[cacheSize];
+		Arrays.fill(recentBots, 0);
+		Arrays.fill(recentBotsIndex, 0);
 	}
 
-	public void writeBot(RobotController rc, RobotInfo robot) throws GameActionException {
-		// check id cache
+	public int getIndex(RobotController rc, int id) throws GameActionException {
+		// check cache
+		for(int i = 0; i < cacheSize; i++){
+			if(recentBots[i] == id) return recentBotsIndex[i];
+		}
 
-		// search array
+		// check array
 		int index = -1;
-		for(int i = 0; i < super.length(); i++){
+		for(int i = 0; i < length; i++){
 			RobotInfo bot = unpackBot(rc, super.read(rc, i));
 			if(bot == null){
 				if(index == -1) index = i;
 				continue;
 			}
-			if(bot.ID == robot.ID){
+			if(bot.ID == id){
 				index = i;
 				break;
 			}
 		}
 
-		super.write(rc, index, packBot(rc, robot));
+		if(index != -1){
+			for(int i = 0; i < cacheSize; i++){
+				if(recentBots[i] == 0){
+					recentBots[i] = id;
+					recentBotsIndex[i] = index;
+				}
+			}
+		}
+
+		return index;
+	}
+
+	public void writeBot(RobotController rc, RobotInfo robot) throws GameActionException {
+		super.write(rc, getIndex(rc, robot.ID), packBot(rc, robot));
 	}
 
 	public RobotInfo readBot(RobotController rc, RobotInfo robot) throws GameActionException {
@@ -342,7 +369,7 @@ class CommsBotArray extends CommsArray {
 
 	public void deleteBot(RobotController rc, RobotInfo robot) throws GameActionException {
 		int index = -1;
-		for(int i = 0; i < super.length(); i++){
+		for(int i = 0; i < length; i++){
 			RobotInfo bot = unpackBot(rc, super.read(rc, i));
 			if(bot != null && bot.ID == robot.ID){
 				super.write(rc, i, 0);
