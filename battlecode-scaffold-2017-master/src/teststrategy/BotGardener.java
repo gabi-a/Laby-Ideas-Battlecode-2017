@@ -1,7 +1,7 @@
 package teststrategy;
 import battlecode.common.*;
 import battlecode.schema.Action;
-import smoothmoves.BotArchon.MapSize;
+import teststrategy.BotArchon.MapSize;
 
 public class BotGardener {
 	static RobotController rc;
@@ -273,15 +273,30 @@ public class BotGardener {
 		// first units to spawn
 		if(firstUnits(units)) return;
 
-		// leave some bullets for shooting
-		if(rc.getTeamBullets() < 130) return;
 		
 		//System.out.println("\nLumberjacks: "+Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)+"\nTanks: "+Comms.ourBotCount.readNumBots(rc, RobotType.TANK));
+
+		if(lotsOfTrees) {
+			System.out.println("Lumberjacks:"+units[RobotType.LUMBERJACK.ordinal()]+"Tanks:"+units[RobotType.TANK.ordinal()]);
+			if(units[RobotType.LUMBERJACK.ordinal()] <= 10 + 10 * units[RobotType.TANK.ordinal()]) {
+				System.out.println("I want to build a lumberjack!");
+				tryToBuild(RobotType.LUMBERJACK);
+			} else {
+				tryToBuild(RobotType.TANK);
+			}
+		} 
 		
-		if(Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) <= 10 * Comms.ourBotCount.readNumBots(rc, RobotType.TANK)) {
-			tryToBuild(RobotType.LUMBERJACK);
-		} else {
-			tryToBuild(RobotType.TANK);
+		else {
+			// leave some bullets for shooting
+			if(rc.getTeamBullets() < 130) return;
+			if( (units[RobotType.SOLDIER.ordinal()] > 4 *units[RobotType.LUMBERJACK.ordinal()]) ) {
+				tryToBuild(RobotType.LUMBERJACK);
+			} else {
+				tryToBuild(RobotType.SOLDIER);
+			}
+		}
+		if(units[RobotType.SCOUT.ordinal()] == 0) {
+			tryToBuild(RobotType.SCOUT);
 		}
 
 	}
@@ -290,21 +305,19 @@ public class BotGardener {
 
 		if(turnsAlive >= 60) return false;
 		
-		//if(mapSize == MapSize.LARGE) return false;
-		
-		//if(units[RobotType.LUMBERJACK.ordinal()] == 0){
-		//	tryToBuild(RobotType.LUMBERJACK);
-		////	return true;
-		//}
-		
-		//if(units[RobotType.SOLDIER.ordinal()] <= 1){
-		//	tryToBuild(RobotType.SOLDIER); 
-		//	return true;
-		//}
+		if(mapSize == MapSize.LARGE) return false;
+		if(!lotsOfTrees) {
+			if(units[RobotType.SOLDIER.ordinal()] <= 1){
+				tryToBuild(RobotType.SOLDIER); 
+				return true;
+			}
+		}
+		/*
 		if(units[RobotType.SCOUT.ordinal()] == 0){
 			tryToBuild(RobotType.SCOUT); 
 			return true;
 		}
+		*/
 		
 		return false;
 	}
