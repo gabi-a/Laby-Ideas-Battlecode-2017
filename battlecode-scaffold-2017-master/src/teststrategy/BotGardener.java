@@ -272,12 +272,15 @@ public class BotGardener {
 		//System.out.println("\nLumberjacks: "+Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)+"\nTanks: "+Comms.ourBotCount.readNumBots(rc, RobotType.TANK));
 
 		if(lotsOfTrees && mapSize != MapSize.VSMALL) {
-			System.out.println("Lumberjacks:"+units[RobotType.LUMBERJACK.ordinal()]+"Tanks:"+units[RobotType.TANK.ordinal()]);
-			if(units[RobotType.LUMBERJACK.ordinal()] <= 10 + 10 * units[RobotType.TANK.ordinal()]) {
-				System.out.println("I want to build a lumberjack!");
+			if(2*units[RobotType.SOLDIER.ordinal()] < units[RobotType.LUMBERJACK.ordinal()]) {
+				tryToBuild(RobotType.SOLDIER);
+			}
+			else if(units[RobotType.LUMBERJACK.ordinal()] <= 6 + 6 * units[RobotType.TANK.ordinal()]) {
 				tryToBuild(RobotType.LUMBERJACK);
 			} else {
-				tryToBuild(RobotType.TANK);
+				if(!tryToBuild(RobotType.TANK)) {
+					tryToBuild(RobotType.LUMBERJACK);
+				}
 			}
 		} 
 		
@@ -307,13 +310,12 @@ public class BotGardener {
 				return true;
 			}
 		}
-		/*
-		if(units[RobotType.SCOUT.ordinal()] == 0){
-			tryToBuild(RobotType.SCOUT); 
-			return true;
+		else {
+			if(units[RobotType.SCOUT.ordinal()] == 0){
+				tryToBuild(RobotType.SCOUT); 
+				return true;
+			}
 		}
-		*/
-		
 		return false;
 	}
 	
