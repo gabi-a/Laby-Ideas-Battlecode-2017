@@ -344,16 +344,16 @@ public class BotSoldier {
 							action = Action.FIRE_PENTAD;
 						}
 						
-						else if(triadHitRadius < enemyToAttack.getRadius()) {
+						else /*if(triadHitRadius < enemyToAttack.getRadius())*/ {
 							//System.out.println("Gabi thinks all 3 will hit");
 							action = Action.FIRE_TRIAD;
 						}
-						
+						/*
 						else {
 							//System.out.println("Gabi thinks 1 might hit if we're lucky");
 							action = Action.FIRE;
 						}
-						
+						*/
 						/*
 						float d = myLocation.distanceTo(enemyToAttack.location);
 						float rMe = rc.getType().bodyRadius;
