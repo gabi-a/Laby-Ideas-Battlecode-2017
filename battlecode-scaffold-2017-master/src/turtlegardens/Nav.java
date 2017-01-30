@@ -51,7 +51,7 @@ public class Nav {
         }
 
         // A move never happened, so return false.
-        System.out.println("I'm stuck! :( I have "+ Clock.getBytecodesLeft()+" bytecodes left");
+        //System.out.println("I'm stuck! :( I have "+ Clock.getBytecodesLeft()+" bytecodes left");
         return false;
     }
 }

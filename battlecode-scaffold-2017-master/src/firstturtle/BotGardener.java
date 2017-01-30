@@ -78,7 +78,7 @@ public class BotGardener {
     public static void broadcastUnassigned(RobotController rc) throws GameActionException {
         Comms.writeStack(rc, 121, 140, new MapLocation(0,0));
         trappedCount = 0;
-        System.out.println("No, I'm trapped :|");
+        //System.out.println("No, I'm trapped :|");
     }
 
 }

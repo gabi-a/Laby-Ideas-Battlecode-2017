@@ -38,7 +38,7 @@ public class BotGardener {
     	// If we aren't trying to build anything,
     	// pop the next unit to build
     	// If there are no units to build, plant trees
-    	if(typeToBuild != null) System.out.println(typeToBuild);
+    	if(typeToBuild != null) //System.out.println(typeToBuild);
     	if(typeToBuild == null) {
     		int[] buildQueue = Comms.popBuildStack(rc);
     		if(buildQueue != null) {

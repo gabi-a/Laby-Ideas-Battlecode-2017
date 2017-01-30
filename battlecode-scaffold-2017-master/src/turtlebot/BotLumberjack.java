@@ -57,7 +57,7 @@ public class BotLumberjack {
 				}
 			}
 		}
-    	if (!moved) System.out.println("\nI'm Stuck");
+    	//if (!moved) //System.out.println("\nI'm Stuck");
     	
 		// Action
         RobotInfo[] enemiesInStrikeRange = rc.senseNearbyRobots(RobotType.LUMBERJACK.bodyRadius+GameConstants.LUMBERJACK_STRIKE_RADIUS, enemyTeam);

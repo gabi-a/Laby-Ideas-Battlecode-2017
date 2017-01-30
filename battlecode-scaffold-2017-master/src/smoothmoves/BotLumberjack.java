@@ -152,11 +152,17 @@ public class BotLumberjack {
 			if(bestTree != null && rc.canChop(bestTree.ID)) {
 				chopID = bestTree.ID;
 				action = Action.CHOP;
-			} else if(rc.canChop(trees[0].ID)) {
-				chopID = trees[0].ID;
+			} if(bestTree != null && rc.canChop(bestTree.ID)) {
+				chopID = bestTree.ID;
 				action = Action.CHOP;
 			} else {
-				//System.err.format("\nI wanted to chop a tree but I couldn't :(\n");
+				for(int i = trees.length; i-->0;) {
+					if(rc.canChop(trees[i].ID))  {
+						chopID = trees[i].ID;
+						action = Action.CHOP;
+						break;
+					}
+				}
 			}
 		}
 		

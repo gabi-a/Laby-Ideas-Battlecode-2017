@@ -56,7 +56,7 @@ public class BotArchon {
 			 */
 
 		if (!Nav.avoidBullets(rc, myLocation) && !Nav.explore(rc)) {
-			// System.out.format("\nCouldn't move");
+			// //System.out.format("\nCouldn't move");
 		}
 
 		// Donate all of our bullets if we can win or the game's about to

@@ -271,7 +271,7 @@ public class BotGardener {
 		// leave some bullets for shooting
 		if(rc.getTeamBullets() < 130) return;
 		
-		System.out.println("\nLumberjacks: "+Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)+"\nTanks: "+Comms.ourBotCount.readNumBots(rc, RobotType.TANK));
+		//System.out.println("\nLumberjacks: "+Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)+"\nTanks: "+Comms.ourBotCount.readNumBots(rc, RobotType.TANK));
 		
 		if(Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK) <= 10 * Comms.ourBotCount.readNumBots(rc, RobotType.TANK)) {
 			tryToBuild(RobotType.LUMBERJACK);

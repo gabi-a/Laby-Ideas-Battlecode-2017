@@ -112,7 +112,7 @@ public class BotArchon {
 			else {
 				mapSize = MapSize.LARGE;
 			}
-			System.out.println(mapDist + "," + mapSize.ordinal());
+			//System.out.println(mapDist + "," + mapSize.ordinal());
 			Comms.mapSize.write(rc, mapSize.ordinal());
 		}
 		

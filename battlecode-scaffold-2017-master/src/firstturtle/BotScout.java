@@ -40,7 +40,7 @@ public class BotScout {
                         rc.move(moveDirection);
                     }
                     else if (!rc.onTheMap(selfLoc.add(moveDirection, STRIDE_RADIUS * 2))) {
-                        System.out.format("I'm at (%f, %f), and couldn't get to (%f, %f)", selfLoc.x, selfLoc.y, lockLocation.x, lockLocation.y);
+                        //System.out.format("I'm at (%f, %f), and couldn't get to (%f, %f)", selfLoc.x, selfLoc.y, lockLocation.x, lockLocation.y);
                         lockLocation = null;
                     }
                     else {

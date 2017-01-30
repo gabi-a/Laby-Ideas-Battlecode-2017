@@ -116,7 +116,7 @@ public class BotArchon {
          MapLocation unassignedCheck = Comms.popStack(rc, Comms.SCOUT_ARCHON_REQUEST_START, Comms.SCOUT_ARCHON_REQUEST_END);
          if(unassignedCheck != null) {
             delegateScout();
-            System.out.println("DELEGATED");
+            //System.out.println("DELEGATED");
             return true;
         }
         return false;

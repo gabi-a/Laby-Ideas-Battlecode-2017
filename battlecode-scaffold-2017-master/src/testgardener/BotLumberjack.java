@@ -96,7 +96,7 @@ public class BotLumberjack {
 				}
 			}
 		}
-    	if (!moved) System.out.println("\nI'm Stuck");
+    	//if (!moved) //System.out.println("\nI'm Stuck");
     	
 		
 		/*

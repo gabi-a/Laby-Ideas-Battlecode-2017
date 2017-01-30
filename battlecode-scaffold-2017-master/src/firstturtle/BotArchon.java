@@ -81,7 +81,7 @@ public class BotArchon {
     
     public static void delegateGardener(RobotController rc) throws GameActionException {
         Comms.writeStack(rc, 100, 120, gardenSpawns[gardenSpawnPointer]);
-        System.out.format("Delegrated (%f, %f)", gardenSpawns[gardenSpawnPointer].x, gardenSpawns[gardenSpawnPointer].y);
+        //System.out.format("Delegrated (%f, %f)", gardenSpawns[gardenSpawnPointer].x, gardenSpawns[gardenSpawnPointer].y);
         gardenSpawnPointer++;
         gardenSpawnPointer %= 24;
     }

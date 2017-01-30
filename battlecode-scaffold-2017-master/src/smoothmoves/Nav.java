@@ -32,7 +32,7 @@ public class Nav {
 			float intersections = 0;
 			for (int i = bulletsToAvoid.length; i --> 0;) {
 				if (bulletsToAvoid[i] == null) continue;
-				if(Clock.getBytecodeNum() > 9000) System.out.format("Bytecodes: %d, bullets: %d\n",Clock.getBytecodeNum(),bulletsToAvoid.length);
+				if(Clock.getBytecodeNum() > 9000); //System.out.format("Bytecodes: %d, bullets: %d\n",Clock.getBytecodeNum(),bulletsToAvoid.length);
 				bulletX = bulletsToAvoid[i].dir.getDeltaX(1f);
 				bulletY = bulletsToAvoid[i].dir.getDeltaY(1f);
 				Direction relDir = myLocation.directionTo(bulletsToAvoid[i].location);

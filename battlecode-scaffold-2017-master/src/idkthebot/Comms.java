@@ -28,7 +28,7 @@ public class Comms {
         int stackPointer = rc.readBroadcast(stackStart);
         
         if (stackStart + stackPointer + 1 > stackEnd) {
-            System.out.println("Oops! Exceeded stack limit.");
+            //System.out.println("Oops! Exceeded stack limit.");
             return;
         }
         
@@ -41,7 +41,7 @@ public class Comms {
         
         // Debug only!
         if (mapZoneX < 0 || mapZoneY < 0 || mapZoneX > 200 || mapZoneY > 200) {
-            System.out.format("\nWe shouldn't be here! Map zone X/Y < 0 or > 200, is %d,%d\n", mapZoneX, mapZoneY);
+            //System.out.format("\nWe shouldn't be here! Map zone X/Y < 0 or > 200, is %d,%d\n", mapZoneX, mapZoneY);
         }
         
         int packedLocation = (mapZoneX << 8) | (mapZoneY);
@@ -55,7 +55,7 @@ public class Comms {
         int stackPointer = rc.readBroadcast(BUILD_START);
         
         if (BUILD_START + stackPointer + 1 > BUILD_END) {
-            System.out.println("Oops! Exceeded stack limit.");
+            //System.out.println("Oops! Exceeded stack limit.");
             return;
         }
         
