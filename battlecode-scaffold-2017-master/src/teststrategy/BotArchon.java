@@ -159,6 +159,9 @@ public class BotArchon {
 		}
 		
 		else {
+			
+			goalLocation = goalLocation.add(theirArchonLocs[archonDesignation.ordinal()].directionTo(myLocation),3f);
+			
 			//if(myLocation.distanceTo(goalLocation) < 0.01f) {
 			if(bots.length > 0) {
 				for(int i = bots.length;i-->0;) {
