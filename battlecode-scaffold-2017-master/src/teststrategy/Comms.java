@@ -33,15 +33,15 @@ public class Comms {
 	
 	static {
 		ourBotCount = new CommsBotCount(0,6);
-		theirBotCount = new CommsBotCount(10,20);
-		enemyGardenersArray = new CommsBotArray(30, 40);
-		enemyArchonsArray = new CommsBotArray(50, 60);
-		enemiesAttackingGardenersOrArchons = new CommsBotArray(70,80);
-		ourLumberjackAndSoldiers = new CommsBotArray(90,100);
 		archonTreeCount = new CommsArray(110,113);
 		archonCount = new CommsInt(120);
 		mapSize = new CommsInt(125);
-		enemiesSighted = new CommsBotArray(130,140);
+		theirBotCount = new CommsBotCount(200,232);
+		enemyGardenersArray = new CommsBotArray(300, 432);
+		enemyArchonsArray = new CommsBotArray(500, 632);
+		enemiesAttackingGardenersOrArchons = new CommsBotArray(700,832);
+		ourLumberjackAndSoldiers = new CommsBotArray(900,1032);
+		enemiesSighted = new CommsBotArray(1300,1432);
 	}
 	
 	public static int packLocation(RobotController rc, MapLocation location) {
@@ -306,9 +306,22 @@ class CommsBotCount extends CommsArray {
 	
 }
 
-class CommsBotArray extends CommsArray {
+class CommsBotArray {
+	CommsArray x;
+	CommsArray y;
+	CommsArray id;
+	int arrayStart;
+	int arrayEnd;
+	int length;
+
 	CommsBotArray(int start, int end) {
-		super(start, end);
+		arrayStart = start;
+		arrayEnd = end;
+		length = (end - start)/3 + 1;
+
+		x = new CommsArray(start, start+length-1);
+		y = new CommsArray(start+length, start+length*2-1);
+		id = new CommsArray(start+length*2, end);
 	}
 
 	public void writeBot(RobotController rc, RobotInfo robot) throws GameActionException {
@@ -316,19 +329,21 @@ class CommsBotArray extends CommsArray {
 
 		// search array
 		int index = -1;
-		for(int i = 0; i < super.length(); i++){
-			RobotInfo bot = unpackBot(rc, super.read(rc, i));
-			if(bot == null){
+		for(int i = 0; i < length; i++){
+			int ID = id.read(rc,i);
+			if(ID == 0){
 				if(index == -1) index = i;
-				continue;
 			}
-			if(bot.ID == robot.ID){
+			if(ID == robot.ID){
 				index = i;
 				break;
 			}
 		}
 
-		super.write(rc, index, packBot(rc, robot));
+		MapLocation loc = robot.getLocation();
+		x.write(rc, index, (int)loc.x);
+		y.write(rc, index, (int)loc.y);
+		id.write(rc, index, robot.ID);
 	}
 
 	public RobotInfo readBot(RobotController rc, RobotInfo robot) throws GameActionException {
@@ -337,44 +352,33 @@ class CommsBotArray extends CommsArray {
 	}
 
 	public RobotInfo readBot(RobotController rc, int index) throws GameActionException {
-		return unpackBot(rc, super.read(rc, index));
+		MapLocation loc = new MapLocation(x.read(rc, index), y.read(rc, index));
+		return new RobotInfo(id.read(rc, index), null, null, loc, 0, 0, 0);
 	}
 
 	public void deleteBot(RobotController rc, RobotInfo robot) throws GameActionException {
 		int index = -1;
-		for(int i = 0; i < super.length(); i++){
-			RobotInfo bot = unpackBot(rc, super.read(rc, i));
-			if(bot != null && bot.ID == robot.ID){
-				super.write(rc, i, 0);
+		for(int i = 0; i < length; i++){
+			if(id.read(rc,i) == robot.ID){
+				x.write(rc, i, 0);
+				y.write(rc, i, 0);
+				id.write(rc, i, 0);
 				break;
 			}
 		}
 	}
 
 	public RobotInfo[] arrayBots(RobotController rc) throws GameActionException {
-		int[] intArray = super.array(rc);
-		RobotInfo[] botArray = new RobotInfo[intArray.length];
+		RobotInfo[] botArray = new RobotInfo[length];
 
-		for(int i = 0; i < intArray.length; i++){
-			botArray[i] = unpackBot(rc, intArray[i]);
+		for(int i = 0; i < length; i++){
+			MapLocation loc = new MapLocation(x.read(rc, i), y.read(rc, i));
+			botArray[i] = new RobotInfo(id.read(rc, i), null, null, loc, 0, 0, 0);
 		}
 
 		return botArray;
 	}
 
-	public int packBot(RobotController rc, RobotInfo robot) {
-		int loc = Comms.packLocation(rc, robot.getLocation());
-		return (robot.getID() << 16) | (loc);
-	}
-
-	public RobotInfo unpackBot(RobotController rc, int data) {
-		if(data == 0) return null;
-
-		int id = (data) >> 16;
-		MapLocation loc = Comms.unpackLocation(rc, data & 0xFFFF);
-
-		return new RobotInfo(id, null, null, loc, 0, 0, 0);
-	}
 }
 
 class CommsTree {
