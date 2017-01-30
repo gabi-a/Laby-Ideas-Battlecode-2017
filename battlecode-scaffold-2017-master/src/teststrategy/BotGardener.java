@@ -276,7 +276,7 @@ public class BotGardener {
 		
 		//System.out.println("\nLumberjacks: "+Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)+"\nTanks: "+Comms.ourBotCount.readNumBots(rc, RobotType.TANK));
 
-		if(lotsOfTrees) {
+		if(lotsOfTrees && mapSize != MapSize.VSMALL) {
 			System.out.println("Lumberjacks:"+units[RobotType.LUMBERJACK.ordinal()]+"Tanks:"+units[RobotType.TANK.ordinal()]);
 			if(units[RobotType.LUMBERJACK.ordinal()] <= 10 + 10 * units[RobotType.TANK.ordinal()]) {
 				System.out.println("I want to build a lumberjack!");
@@ -306,7 +306,7 @@ public class BotGardener {
 		if(turnsAlive >= 60) return false;
 		
 		if(mapSize == MapSize.LARGE) return false;
-		if(!lotsOfTrees) {
+		if(!lotsOfTrees || mapSize == MapSize.VSMALL) {
 			if(units[RobotType.SOLDIER.ordinal()] <= 1){
 				tryToBuild(RobotType.SOLDIER); 
 				return true;

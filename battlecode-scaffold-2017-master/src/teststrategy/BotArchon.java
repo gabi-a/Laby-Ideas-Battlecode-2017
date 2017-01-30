@@ -19,6 +19,7 @@ public class BotArchon {
 	}
 	
 	public static enum MapSize {
+		VSMALL,
 		SMALL,
 		MEDIUM,
 		LARGE
@@ -133,7 +134,10 @@ public class BotArchon {
 					}
 				}
 			}
-			if(mapDist < 50f) {
+			if(mapDist < 15f) {
+				mapSize = MapSize.VSMALL;
+			}
+			else if(mapDist < 50f) {
 				mapSize = MapSize.SMALL;
 			}
 			else if(mapDist < 100f) {
