@@ -82,7 +82,48 @@ public class BotArchon {
 					*/
 				}
 			}
-			tryHireGardener();
+			
+			Comms.archonCount.increment(rc, 1);
+			float longestDistance = 0f;
+			MapLocation bestArchonLocation = myLocation;
+			for(int i = ourArchonLocs.length;i-->0;) {
+				MapLocation ourArchonLoc = ourArchonLocs[i];
+				for(int j = theirArchonLocs.length;j-->0;) {
+					if(theirArchonLocs[j].distanceTo(ourArchonLoc) > longestDistance) {
+						longestDistance = theirArchonLocs[j].distanceTo(ourArchonLoc);
+						bestArchonLocation = ourArchonLoc;
+					}
+				}
+			}
+			if(bestArchonLocation == myLocation) {
+				initialSpawningArchon = true;
+				tryHireGardener();
+			}
+			float mapDist = 0f;
+			for(int i=0; i < numInitialArchons; i++) {
+				for(int j=0; j < numInitialArchons; j++) {
+					float dist = ourArchonLocs[i].distanceTo(theirArchonLocs[j]);
+					if(dist > mapDist) {
+						mapDist = dist;
+					}
+				}
+			}
+			if(mapDist < 15f) {
+				mapSize = MapSize.VSMALL;
+			}
+			else if(mapDist < 50f) {
+				mapSize = MapSize.SMALL;
+			}
+			else if(mapDist < 100f) {
+				mapSize = MapSize.MEDIUM;
+			}
+			else {
+				mapSize = MapSize.LARGE;
+			}
+			//System.out.println(mapDist + "," + mapSize.ordinal());
+			Comms.mapSize.write(rc, mapSize.ordinal());
+			
+
 			float treeHits = 0;
 			float onMapHits = 0;
 			for(float rayRads = (float) (2f*Math.PI); (rayRads -= 2f*Math.PI/36f) > 0;) {
@@ -112,44 +153,6 @@ public class BotArchon {
 			System.out.println("On Map:"+onMapHits+"Trees:"+treeHits);
 			System.out.println("Tree heuristic: " + treeHeuristic);
 			
-			Comms.archonCount.increment(rc, 1);
-			float longestDistance = 0f;
-			MapLocation bestArchonLocation = myLocation;
-			for(int i = ourArchonLocs.length;i-->0;) {
-				MapLocation ourArchonLoc = ourArchonLocs[i];
-				for(int j = theirArchonLocs.length;j-->0;) {
-					if(theirArchonLocs[j].distanceTo(ourArchonLoc) > longestDistance) {
-						longestDistance = theirArchonLocs[j].distanceTo(ourArchonLoc);
-						bestArchonLocation = ourArchonLoc;
-					}
-				}
-			}
-			if(bestArchonLocation == myLocation) {
-				initialSpawningArchon = true;
-			}
-			float mapDist = 0f;
-			for(int i=0; i < numInitialArchons; i++) {
-				for(int j=0; j < numInitialArchons; j++) {
-					float dist = ourArchonLocs[i].distanceTo(theirArchonLocs[j]);
-					if(dist > mapDist) {
-						mapDist = dist;
-					}
-				}
-			}
-			if(mapDist < 15f) {
-				mapSize = MapSize.VSMALL;
-			}
-			else if(mapDist < 50f) {
-				mapSize = MapSize.SMALL;
-			}
-			else if(mapDist < 100f) {
-				mapSize = MapSize.MEDIUM;
-			}
-			else {
-				mapSize = MapSize.LARGE;
-			}
-			//System.out.println(mapDist + "," + mapSize.ordinal());
-			Comms.mapSize.write(rc, mapSize.ordinal());
 		}
 		
 		
