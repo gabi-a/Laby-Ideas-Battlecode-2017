@@ -87,6 +87,20 @@ public class Util {
 		
 	}
 	
+	static boolean doesLineIntersectWithCircle(MapLocation lineStart, Direction lineDir, MapLocation circleLocation, float circleRadius) {
+
+		//System.out.format("Line Start: %f,%f  Circle Loc: %f,%f\n", lineStart.x,lineStart.y,circleLocation.x,circleLocation.y);
+		double theta = lineDir.radiansBetween(lineStart.directionTo(circleLocation));
+		theta =  theta % 2*Math.PI;
+		double hypotenuse = lineStart.distanceTo(circleLocation);
+		double perpendicularDist = hypotenuse * Math.sin(theta);
+		
+		//RobotPlayer.rc.setIndicatorLine(lineStart,lineStart.add(lineDir, 10f), 100, 50, 0);
+		//RobotPlayer.rc.setIndicatorDot(circleLocation, 0, 100, 50);
+		return perpendicularDist < circleRadius;
+		
+	}
+	
 	public static MapLocation halfwayLocation(MapLocation loc1, MapLocation loc2) {
 		return loc1.add(new Direction(loc1, loc2), loc1.distanceTo(loc2) / 2);
 	}
