@@ -245,6 +245,36 @@ public class Nav {
 		}
 
 		moveState = (moveState == moveState.LEFT) ? moveState.RIGHT : moveState.LEFT;
+		
+		switch (moveState) {
+		case LEFT:
+			for (int i = 0; i < tries; i++) {
+				trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
+				//rc.setIndicatorLine(myLocation, myLocation.add(trial), 255, 0, 0);
+				if (rc.canMove(trial, stride)) {
+					dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+					heading = trial;
+					return myLocation.add(trial, stride);
+				}
+			}
+			break;
+		case RIGHT:
+			for (int i = 0; i < tries; i++) {
+				trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
+				//rc.setIndicatorLine(myLocation, myLocation.add(trial), 0, 255, 0);
+				if (rc.canMove(trial, stride)) {
+					dMin = Math.min(dMin, myLocation.add(trial, stride).distanceTo(goal));
+					heading = trial;
+					myLocation.add(trial, stride);
+					return myLocation.add(trial, stride);
+				}
+			}
+			break;
+		default:
+			System.out.println("PATHING SHOULDN'T GET HERE!");
+			break;
+		}
+		
 		return null;
 
 	}
