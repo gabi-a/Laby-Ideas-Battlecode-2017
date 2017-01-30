@@ -19,6 +19,7 @@ public class BotArchon {
 	}
 	
 	public static enum MapSize {
+		VSMALL,
 		SMALL,
 		MEDIUM,
 		LARGE
@@ -87,13 +88,15 @@ public class BotArchon {
 			for(float rayRads = (float) (2f*Math.PI); (rayRads -= 2f*Math.PI/36f) > 0;) {
 				boolean rayHitTree = false;
 				Direction rayDir = new Direction(rayRads);
-				rc.setIndicatorLine(myLocation, myLocation.add(rayDir,5),  0, 0, 255);
 				for(int i = 0; i < Math.min(trees.length, 36); i++) {
 					if (Util.doesLineIntersectWithCircle(myLocation, rayDir, trees[i].location, trees[i].radius +0f)) {
 						rayHitTree = true;
-						rc.setIndicatorLine(myLocation, trees[i].location, 255, 0, 0);
+						rc.setIndicatorLine(myLocation, myLocation.add(rayDir,10),  0, 0, 255);
 						treeHits++;
 						break;
+					}
+					else {
+						rc.setIndicatorLine(myLocation, myLocation.add(rayDir,10), 255, 0, 0);
 					}
 				}
 				if(rayHitTree) {
@@ -101,7 +104,7 @@ public class BotArchon {
 				} else if(rc.onTheMap(myLocation.add(rayDir, RobotType.ARCHON.sensorRadius - 0.0001f))) {
 					onMapHits++;
 				} else {
-					rc.setIndicatorLine(myLocation, myLocation.add(rayDir,5),  0, 255, 0);
+					rc.setIndicatorLine(myLocation, myLocation.add(rayDir,10),  0, 255, 0);
 				}
 			}
 			float treeHeuristic = treeHits / onMapHits;
@@ -133,7 +136,10 @@ public class BotArchon {
 					}
 				}
 			}
-			if(mapDist < 50f) {
+			if(mapDist < 15f) {
+				mapSize = MapSize.VSMALL;
+			}
+			else if(mapDist < 50f) {
 				mapSize = MapSize.SMALL;
 			}
 			else if(mapDist < 100f) {

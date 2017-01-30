@@ -22,7 +22,7 @@ public class BotGardener {
 	
 	static int turnsAlive = 0;
 	
-	static final float TREE_HEURISTIC_THRESHOLD = 60;
+	static final float TREE_HEURISTIC_THRESHOLD = 77;
 	
 	static MapLocation goalLocation;
 	static MapLocation enemyBase;
@@ -48,17 +48,12 @@ public class BotGardener {
 			MapLocation[] theirArchonLocs = rc.getInitialArchonLocations(them);
 			enemyBase = theirArchonLocs[0];
 			int[] archonTrees = Comms.archonTreeCount.array(rc);
-			int heuristic = 0;
+			int heuristic = 100;
 			for(int i = numInitialArchons;i-->0;) {
-				heuristic += archonTrees[i];
+				if(archonTrees[i] < heuristic) {
+					heuristic = archonTrees[i];
+				}
 			}
-			heuristic /= numInitialArchons;
-			//int minArea = 10000;
-			//for(int i = numInitialArchons;i-->0;) {
-			//	if(archonTrees[i] < minArea) {
-			//		minArea = archonTrees[i];
-			//	}
-			//}
 			if(heuristic > TREE_HEURISTIC_THRESHOLD) {
 				lotsOfTrees = true;
 			}
@@ -276,7 +271,7 @@ public class BotGardener {
 		
 		//System.out.println("\nLumberjacks: "+Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)+"\nTanks: "+Comms.ourBotCount.readNumBots(rc, RobotType.TANK));
 
-		if(lotsOfTrees) {
+		if(lotsOfTrees && mapSize != MapSize.VSMALL) {
 			System.out.println("Lumberjacks:"+units[RobotType.LUMBERJACK.ordinal()]+"Tanks:"+units[RobotType.TANK.ordinal()]);
 			if(units[RobotType.LUMBERJACK.ordinal()] <= 10 + 10 * units[RobotType.TANK.ordinal()]) {
 				System.out.println("I want to build a lumberjack!");
@@ -306,7 +301,7 @@ public class BotGardener {
 		if(turnsAlive >= 60) return false;
 		
 		if(mapSize == MapSize.LARGE) return false;
-		if(!lotsOfTrees) {
+		if(!lotsOfTrees || mapSize == MapSize.VSMALL) {
 			if(units[RobotType.SOLDIER.ordinal()] <= 1){
 				tryToBuild(RobotType.SOLDIER); 
 				return true;
