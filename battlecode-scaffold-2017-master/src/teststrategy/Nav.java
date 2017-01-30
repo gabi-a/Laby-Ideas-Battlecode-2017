@@ -164,7 +164,7 @@ public class Nav {
 		float stride = Math.min(rc.getType().strideRadius, Math.max(myLocation.distanceTo(goal) - bodyRadius - goalRadius, 0f));
 		
 		// If this is the first time going here, clear our pathing memory
-		if (goal.distanceTo(goalCache) > 5f) {
+		if (goal.distanceTo(goalCache) > 3f) {
 			goalCache = goal;
 			dMin = 10000f;
 			moveState = MoveState.TOWARD_LEFT;
@@ -172,7 +172,7 @@ public class Nav {
 		
 		goalCache = goal;
 
-		float degreeOffset = 31f;
+		float degreeOffset = 29f;
 		int tries = 6;
 		Direction trial;
 		
@@ -183,7 +183,7 @@ public class Nav {
 		}
 
 		// Idea: if we can go closer to the goal than we ever have before, do so.
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i <= 3; i++) {
 			trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 			if (rc.canMove(trial, stride) && myLocation.add(trial, stride).distanceTo(goal) < dMin) {
 				dMin = myLocation.add(trial, stride).distanceTo(goal);
@@ -217,7 +217,7 @@ public class Nav {
 
 		switch (moveState) {
 			case LEFT:
-				for (int i = 0; i < tries; i++) {
+				for (int i = 0; i <= tries; i++) {
 					trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 					//rc.setIndicatorLine(myLocation, myLocation.add(trial), 255, 0, 0);
 					if (rc.canMove(trial, stride)) {
@@ -228,7 +228,7 @@ public class Nav {
 				}
 				break;
 			case RIGHT:
-				for (int i = 0; i < tries; i++) {
+				for (int i = 0; i <= tries; i++) {
 					trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
 					//rc.setIndicatorLine(myLocation, myLocation.add(trial), 0, 255, 0);
 					if (rc.canMove(trial, stride)) {
@@ -248,7 +248,7 @@ public class Nav {
 		
 		switch (moveState) {
 		case LEFT:
-			for (int i = 0; i < tries; i++) {
+			for (int i = 0; i <= tries; i++) {
 				trial = new Direction(myLocation, goal).rotateLeftDegrees(degreeOffset * i);
 				//rc.setIndicatorLine(myLocation, myLocation.add(trial), 255, 0, 0);
 				if (rc.canMove(trial, stride)) {
@@ -259,7 +259,7 @@ public class Nav {
 			}
 			break;
 		case RIGHT:
-			for (int i = 0; i < tries; i++) {
+			for (int i = 0; i <= tries; i++) {
 				trial = new Direction(myLocation, goal).rotateRightDegrees(degreeOffset * i);
 				//rc.setIndicatorLine(myLocation, myLocation.add(trial), 0, 255, 0);
 				if (rc.canMove(trial, stride)) {
