@@ -118,6 +118,17 @@ public class BotLumberjack {
 			}
 		}
 		
+		if(moveDirection == null && trees.length == 0) {
+			RobotInfo somewhereToGo = Util.getBestPassiveEnemy(rc);
+			MapLocation goalLocation = null;
+			if(somewhereToGo != null) goalLocation = somewhereToGo.location;
+			MapLocation moveLocation = Nav.pathTo(rc, goalLocation);
+			if(moveLocation != null) moveDirection = myLocation.directionTo(moveLocation);
+		}
+		
+		System.out.println("Move stride:"+moveStride);
+		System.out.println("Move direction:"+moveDirection);
+		
 		/************* Determine what action to take *************/
 		byte action = Action.DIE_EXCEPTION;
 		int chopID = 0;
@@ -169,6 +180,7 @@ public class BotLumberjack {
 			}
 			*/
 		}
+		
 		
 		/************* Do action *********************************/
 		
