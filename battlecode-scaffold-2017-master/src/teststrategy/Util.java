@@ -77,7 +77,8 @@ public class Util {
 		if(lineStart.directionTo(circleLocation) == null || lineEnd.directionTo(circleLocation) == null) return false;
 		
 		//System.out.format("Line Start: %f,%f  Circle Loc: %f,%f\n", lineStart.x,lineStart.y,circleLocation.x,circleLocation.y);
-		float theta = lineStart.directionTo(lineEnd).radiansBetween(lineStart.directionTo(circleLocation));
+		float theta = Math.abs(lineStart.directionTo(lineEnd).radiansBetween(lineStart.directionTo(circleLocation)));
+		if(theta > Math.PI/4) return false;
 		float hypotenuse = lineStart.distanceTo(circleLocation);
 		float perpendicularDist = (float) (hypotenuse * Math.sin(theta));
 		
@@ -90,8 +91,8 @@ public class Util {
 	static boolean doesLineIntersectWithCircle(MapLocation lineStart, Direction lineDir, MapLocation circleLocation, float circleRadius) {
 
 		//System.out.format("Line Start: %f,%f  Circle Loc: %f,%f\n", lineStart.x,lineStart.y,circleLocation.x,circleLocation.y);
-		double theta = lineDir.radiansBetween(lineStart.directionTo(circleLocation));
-		theta =  theta % 2*Math.PI;
+		double theta = Math.abs(lineDir.radiansBetween(lineStart.directionTo(circleLocation)));
+		if(theta > Math.PI/4) return false;
 		double hypotenuse = lineStart.distanceTo(circleLocation);
 		double perpendicularDist = hypotenuse * Math.sin(theta);
 		

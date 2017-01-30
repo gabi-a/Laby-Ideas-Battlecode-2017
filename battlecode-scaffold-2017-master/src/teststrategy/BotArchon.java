@@ -81,28 +81,32 @@ public class BotArchon {
 					*/
 				}
 			}
+			tryHireGardener();
 			float treeHits = 0;
 			float onMapHits = 0;
-			for(float rayRads = (float) (2f*Math.PI); (rayRads -= 2f*Math.PI/72f) > 0;) {
+			for(float rayRads = (float) (2f*Math.PI); (rayRads -= 2f*Math.PI/36f) > 0;) {
 				boolean rayHitTree = false;
 				Direction rayDir = new Direction(rayRads);
 				rc.setIndicatorLine(myLocation, myLocation.add(rayDir,5),  0, 0, 255);
-				for(int i = 0; i < trees.length; i++) {
-					if (Util.doesLineIntersectWithCircle(myLocation, rayDir, trees[i].location, trees[i].radius+1)) {
+				for(int i = 0; i < Math.min(trees.length, 36); i++) {
+					if (Util.doesLineIntersectWithCircle(myLocation, rayDir, trees[i].location, trees[i].radius +0f)) {
 						rayHitTree = true;
 						rc.setIndicatorLine(myLocation, trees[i].location, 255, 0, 0);
 						treeHits++;
 						break;
 					}
 				}
-				if(!rayHitTree) {
-					if(rc.onTheMap(myLocation.add(rayDir, RobotType.ARCHON.sensorRadius - 0.0001f))) {
-						onMapHits++;
-					}
+				if(rayHitTree) {
+					onMapHits++;
+				} else if(rc.onTheMap(myLocation.add(rayDir, RobotType.ARCHON.sensorRadius - 0.0001f))) {
+					onMapHits++;
+				} else {
+					rc.setIndicatorLine(myLocation, myLocation.add(rayDir,5),  0, 255, 0);
 				}
 			}
 			float treeHeuristic = treeHits / onMapHits;
-			
+			Comms.archonTreeCount.write(rc, archonDesignation.ordinal(), (int)(100*treeHeuristic));
+			System.out.println("On Map:"+onMapHits+"Trees:"+treeHits);
 			System.out.println("Tree heuristic: " + treeHeuristic);
 			
 			Comms.archonCount.increment(rc, 1);
