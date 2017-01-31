@@ -152,6 +152,16 @@ public class BotGardener {
 				moveStride = myLocation.distanceTo(myLocation);
 			}
 		}
+
+		
+		/************* Do Move ***********************************/
+		
+		/*
+		 * All checks to see if this move is possible should already
+		 * have taken place
+		 */
+		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
+			rc.move(moveDirection, moveStride);
 		
 		/************* Determine what action to take *************/
 		
@@ -166,15 +176,6 @@ public class BotGardener {
 		
 		buildUnit(units);
 		waterTrees();
-		
-		/************* Do Move ***********************************/
-		
-		/*
-		 * All checks to see if this move is possible should already
-		 * have taken place
-		 */
-		if(moveDirection != null && rc.canMove(moveDirection, moveStride))
-			rc.move(moveDirection, moveStride);
 		
 		/************* Do action *********************************/
 		
@@ -297,6 +298,9 @@ public class BotGardener {
 		
 		//System.out.println("\nLumberjacks: "+Comms.ourBotCount.readNumBots(rc, RobotType.LUMBERJACK)+"\nTanks: "+Comms.ourBotCount.readNumBots(rc, RobotType.TANK));
 
+		if(units[RobotType.SCOUT.ordinal()] == 0) {
+			tryToBuild(RobotType.SCOUT);
+		}
 		if(lotsOfTrees && mapSize != MapSize.VSMALL) {
 			if(2*units[RobotType.SOLDIER.ordinal()] < units[RobotType.LUMBERJACK.ordinal()]) {
 				tryToBuild(RobotType.SOLDIER);
