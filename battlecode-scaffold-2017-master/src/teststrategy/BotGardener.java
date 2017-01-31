@@ -321,7 +321,7 @@ public class BotGardener {
 			tryToBuild(RobotType.SCOUT);
 		}
 		if(lotsOfTrees && mapSize != MapSize.VSMALL) {
-			if(2*units[RobotType.SOLDIER.ordinal()] < units[RobotType.LUMBERJACK.ordinal()]) {
+			if(units[RobotType.LUMBERJACK.ordinal()] > 2 * units[RobotType.SOLDIER.ordinal()]) {
 				tryToBuild(RobotType.SOLDIER);
 			}
 			else if(units[RobotType.LUMBERJACK.ordinal()] <= 6 + 6 * units[RobotType.TANK.ordinal()]) {

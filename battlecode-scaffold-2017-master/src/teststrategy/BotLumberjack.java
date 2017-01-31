@@ -89,7 +89,19 @@ public class BotLumberjack {
 				enemyBase = rc.getInitialArchonLocations(them)[0];
 			}
 			//rc.setIndicatorDot(enemyBase, 0, 255, 0);
-			if(!treeContainsRobot) {
+			boolean gardenerNearby = false;
+			if(allies.length > 0) {
+				for(int i = allies.length;i-->0;) {
+					if(allies[i].getType() == RobotType.GARDENER) {
+						gardenerNearby = true;
+						rc.setIndicatorDot(allies[i].location, 0, 255, 255);
+						break;
+					}
+				}
+			}
+			rc.setIndicatorDot(goalLocation, 255, 255, 0);
+			
+			if(!treeContainsRobot && !(goalLocation != myLocation && trees.length>0 && gardenerNearby)) {
 				
 				if(enemyBase != null){
 						goalLocation = enemyBase;
@@ -102,7 +114,8 @@ public class BotLumberjack {
 				
 				if(allies.length > 0) {
 					for(int i = allies.length;i-->0;) {
-						goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 1f);
+							goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 1f);
+				
 					}
 				}
 			}
