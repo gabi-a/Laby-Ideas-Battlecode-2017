@@ -33,6 +33,8 @@ public class BotGardener {
 	
 	static boolean tankGardener = false;
 	
+	static boolean heuristicSet = false;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
 		
@@ -62,9 +64,14 @@ public class BotGardener {
 		if(!treeCountFlag) {
 			MapLocation[] theirArchonLocs = rc.getInitialArchonLocations(them);
 			enemyBase = theirArchonLocs[0];
+			treeCountFlag = true;
+		}
+		
+		if(!heuristicSet && turnsAlive >= 2) {
 			int[] archonTrees = Comms.archonTreeCount.array(rc);
 			int heuristic = 100;
-			for(int i = numInitialArchons-1;i-->0;) {
+			for(int i = 0; i < numInitialArchons; i++) {
+				System.out.println(archonTrees[i]);
 				if(archonTrees[i] < heuristic) {
 					heuristic = archonTrees[i];
 				}
@@ -73,10 +80,11 @@ public class BotGardener {
 			if(heuristic > TREE_HEURISTIC_THRESHOLD) {
 				lotsOfTrees = true;
 			}
-			treeCountFlag = true;
-			System.out.format("Lots of trees: %b\n"
+			heuristicSet = true;
+			System.out.format("Num initial archons: %d\n"
+							+ "Lots of trees: %b\n"
 							+ "heuristic: %d\n"
-							+ "threshold: %f\n",lotsOfTrees,heuristic,TREE_HEURISTIC_THRESHOLD);
+							+ "threshold: %f\n",numInitialArchons,lotsOfTrees,heuristic,TREE_HEURISTIC_THRESHOLD);
 		}
 		
 		RobotInfo[] bots = rc.senseNearbyRobots();
