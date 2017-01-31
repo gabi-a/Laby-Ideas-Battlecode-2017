@@ -74,8 +74,8 @@ public class RobotPlayer {
 				MapLocation myLocation = rc.getLocation();
 	 			
 				//MapLocation moveLocation = BulletsAndSets.useVennDiagramsToDodgeBullets(rc.getType().bodyRadius, myLocation, bullets);
-				//MapLocation moveLocation = Nav.dodgeBulletsAndStuff(rc, myLocation, bullets);
-				MapLocation moveLocation = awayFromBullets(rc, myLocation, bullets);
+				MapLocation moveLocation = Nav.reallyDontGetHit(rc, myLocation, bullets);
+				//MapLocation moveLocation = awayFromBullets(rc, myLocation, bullets);
 				
 				Direction moveDirection = myLocation.directionTo(moveLocation);
 				float moveStride = Math.min(rc.getType().strideRadius, myLocation.distanceTo(moveLocation));
@@ -91,11 +91,11 @@ public class RobotPlayer {
 	}
 
 	private static void runGardener() throws GameActionException {
-		
+		BotGardener.turn(rc);
 	}
 
 	private static void runArchon() throws GameActionException {
-		
+		BotArchon.turn(rc);
 	}
 	
 	public static MapLocation awayFromBullets(RobotController rc, MapLocation myLocation, BulletInfo[] bullets) throws GameActionException {

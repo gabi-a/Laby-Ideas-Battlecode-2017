@@ -300,6 +300,7 @@ public class Nav {
 	
 	static float calcHitDist(MapLocation bulletStart, MapLocation bulletFinish,
             MapLocation targetCenter, float targetRadius) {
+		RobotPlayer.rc.setIndicatorLine(bulletStart, bulletFinish, 255, 0, 255);
 		final float minDist = 0;
         final float maxDist = bulletStart.distanceTo(bulletFinish);
         final float distToTarget = bulletStart.distanceTo(targetCenter);
@@ -352,7 +353,7 @@ public class Nav {
 		
 		float minHitDist = 100;
 		for(int i = bullets.length; i-->0;) {
-			float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,bullets[i].speed), myLocation, rc.getType().bodyRadius);
+			float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,2*bullets[i].speed), myLocation, rc.getType().bodyRadius);
 			if(hitDist != -1) {
 				if(hitDist < minHitDist) {
 					minHitDist = hitDist;
@@ -427,6 +428,7 @@ public class Nav {
 			hits = 0;
 			for(int i = bullets.length; i-->0;) {
 				boolean hit = calcHit(bullets[i], possibleMoveLoc, rc.getType().bodyRadius);
+				if(hit) RobotPlayer.rc.setIndicatorDot(possibleMoveLoc,0,0,128);
 				if(hit) hits++;
 			}
 			if(hits == 0) return possibleMoveLoc;
@@ -439,6 +441,7 @@ public class Nav {
 			hits = 0;
 			for(int i = bullets.length; i-->0;) {
 				boolean hit = calcHit(bullets[i], possibleMoveLoc, rc.getType().bodyRadius);
+				if(hit) RobotPlayer.rc.setIndicatorDot(possibleMoveLoc,0,0,128);
 				if(hit) hits++;
 			}
 			if(hits == 0) return possibleMoveLoc;
