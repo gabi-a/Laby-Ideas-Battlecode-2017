@@ -48,7 +48,7 @@ public class BotSoldier {
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		//RobotInfo[] closeEnemies = rc.senseNearbyRobots(3f, them);
 		
-		Util.shakeIfAble(rc, trees);
+		Util.shakeIfAble(rc);
 		
 		Util.updateMyPostion(rc);
 		Util.reportEnemyBots(rc, enemies);
