@@ -291,8 +291,9 @@ public class Nav {
 	}
 	
 	static boolean calcHit(BulletInfo bullet, MapLocation targetCenter, float targetRadius) {
-		//System.out.println(bulletCenter.distanceTo(targetCenter));
-		//return bulletCenter.distanceTo(targetCenter) < targetRadius;
+		
+		if( Math.abs(bullet.dir.degreesBetween(bullet.location.directionTo(targetCenter))) % 360 > 30 ) return false; 
+		
 		MapLocation bulletFutureLocation = bullet.location.add(bullet.dir,bullet.speed);
 		float hitDist = calcHitDist(bullet.location, bulletFutureLocation, targetCenter, targetRadius);
 		return(hitDist >= 0);
@@ -352,7 +353,7 @@ public class Nav {
 		
 		float minHitDist = 100;
 		for(int i = bullets.length; i-->0;) {
-			float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,bullets[i].speed), myLocation, rc.getType().bodyRadius);
+			float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,10*bullets[i].speed), myLocation, rc.getType().bodyRadius);
 			if(hitDist != -1) {
 				if(hitDist < minHitDist) {
 					minHitDist = hitDist;
@@ -368,7 +369,7 @@ public class Nav {
 			
 			minHitDist = 100;
 			for(int i = bullets.length; i-->0;) {
-				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
+				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,10*bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
 				if(hitDist != -1) {
 					rc.setIndicatorDot(possibleMoveLoc, (int)(100 * hitDist), (int)(100 * hitDist), (int)(100 * hitDist));
 					if(hitDist < minHitDist) {
@@ -388,7 +389,7 @@ public class Nav {
 			
 			minHitDist = 100;
 			for(int i = bullets.length; i-->0;) {
-				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
+				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,10*bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
 				if(hitDist != -1) {
 					rc.setIndicatorDot(possibleMoveLoc, (int)(100 * hitDist), (int)(100 * hitDist), (int)(100 * hitDist));
 					if(hitDist < minHitDist) {
@@ -458,9 +459,47 @@ public class Nav {
 		
 	}
 	
-	static void finalDodgeAttempt(float strideRadius, float bodyRadius, MapLocation myLocation, BulletInfo[] bullets) {
+	static MapLocation finalDodgeAttempt(float strideRadius, float bodyRadius, MapLocation myLocation, BulletInfo[] bullets) {
 		
-		// Step 1: Find 
+		// Step 1: Find the circle with the least bullets in it
+		int minBulletsInTestLocation = 1000;
+		MapLocation bestTestLocation = myLocation;
+		for(float testRads = 2f * (float) Math.PI; (testRads -= 2f * (float) Math.PI / 6f) >= 0;) {
+			Direction testDir = new Direction(testRads);
+			MapLocation centerTestLocation = myLocation.add(testDir, strideRadius/2f);
+			int bulletsInTestLocation = 0;
+			RobotPlayer.rc.setIndicatorDot(myLocation.add(testDir, 10*strideRadius/2f), 255, 0, 0);
+			for(int i = bullets.length;i-->0;) {
+				if(bullets[i].location.add(bullets[i].dir,4 * bullets[i].speed).distanceTo(centerTestLocation) < 1f) {
+					bulletsInTestLocation++;
+				}
+			}
+			if(bulletsInTestLocation < minBulletsInTestLocation) {
+				minBulletsInTestLocation = bulletsInTestLocation;
+				bestTestLocation = centerTestLocation;
+			}
+		}
+
+		RobotPlayer.rc.setIndicatorDot(myLocation.add(myLocation.directionTo(bestTestLocation), 10*strideRadius/2f), 0, 0, 0);
 		
+		// Step 2: Within the test circle find a better location
+		MapLocation bestFinalTestLocation = bestTestLocation;
+		for(float testRads = 2f * (float) Math.PI; (testRads -= 2f * (float) Math.PI / 6f) >= 0;) {
+			Direction testDir = new Direction(testRads);
+			MapLocation centerTestLocation = bestTestLocation.add(testDir, strideRadius/4f);
+			int bulletsInTestLocation = 0;
+			RobotPlayer.rc.setIndicatorDot(myLocation.add(myLocation.directionTo(bestTestLocation), 10*strideRadius/2f).add(testDir, 5 * strideRadius/4f), 0, 255, 0);
+			for(int i = bullets.length;i-->0;) {
+				if(calcHit(bullets[i], myLocation, bodyRadius)) {
+					bulletsInTestLocation++;
+				}
+			}
+			if(bulletsInTestLocation < minBulletsInTestLocation) {
+				minBulletsInTestLocation = bulletsInTestLocation;
+				bestFinalTestLocation = centerTestLocation;
+			}
+		}
+		RobotPlayer.rc.setIndicatorDot(myLocation.add(myLocation.directionTo(bestTestLocation), 10*strideRadius/2f).add(bestTestLocation.directionTo(bestFinalTestLocation), 5 * strideRadius/4f), 0, 0, 0);
+		return bestFinalTestLocation;
 	}
 }

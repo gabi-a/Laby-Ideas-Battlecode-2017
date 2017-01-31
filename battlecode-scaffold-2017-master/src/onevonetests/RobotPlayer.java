@@ -63,7 +63,7 @@ public class RobotPlayer {
 			//}
 			if(enemies.length > 0) {
 				//if(!rc.hasMoved() && rc.canMove(rc.getLocation().directionTo(enemies[0].location))) rc.move(rc.getLocation().directionTo(enemies[0].location));
-				if(rc.canFireSingleShot()) rc.fireSingleShot(rc.getLocation().directionTo(enemies[0].location));
+				if(rc.canFireTriadShot()) rc.fireTriadShot(rc.getLocation().directionTo(enemies[0].location));
 			}
 			break;}
 			//No break so that it fires
@@ -75,7 +75,10 @@ public class RobotPlayer {
 	 			
 				//MapLocation moveLocation = BulletsAndSets.useVennDiagramsToDodgeBullets(rc.getType().bodyRadius, myLocation, bullets);
 				//MapLocation moveLocation = Nav.dodgeBulletsAndStuff(rc, myLocation, bullets);
-				MapLocation moveLocation = awayFromBullets(rc, myLocation, bullets);
+				//MapLocation moveLocation = awayFromBullets(rc, myLocation, bullets);
+				//MapLocation moveLocation = Nav.finalDodgeAttempt(rc.getType().strideRadius, rc.getType().bodyRadius, myLocation, bullets);
+				MapLocation moveLocation = Nav.reallyDontGetHit(rc, myLocation, bullets);
+				
 				
 				Direction moveDirection = myLocation.directionTo(moveLocation);
 				float moveStride = Math.min(rc.getType().strideRadius, myLocation.distanceTo(moveLocation));
