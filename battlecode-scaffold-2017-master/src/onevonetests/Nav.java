@@ -353,7 +353,7 @@ public class Nav {
 		
 		float minHitDist = 100;
 		for(int i = bullets.length; i-->0;) {
-			float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,10*bullets[i].speed), myLocation, rc.getType().bodyRadius);
+			float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,2*bullets[i].speed), myLocation, rc.getType().bodyRadius);
 			if(hitDist != -1) {
 				if(hitDist < minHitDist) {
 					minHitDist = hitDist;
@@ -369,7 +369,7 @@ public class Nav {
 			
 			minHitDist = 100;
 			for(int i = bullets.length; i-->0;) {
-				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,10*bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
+				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,2*bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
 				if(hitDist != -1) {
 					rc.setIndicatorDot(possibleMoveLoc, (int)(100 * hitDist), (int)(100 * hitDist), (int)(100 * hitDist));
 					if(hitDist < minHitDist) {
@@ -389,7 +389,7 @@ public class Nav {
 			
 			minHitDist = 100;
 			for(int i = bullets.length; i-->0;) {
-				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,10*bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
+				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,2*bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
 				if(hitDist != -1) {
 					rc.setIndicatorDot(possibleMoveLoc, (int)(100 * hitDist), (int)(100 * hitDist), (int)(100 * hitDist));
 					if(hitDist < minHitDist) {
