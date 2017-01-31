@@ -112,28 +112,33 @@ public class BotGardener {
 		
 		else if(!settled) {
 			
-			if(bots.length > 0) {
-				for(int i = bots.length;i-->0;) {
-					if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
-						goalLocation = goalLocation.add(bots[i].location.directionTo(myLocation), 5f);//, 10f/(1f + bots[i].location.distanceTo(myLocation)));
+			//if(myLocation.distanceTo(goalLocation) > 15f) {
+			//	goalLocation = myLocation;
+			//}
+			//goalLocation = myLocation;
+			if(myLocation.distanceTo(goalLocation) < 4f) {
+				if(bots.length > 0) {
+					for(int i = bots.length;i-->0;) {
+						if(bots[i].getType() == RobotType.GARDENER || bots[i].getType() == RobotType.ARCHON) {
+							goalLocation = goalLocation.add(bots[i].location.directionTo(myLocation), 5f);//, 10f/(1f + bots[i].location.distanceTo(myLocation)));
+						}
 					}
 				}
-			}
-			
-			if(trees.length > 0) {
-				for(int i = trees.length;i-->0;) {
-					goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation), 2f);//, 10f/(1f + trees[i].location.distanceTo(myLocation)));
+				
+				if(trees.length > 0) {
+					for(int i = trees.length;i-->0;) {
+						goalLocation = goalLocation.add(trees[i].location.directionTo(myLocation), 2f);//, 10f/(1f + trees[i].location.distanceTo(myLocation)));
+					}
 				}
+				
+				if (!rc.onTheMap(myLocation.add(Direction.NORTH, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.SOUTH, 20f);
+				if (!rc.onTheMap(myLocation.add(Direction.SOUTH, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.NORTH, 20f);
+				if (!rc.onTheMap(myLocation.add(Direction.WEST, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.EAST, 20f);
+				if (!rc.onTheMap(myLocation.add(Direction.EAST, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.WEST, 20f);
+				
+				// Stay away from the enemy base
+				goalLocation = goalLocation.add(myLocation.directionTo(enemyBase).opposite(), 3f);//, 10f/(myLocation.distanceTo(enemyBase)+1f));
 			}
-			
-			if (!rc.onTheMap(myLocation.add(Direction.NORTH, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.SOUTH, 20f);
-			if (!rc.onTheMap(myLocation.add(Direction.SOUTH, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.NORTH, 20f);
-			if (!rc.onTheMap(myLocation.add(Direction.WEST, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.EAST, 20f);
-			if (!rc.onTheMap(myLocation.add(Direction.EAST, RobotType.GARDENER.sensorRadius-1f))) goalLocation=goalLocation.add(Direction.WEST, 20f);
-			
-			// Stay away from the enemy base
-			goalLocation = goalLocation.add(myLocation.directionTo(enemyBase).opposite(), 3f);//, 10f/(myLocation.distanceTo(enemyBase)+1f));
-			
 			rc.setIndicatorDot(goalLocation, 100, 0, 100);
 			MapLocation moveLocation = Nav.pathTo(rc, goalLocation);
 			if(moveLocation != null) {
@@ -201,16 +206,30 @@ public class BotGardener {
 		int treesCanPlant = getMaxTrees();
 		int turnsAliveThreshold = 0;
 		
+		
 		switch(mapSize) {
 			case VSMALL:
 				turnsAliveThreshold = 20;
 				break;
 			case LARGE:
-				turnsAliveThreshold = rc.getRoundNum() < 100 ? 30 : 40;
+				turnsAliveThreshold = rc.getTreeCount() < 20 ? 30 : 100;
 				break;
 			default:
-				turnsAliveThreshold = 30;
+				turnsAliveThreshold = rc.getTreeCount() < 20 ? 30 : 100;
 				break;
+		}
+
+		if(turnsAlive < turnsAliveThreshold) {
+			RobotInfo[] nearbyBots = rc.senseNearbyRobots(-1, us);
+			for(int i = nearbyBots.length;i-->0;) {
+				if(nearbyBots[i].getType() == RobotType.GARDENER) {
+					return false;
+				}
+			}
+		}
+		
+		if(treesCanPlant > 3) {
+			return true;
 		}
 		
 		if(treesCanPlant > settleThreshold && turnsAlive > turnsAliveThreshold) {

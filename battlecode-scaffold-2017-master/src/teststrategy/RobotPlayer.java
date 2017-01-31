@@ -16,7 +16,14 @@ public strictfp class RobotPlayer {
 				rc.donate(rc.getTeamBullets());
 			}
 			
-			if(rc.getTeamBullets() > 1000 * (7.5f + rc.getRoundNum() * 0.0041666666f)) {
+			if(rc.getTeamBullets() > 500) {
+				int amountToDonate = (int) (rc.getTeamBullets() - 500);
+				if(amountToDonate > 0) {
+					rc.donate(amountToDonate);
+				}
+			}
+			
+			if(rc.getTeamBullets() > rc.getVictoryPointCost() * (1000 - rc.getTeamVictoryPoints())) {
 				rc.donate(rc.getTeamBullets());
 			}
 			
