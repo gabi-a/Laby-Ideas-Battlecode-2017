@@ -13,6 +13,11 @@ public class RobotPlayer {
  	public static void run(RobotController rc) throws GameActionException {
  		RobotPlayer.rc = rc;
  		while(true) {
+ 			//int[] arrayA = {1,5,2,7,4,56};
+ 		    //int[] arrayB = {56,2,6,1,65,4,5};
+ 		    //int[] intersect = BulletsAndSets.intersection(arrayA, arrayB);
+ 		    //for(int e : intersect) System.out.println(e);
+ 		   
  			try {
  				switch (rc.getType()) {
 			    case ARCHON:
@@ -50,24 +55,33 @@ public class RobotPlayer {
 		
 		case A:{
 			BulletInfo[] bullets = rc.senseNearbyBullets();
-			if(bullets.length > 0) {
-				MapLocation myLocation = rc.getLocation();
-				MapLocation moveLocation = awayFromBullets(rc, myLocation, bullets);
-				if(rc.canMove(myLocation.directionTo(moveLocation))) rc.move(myLocation.directionTo(moveLocation));
-			}
 			RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
+			//if(bullets.length > 0) {
+			//	MapLocation myLocation = rc.getLocation();
+			//	MapLocation moveLocation = Nav.dontGetHit(rc, myLocation, bullets, enemies.length == 0 ? null : enemies[0].location);
+			//	if(moveLocation != myLocation && rc.canMove(myLocation.directionTo(moveLocation))) rc.move(myLocation.directionTo(moveLocation));
+			//}
 			if(enemies.length > 0) {
-				if(!rc.hasMoved() && rc.canMove(rc.getLocation().directionTo(enemies[0].location))) rc.move(rc.getLocation().directionTo(enemies[0].location));
+			//	if(!rc.hasMoved() && rc.canMove(rc.getLocation().directionTo(enemies[0].location))) rc.move(rc.getLocation().directionTo(enemies[0].location));
 				if(rc.canFireTriadShot()) rc.fireTriadShot(rc.getLocation().directionTo(enemies[0].location));
 			}
 			break;}
 			//No break so that it fires
 		case B:{
+			BulletInfo[] bullets = rc.senseNearbyBullets();
 			RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
-			if(enemies.length > 0) {
-				if(rc.canMove(rc.getLocation().directionTo(enemies[0].location))) rc.move(rc.getLocation().directionTo(enemies[0].location));
-				if(rc.canFireSingleShot()) rc.fireSingleShot(rc.getLocation().directionTo(enemies[0].location));
+			if(bullets.length > 0) {
+				MapLocation myLocation = rc.getLocation();
+	 			
+				MapLocation moveLocation = BulletsAndSets.useVennDiagramsToDodgeBullets(rc.getType().bodyRadius, myLocation, bullets);
+				Direction moveDirection = myLocation.directionTo(moveLocation);
+				float moveStride = Math.min(rc.getType().strideRadius, myLocation.distanceTo(moveLocation));
+				if(moveLocation != myLocation && rc.canMove(moveDirection, moveStride)) rc.move(moveDirection, moveStride);
 			}
+			//if(enemies.length > 0) {
+			//	if(!rc.hasMoved() && rc.canMove(rc.getLocation().directionTo(enemies[0].location))) rc.move(rc.getLocation().directionTo(enemies[0].location));
+			//	if(rc.canFireTriadShot()) rc.fireTriadShot(rc.getLocation().directionTo(enemies[0].location));
+			//}
 			break;}
 		}
 		
