@@ -252,7 +252,7 @@ public class BotArchon {
 			if(rc.getTreeCount() >= bigBonus + 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER)) {
 				action = Action.SPAWN_UNIT;
 			}
-			else if(Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100) {
+			else if(Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < bigBonus + rc.getRoundNum()/100) {
 				action = Action.SPAWN_UNIT;
 			}
 		}

@@ -189,7 +189,7 @@ public class BotGardener {
 				turnsAliveThreshold = 20;
 				break;
 			case LARGE:
-				turnsAliveThreshold = rc.getRoundNum() < 50 ? 15 : 40;
+				turnsAliveThreshold = rc.getRoundNum() < 100 ? 20 : 40;
 				break;
 			default:
 				turnsAliveThreshold = 30;
