@@ -247,12 +247,12 @@ public class BotArchon {
 		
 		byte action = Action.DIE_EXCEPTION;
 		
-		if(rc.getTeamBullets() > 130) {
+		if(rc.getTeamBullets() > 130 || rc.getRoundNum() > 100) {
 			int bigBonus = mapSize == MapSize.LARGE ? 1 : 0;  
 			if(rc.getTreeCount() >= bigBonus + 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER)) {
 				action = Action.SPAWN_UNIT;
 			}
-			else if(Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100) {
+			else if(Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < bigBonus + rc.getRoundNum()/100) {
 				action = Action.SPAWN_UNIT;
 			}
 		}

@@ -197,7 +197,7 @@ public class BotGardener {
 				turnsAliveThreshold = 20;
 				break;
 			case LARGE:
-				turnsAliveThreshold = rc.getRoundNum() < 50 ? 15 : 40;
+				turnsAliveThreshold = rc.getRoundNum() < 100 ? 30 : 40;
 				break;
 			default:
 				turnsAliveThreshold = 30;
@@ -334,6 +334,7 @@ public class BotGardener {
 	public static boolean firstUnits(int[] units) throws GameActionException {
 
 		if(turnsAlive >= 60) return false;
+		if(rc.getRoundNum() > 100) return false;
 		
 		if(treeUnitCount > 4 && (mapSize == MapSize.LARGE || mapSize == MapSize.MEDIUM)) {
 			if(units[RobotType.LUMBERJACK.ordinal()] <= 1){

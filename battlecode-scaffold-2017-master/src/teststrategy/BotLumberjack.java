@@ -88,7 +88,7 @@ public class BotLumberjack {
 			} else {
 				enemyBase = rc.getInitialArchonLocations(them)[0];
 			}
-			rc.setIndicatorDot(enemyBase, 0, 255, 0);
+			//rc.setIndicatorDot(enemyBase, 0, 255, 0);
 			if(!treeContainsRobot) {
 				
 				if(enemyBase != null){
