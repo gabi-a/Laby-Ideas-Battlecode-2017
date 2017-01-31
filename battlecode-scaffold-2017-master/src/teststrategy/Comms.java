@@ -236,7 +236,7 @@ class CommsArray {
 	private int arrayStart;
 	private int arrayEnd;
 	int length;
-	int cacheRounds = 10;
+	int cacheRounds = 0;
 	private int[] array;
 	private int[] lastUpdated;
 

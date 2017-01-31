@@ -34,7 +34,7 @@ public class BotArchon {
 	
 	static MapSize mapSize;
 
-	static MapLocation[] theirArchonLocs;
+	static MapLocation[] theirArchonLocs = RobotPlayer.rc.getInitialArchonLocations(them);;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotArchon.rc = rc;
@@ -57,7 +57,6 @@ public class BotArchon {
 		if(rc.getRoundNum() == 1) {
 			goalLocation = myLocation;
 			MapLocation[] ourArchonLocs = rc.getInitialArchonLocations(us); 
-			theirArchonLocs = rc.getInitialArchonLocations(them);
 			enemyBase = theirArchonLocs[0];
 			numInitialArchons = ourArchonLocs.length;
 			for(int i = 0; i < ourArchonLocs.length; i++) {
@@ -181,8 +180,10 @@ public class BotArchon {
 		}
 		
 		else {
-			
-			goalLocation = goalLocation.add(theirArchonLocs[archonDesignation.ordinal()].directionTo(myLocation),3f);
+			if(goalLocation == null) goalLocation = myLocation;	
+			System.out.println("Archon designation " + archonDesignation.ordinal());
+			if(theirArchonLocs[archonDesignation.ordinal()].directionTo(myLocation) != null)
+				goalLocation = goalLocation.add(theirArchonLocs[archonDesignation.ordinal()].directionTo(myLocation),3f);
 			
 			//if(myLocation.distanceTo(goalLocation) < 0.01f) {
 			if(bots.length > 0) {

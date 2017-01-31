@@ -55,7 +55,7 @@ public class BotGardener {
 			enemyBase = theirArchonLocs[0];
 			int[] archonTrees = Comms.archonTreeCount.array(rc);
 			int heuristic = 100;
-			for(int i = numInitialArchons;i-->0;) {
+			for(int i = numInitialArchons-1;i-->0;) {
 				if(archonTrees[i] < heuristic) {
 					heuristic = archonTrees[i];
 				}
@@ -203,7 +203,8 @@ public class BotGardener {
 	
 	public static Direction setSpawnDirection() throws GameActionException {
 		//System.out.println("Set spawn direction");
-		Direction testDirection = myLocation.directionTo(rc.getInitialArchonLocations(them)[0]);
+		
+		Direction testDirection = new Direction((float) Math.toRadians(5 * Math.round(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]).getAngleDegrees()/5)));
 		for(int i = 0;i<36;i++) {
 			rc.setIndicatorDot(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i),2f), 0, 255, 0);
 			if( !(rc.isCircleOccupiedExceptByThisRobot(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i), 2f), 1f) || !rc.onTheMap(rc.getLocation().add(testDirection.rotateLeftDegrees(5f * i), 2f), 1f))) {			
@@ -346,6 +347,7 @@ public class BotGardener {
 				return true;
 			}
  		}
+		
 	return false;
 	}
 }

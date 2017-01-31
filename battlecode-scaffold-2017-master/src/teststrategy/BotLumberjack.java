@@ -13,6 +13,8 @@ public class BotLumberjack {
 	
 	static Team us = RobotPlayer.rc.getTeam();
 	static Team them = us.opponent();
+
+	static MapLocation enemyBase = null;
 	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotLumberjack.rc = rc;
@@ -78,32 +80,33 @@ public class BotLumberjack {
 					}
 				}
 			} 
-			rc.setIndicatorDot(goalLocation, 255, 0, 0);
+			//rc.setIndicatorDot(goalLocation, 255, 0, 0);
 			MapLocation closestToEnemyBase = Util.getClosestToEnemyBase(rc);
-			MapLocation enemyBase = null;
 			RobotInfo enemyBaseBot = Util.getBestPassiveEnemy(rc);
 			if(enemyBaseBot != null) {
 				enemyBase = enemyBaseBot.location;
 			} else {
 				enemyBase = rc.getInitialArchonLocations(them)[0];
 			}
-			rc.setIndicatorDot(enemyBase, 255, 0, 0);
+			rc.setIndicatorDot(enemyBase, 0, 255, 0);
 			if(!treeContainsRobot) {
+				
+				if(enemyBase != null){
+						goalLocation = enemyBase;
+				}
+				 
 				if(closestToEnemyBase != null && closestToEnemyBase != myLocation){
-					goalLocation = goalLocation.add(myLocation.directionTo(closestToEnemyBase), 1f);
+					goalLocation = goalLocation.add(myLocation.directionTo(closestToEnemyBase), 10f);
 					rc.setIndicatorDot(closestToEnemyBase, 0, 255, 0);
 				} 
-				else if(enemyBase != null){
-					goalLocation = goalLocation.add(myLocation.directionTo(enemyBase), 1f);
-				}
 				
 				if(allies.length > 0) {
 					for(int i = allies.length;i-->0;) {
-						goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 0.2f);
+						goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 1f);
 					}
 				}
 			}
-			
+			rc.setIndicatorDot(goalLocation, 255, 0, 0);
 			MapLocation moveLocation = Nav.pathTo(rc, goalLocation, moveTreeRadius);
 			
 			if(moveLocation != null) {
@@ -116,12 +119,16 @@ public class BotLumberjack {
 		}
 		
 		if(moveDirection == null && trees.length == 0) {
-			RobotInfo somewhereToGo = Util.getBestPassiveEnemy(rc);
-			MapLocation goalLocation = null;
-			if(somewhereToGo != null) goalLocation = somewhereToGo.location;
-			MapLocation moveLocation = Nav.pathTo(rc, goalLocation);
-			if(moveLocation != null) moveDirection = myLocation.directionTo(moveLocation);
+			if(enemyBase == null) {
+				RobotInfo somewhereToGo = Util.getBestPassiveEnemy(rc);
+				MapLocation goalLocation = null;
+				if(somewhereToGo != null) goalLocation = somewhereToGo.location;
+				MapLocation moveLocation = Nav.pathTo(rc, goalLocation);
+				if(moveLocation != null) moveDirection = myLocation.directionTo(moveLocation);
+			}
 		}
+		
+		System.out.println(moveDirection);
 		
 		/************* Determine what action to take *************/
 		byte action = Action.DIE_EXCEPTION;
