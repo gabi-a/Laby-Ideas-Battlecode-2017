@@ -6,6 +6,8 @@ public strictfp class RobotPlayer {
 	
 	static RobotController rc;
 	
+	static int donateThreshold = 400;
+	
 	public static void run(RobotController rc) throws GameActionException {
 		RobotPlayer.rc = rc;
 		while(true) {
@@ -16,8 +18,12 @@ public strictfp class RobotPlayer {
 				rc.donate(rc.getTeamBullets());
 			}
 			
-			if(rc.getTeamBullets() > 500) {
-				int amountToDonate = (int) (rc.getTeamBullets() - 500);
+			if(rc.getOpponentVictoryPoints() > 0 || rc.getTreeCount() > 70) {
+				donateThreshold = 310;
+			}
+			
+			if(rc.getTeamBullets() > donateThreshold) {
+				int amountToDonate = (int) (rc.getTeamBullets() - donateThreshold);
 				if(amountToDonate > 0) {
 					rc.donate(amountToDonate);
 				}

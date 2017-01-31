@@ -23,10 +23,16 @@ public class BotLumberjack {
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);
 		RobotInfo[] allies = rc.senseNearbyRobots(-1, us);
 		BulletInfo[] bullets = rc.senseNearbyBullets(4);
-		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
+		TreeInfo[] neutralTrees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
+		TreeInfo[] enemyTrees = rc.senseNearbyTrees(-1, them);
 		TreeInfo bestTree = null;
 		float moveTreeRadius = 0f;
 		boolean treeContainsRobot = false;
+		
+		TreeInfo[] trees = new TreeInfo[neutralTrees.length + enemyTrees.length];
+		
+		System.arraycopy(neutralTrees, 0, trees, 0, neutralTrees.length);
+        System.arraycopy(enemyTrees, 0, trees, neutralTrees.length, enemyTrees.length);
 		
 		Util.shakeIfAble(rc);
 		
