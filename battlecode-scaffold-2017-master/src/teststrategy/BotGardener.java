@@ -15,6 +15,7 @@ public class BotGardener {
 
 	static MapLocation myLocation;
 	
+	static boolean noTrees = false;
 	static boolean lotsOfTrees = false;
 	static boolean treeCountFlag = false;
 	
@@ -60,6 +61,7 @@ public class BotGardener {
 					heuristic = archonTrees[i];
 				}
 			}
+			if(numInitialArchons == 1) heuristic = archonTrees[0];
 			if(heuristic > TREE_HEURISTIC_THRESHOLD) {
 				lotsOfTrees = true;
 			}
