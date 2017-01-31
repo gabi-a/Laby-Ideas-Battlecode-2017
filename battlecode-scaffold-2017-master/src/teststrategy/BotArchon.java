@@ -54,8 +54,6 @@ public class BotArchon {
 		
 		/************* Setup game variables    *******************/
 		if(rc.getRoundNum() == 1) {
-			TeamInfo info = new TeamInfo(new long[0][0]);
-			info.adjustBulletSupply(Team.A, 10000f);
 			goalLocation = myLocation;
 			MapLocation[] ourArchonLocs = rc.getInitialArchonLocations(us); 
 			theirArchonLocs = rc.getInitialArchonLocations(them);
