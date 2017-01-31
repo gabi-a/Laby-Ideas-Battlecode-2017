@@ -25,7 +25,7 @@ public class BotLumberjack {
 		TreeInfo bestTree = null;
 		float moveTreeRadius = 0f;
 		
-		Util.shakeIfAble(rc, trees);
+		Util.shakeIfAble(rc);
 		
 		if(bullets.length == 0) {
 			Util.updateMyPostion(rc);

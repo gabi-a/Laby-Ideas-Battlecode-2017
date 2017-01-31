@@ -40,6 +40,7 @@ public class BotGardener {
 			mapSize = MapSize.values()[Comms.mapSize.read(rc)];
 		}
 		Util.updateMyPostion(rc);
+		Util.shakeIfAble(rc);
 		
 		/*
 		 * Get an idea for how many trees on the map based on the archons perceptions

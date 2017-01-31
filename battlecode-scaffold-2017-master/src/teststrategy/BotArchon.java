@@ -40,6 +40,7 @@ public class BotArchon {
 		BotArchon.rc = rc;
 
 		Util.updateMyPostion(rc);
+		Util.shakeIfAble(rc);
 		
 		RobotInfo[] bots = rc.senseNearbyRobots(-1, us);
 		RobotInfo[] enemies = rc.senseNearbyRobots(-1, them);

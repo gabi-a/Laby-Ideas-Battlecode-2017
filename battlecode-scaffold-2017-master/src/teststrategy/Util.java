@@ -234,9 +234,13 @@ public class Util {
 		return gardener;
 	}
 	
-	static void shakeIfAble(RobotController rc, TreeInfo[] trees) throws GameActionException{
-		if(trees.length > 0 && trees[0] != null && rc.canShake(trees[0].ID)) {
-			rc.shake(trees[0].ID);
+	static void shakeIfAble(RobotController rc) throws GameActionException {
+		TreeInfo[] trees = rc.senseNearbyTrees(rc.getType().bodyRadius + 1f, Team.NEUTRAL);
+		for(TreeInfo tree : trees) {
+			if(tree.containedBullets > 0 && rc.canShake(tree.ID)) {
+				rc.shake(tree.ID);
+				return;
+			}
 		}
 	}
 	
