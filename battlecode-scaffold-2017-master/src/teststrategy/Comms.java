@@ -34,6 +34,8 @@ public class Comms {
 	
 	public static final CommsInt mapSize;
 	
+	public static final CommsInt tankGardeners;
+	
 	static {
 		ourBotCount = new CommsBotCount(0,6);
 		theirBotCount = new CommsBotCount(10,20);
@@ -46,6 +48,7 @@ public class Comms {
 		mapSize = new CommsInt(125);
 		enemiesSighted = new CommsBotArray(130,140);
 		treeUnitCount = new CommsInt(150);
+		tankGardeners = new CommsInt(160);
 	}
 	
 	public static int packLocation(RobotController rc, MapLocation location) {

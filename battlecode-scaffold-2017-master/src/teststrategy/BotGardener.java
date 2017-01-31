@@ -31,8 +31,16 @@ public class BotGardener {
 	
 	static MapSize mapSize;
 	
+	static boolean tankGardener = false;
+	
 	public static void turn(RobotController rc) throws GameActionException {
 		BotGardener.rc = rc;
+		
+		if(!tankGardener && rc.getTreeCount() > 20 && Comms.tankGardeners.read(rc) < 2) {
+			tankGardener = true;
+			Comms.tankGardeners.increment(rc, 1);
+		}
+		
 		turnsAlive++;
 		if(turnsAlive % 10 == 0) {
 			settleThreshold = Math.max(0, settleThreshold - 1);
@@ -239,6 +247,10 @@ public class BotGardener {
 			rc.plantTree(buildDirection);
 		}
 		for(int i = 3; i-->0;) {
+			if(tankGardener && (Math.abs(buildDirection.rotateLeftDegrees(60f * i).degreesBetween(spawnDirection)) % 360 <= 60 
+					|| Math.abs(buildDirection.rotateRightDegrees(60f * i).degreesBetween(spawnDirection)) % 360 <= 60)) {
+				continue;
+			}
 			rc.setIndicatorDot(rc.getLocation().add(buildDirection.rotateLeftDegrees(60f * i),2f), 255, 0, 0);
 			if(rc.canPlantTree(buildDirection.rotateLeftDegrees(60f * i))) {
 				rc.plantTree(buildDirection.rotateLeftDegrees(60f * i));
@@ -284,8 +296,10 @@ public class BotGardener {
 			else if(units[RobotType.LUMBERJACK.ordinal()] <= 6 + 6 * units[RobotType.TANK.ordinal()]) {
 				tryToBuild(RobotType.LUMBERJACK);
 			} else {
-				if(!tryToBuild(RobotType.TANK)) {
-					tryToBuild(RobotType.LUMBERJACK);
+				if(rc.getTeamBullets() >= RobotType.TANK.bulletCost) {
+					if(!tryToBuild(RobotType.TANK)) {
+						tryToBuild(RobotType.LUMBERJACK);
+					}
 				}
 			}
 		} 
@@ -293,10 +307,22 @@ public class BotGardener {
 		else {
 			// leave some bullets for shooting
 			if(rc.getTeamBullets() < 130) return;
-			if( (units[RobotType.SOLDIER.ordinal()] > 4 *units[RobotType.LUMBERJACK.ordinal()]) ) {
-				tryToBuild(RobotType.LUMBERJACK);
+			if(rc.getTreeCount() >= 20) {
+				if(units[RobotType.SOLDIER.ordinal()] <= 6 + 6 * units[RobotType.TANK.ordinal()]) {
+					tryToBuild(RobotType.SOLDIER);
+				} else {
+					if(rc.getTeamBullets() >= RobotType.TANK.bulletCost) {
+						if(!tryToBuild(RobotType.TANK)) {
+							tryToBuild(RobotType.SOLDIER);
+						}
+					}
+				}
 			} else {
-				tryToBuild(RobotType.SOLDIER);
+				if( (units[RobotType.SOLDIER.ordinal()] > 4 *units[RobotType.LUMBERJACK.ordinal()]) ) {
+					tryToBuild(RobotType.LUMBERJACK);
+				} else {
+					tryToBuild(RobotType.SOLDIER);
+				}
 			}
 		}
 		if(units[RobotType.SCOUT.ordinal()] == 0) {
