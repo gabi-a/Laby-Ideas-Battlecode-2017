@@ -291,7 +291,7 @@ public class BotSoldier {
 				if(enemies[i].type == RobotType.ARCHON) {
 					enemyArchonCache = enemies[i];
 				}
-				else if(Util.goodToShoot(rc, myLocation, enemies[i])) {
+				else if(Util.goodToShootNotTrees(rc, myLocation, enemies[i])) {
 					enemyToAttack = enemies[i];
 					break;
 				}
@@ -403,8 +403,7 @@ public class BotSoldier {
 					//}
 				}
 				
-				//Don't waste bullets on a scout hiding in trees
-				if(enemyToAttack.type == RobotType.SCOUT && !Util.goodToShoot(rc, myLocation, enemyToAttack)) {
+				if(!Util.goodToShootNotTrees(rc, myLocation, enemyToAttack)) {
 					action = Action.DIE_EXCEPTION;
 				}
 
@@ -418,7 +417,7 @@ public class BotSoldier {
 			else if(turnsSinceLastSeen < TURNS_SHOOT_UNSEEN && trackedEnemy != null){
 				turnsSinceLastSeen ++;
 				
-				if( Util.goodToShoot(rc, myLocation, trackedEnemy) ) {
+				if( Util.goodToShootNotTrees(rc, myLocation, trackedEnemy) ) {
 					action = Action.FIRE_TRIAD;
 					shootDirection = myLocation.directionTo(trackedEnemy.location);
 				}
