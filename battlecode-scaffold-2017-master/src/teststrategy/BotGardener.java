@@ -175,26 +175,23 @@ public class BotGardener {
 		if(spawnDirection == null) return false;
 		
 		int treesCanPlant = getMaxTrees();
-		//System.out.println("Trees can plant:" +treesCanPlant );
-		if(treesCanPlant > settleThreshold && turnsAlive > 30) {
+		int turnsAliveThreshold = 0;
+		
+		switch(mapSize) {
+			case VSMALL:
+				turnsAliveThreshold = 20;
+				break;
+			case LARGE:
+				turnsAliveThreshold = rc.getRoundNum() < 50 ? 15 : 40;
+				break;
+			default:
+				turnsAliveThreshold = 30;
+				break;
+		}
+		
+		if(treesCanPlant > settleThreshold && turnsAlive > turnsAliveThreshold) {
 			return true;
 		}
-		
-		/*
-		TreeInfo[] closeTrees = rc.senseNearbyTrees(2f);
-		RobotInfo[] closeRobots = rc.senseNearbyRobots(2f);
-		
-		int bigTrees = 0;
-		for(TreeInfo tree : closeTrees) {
-			if(tree.radius >= 1) {
-				bigTrees++;
-			}
-		}
-		
-		if(bigTrees < 2 && closeRobots.length == 0 && (rc.onTheMap(rc.getLocation(), 3f))) {
-			return true;
-		}
-		*/
 		
 		return false;
 	}
