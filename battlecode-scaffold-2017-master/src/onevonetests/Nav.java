@@ -457,4 +457,10 @@ public class Nav {
 		return minHitsLoc;
 		
 	}
+	
+	static void finalDodgeAttempt(float strideRadius, float bodyRadius, MapLocation myLocation, BulletInfo[] bullets) {
+		
+		// Step 1: Find 
+		
+	}
 }
