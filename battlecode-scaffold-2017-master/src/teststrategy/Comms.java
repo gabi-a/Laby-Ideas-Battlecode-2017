@@ -40,7 +40,7 @@ public class Comms {
 		enemyGardenersArray = new CommsBotArray(30, 40);
 		enemyArchonsArray = new CommsBotArray(50, 60);
 		enemiesAttackingGardenersOrArchons = new CommsBotArray(70,80);
-		ourLumberjackAndSoldiers = new CommsBotArray(90,100);
+		ourLumberjackAndSoldiers = new CommsBotArray(500,550);
 		archonTreeCount = new CommsArray(110,113);
 		archonCount = new CommsInt(120);
 		mapSize = new CommsInt(125);
