@@ -1,6 +1,7 @@
 package teststrategy;
 import battlecode.common.*;
 import battlecode.schema.Action;
+import battlecode.world.TeamInfo;
 
 public class BotArchon {
 	static RobotController rc;
@@ -53,6 +54,8 @@ public class BotArchon {
 		
 		/************* Setup game variables    *******************/
 		if(rc.getRoundNum() == 1) {
+			TeamInfo info = new TeamInfo(new long[0][0]);
+			info.adjustBulletSupply(Team.A, 10000f);
 			goalLocation = myLocation;
 			MapLocation[] ourArchonLocs = rc.getInitialArchonLocations(us); 
 			theirArchonLocs = rc.getInitialArchonLocations(them);
@@ -233,8 +236,15 @@ public class BotArchon {
 		
 		byte action = Action.DIE_EXCEPTION;
 		
-		if(rc.getTeamBullets() > 130 && (rc.getTreeCount() >= 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) && rc.getTeamBullets() > 130 || Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100 ))
-			action = Action.SPAWN_UNIT;
+		if(rc.getTeamBullets() > 130) {
+			int bigBonus = mapSize == MapSize.LARGE ? 1 : 0;  
+			if(rc.getTreeCount() >= bigBonus + 3*Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER)) {
+				action = Action.SPAWN_UNIT;
+			}
+			else if(Comms.ourBotCount.readNumBots(rc, RobotType.GARDENER) < rc.getRoundNum()/100) {
+				action = Action.SPAWN_UNIT;
+			}
+		}
 		
 		/************* Do Move ***********************************/
 		
