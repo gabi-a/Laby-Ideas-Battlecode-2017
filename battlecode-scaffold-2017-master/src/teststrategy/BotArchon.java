@@ -155,6 +155,17 @@ public class BotArchon {
 			System.out.println("On Map:"+onMapHits+"Trees:"+treeHits);
 			System.out.println("Tree heuristic: " + treeHeuristic);
 			
+			int treeUnitCount = 0;
+			if(initialSpawningArchon) {
+				for(TreeInfo tree : trees) {
+					if(tree.containedRobot != null && tree.containedRobot != RobotType.GARDENER && tree.health <= 222) {
+						treeUnitCount++;
+					}
+				}
+				Comms.treeUnitCount.write(rc, treeUnitCount);
+				System.out.println(treeUnitCount);
+			}
+			
 		}
 		
 		

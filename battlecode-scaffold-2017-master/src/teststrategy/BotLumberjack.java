@@ -24,6 +24,7 @@ public class BotLumberjack {
 		TreeInfo[] trees = rc.senseNearbyTrees(-1, Team.NEUTRAL);
 		TreeInfo bestTree = null;
 		float moveTreeRadius = 0f;
+		boolean treeContainsRobot = false;
 		
 		Util.shakeIfAble(rc);
 		
@@ -73,6 +74,7 @@ public class BotLumberjack {
 						score = newScore;
 						goalLocation = trees[i].getLocation();
 						moveTreeRadius = trees[i].radius;
+						treeContainsRobot = (trees[i].containedRobot != null); 
 					}
 				}
 			} 
@@ -86,24 +88,19 @@ public class BotLumberjack {
 				enemyBase = rc.getInitialArchonLocations(them)[0];
 			}
 			rc.setIndicatorDot(enemyBase, 255, 0, 0);
-			if(closestToEnemyBase != null && closestToEnemyBase != myLocation){
-				goalLocation = goalLocation.add(myLocation.directionTo(closestToEnemyBase), 1f);
-				rc.setIndicatorDot(closestToEnemyBase, 0, 255, 0);
-			} 
-			else if(enemyBase != null){
-				goalLocation = goalLocation.add(myLocation.directionTo(enemyBase), 1f);
-			}
-			rc.setIndicatorDot(goalLocation, 0, 0, 255);
-			
-			//else {
-			//	goalLocation = goalLocation.add(myLocation.directionTo(rc.getInitialArchonLocations(them)[0]), 2f);
-			//}
-			
-			// Move away from ally bots
-			if(allies.length > 0) {
-				//System.out.println("B" + Clock.getBytecodeNum());
-				for(int i = allies.length;i-->0;) {
-					goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 0.2f);
+			if(!treeContainsRobot) {
+				if(closestToEnemyBase != null && closestToEnemyBase != myLocation){
+					goalLocation = goalLocation.add(myLocation.directionTo(closestToEnemyBase), 1f);
+					rc.setIndicatorDot(closestToEnemyBase, 0, 255, 0);
+				} 
+				else if(enemyBase != null){
+					goalLocation = goalLocation.add(myLocation.directionTo(enemyBase), 1f);
+				}
+				
+				if(allies.length > 0) {
+					for(int i = allies.length;i-->0;) {
+						goalLocation = goalLocation.add(myLocation.directionTo(allies[i].getLocation()).opposite(), 0.2f);
+					}
 				}
 			}
 			

@@ -21,6 +21,7 @@ public class BotGardener {
 	static int settleThreshold = 3;
 	
 	static int turnsAlive = 0;
+	static int treeUnitCount = 0;
 	
 	static final float TREE_HEURISTIC_THRESHOLD = 77;
 	
@@ -41,6 +42,10 @@ public class BotGardener {
 		}
 		Util.updateMyPostion(rc);
 		Util.shakeIfAble(rc);
+		
+		if(turnsAlive <= 1) {
+			treeUnitCount = Comms.treeUnitCount.read(rc);
+		}
 		
 		/*
 		 * Get an idea for how many trees on the map based on the archons perceptions
@@ -301,7 +306,15 @@ public class BotGardener {
 
 		if(turnsAlive >= 60) return false;
 		
+		if(treeUnitCount > 4 && (mapSize == MapSize.LARGE || mapSize == MapSize.MEDIUM)) {
+			if(units[RobotType.LUMBERJACK.ordinal()] <= 1){
+				tryToBuild(RobotType.LUMBERJACK); 
+				return true;
+			}
+		}
+		
 		if(mapSize == MapSize.LARGE) return false;
+
 		if(!lotsOfTrees || mapSize == MapSize.VSMALL) {
 			if(units[RobotType.SOLDIER.ordinal()] <= 1){
 				tryToBuild(RobotType.SOLDIER); 
