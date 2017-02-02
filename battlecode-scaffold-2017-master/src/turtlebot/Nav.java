@@ -2,9 +2,9 @@ package turtlebot;
 import battlecode.common.*;
 
 public class Nav {
-
-    static Direction heading = Nav.randomDirection();
     
+	static Direction heading = Nav.randomDirection();
+	
 	/**
      * Attempts to move in a given direction, while avoiding small obstacles directly in the path.
      *
@@ -165,15 +165,14 @@ public class Nav {
 		s /= eaPointer;
 		c /= eaPointer;
 		if (c < 0) {
-			tryPrecisionMove(rc, new Direction((float) Math.atan2(s, c)), 2f, 5, 2.5f - closestDistance);
-			return true;
+			return tryPrecisionMove(rc, new Direction((float) Math.atan2(s, c)), 2f, 5, 2.5f - closestDistance);			
 		}
 		else {
-			tryPrecisionMove(rc, (new Direction((float) Math.atan2(s, c)).opposite()), 2f, 5, 2.5f - closestDistance);
-			return true;
+			return tryPrecisionMove(rc, (new Direction((float) Math.atan2(s, c)).opposite()), 2f, 5, 2.5f - closestDistance);
 		}
 		
 	}
+	
 	
 	static boolean willCollideWithMe(RobotController rc, BulletInfo bullet, MapLocation loc) {
 
@@ -199,4 +198,16 @@ public class Nav {
 
         return (perpendicularDist <= rc.getType().bodyRadius);
     }
+	
+	public static boolean simpleRunAway(RobotController rc, MapLocation myLocation, RobotInfo[] nearbyEnemies, TreeInfo[] nearbyTrees) throws GameActionException {
+		MapLocation goalLoc = myLocation;
+		for(int i = nearbyEnemies.length;i-->0;) {
+			goalLoc = goalLoc.add(myLocation.directionTo(nearbyEnemies[i].getLocation()).opposite());
+		}
+		for(int i = nearbyTrees.length;i-->0;) {
+			goalLoc = goalLoc.add(myLocation.directionTo(nearbyTrees[i].getLocation()).opposite());
+		}
+		return Nav.tryMove(rc, myLocation.directionTo(goalLoc));
+	}
+	
 }

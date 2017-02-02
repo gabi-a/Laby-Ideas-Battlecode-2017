@@ -38,7 +38,7 @@ public class BotScout {
 		if (moveTarget == null) {
 			moveTarget = Comms.popStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END);
 			if (moveTarget == null) {
-				// System.out.format("Failed to get comms, while %b
+				// //System.out.format("Failed to get comms, while %b
 				// returning\n", returning);
 			} else {
 				System.out.format("My assignment: (%f, %f)\n", moveTarget.x, moveTarget.y);

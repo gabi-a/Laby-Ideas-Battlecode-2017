@@ -21,7 +21,21 @@ public class BotScout {
 		enemyTarget = null;
 		double lowestHealth = 10000d;
 
+		
+		Nav.avoidBullets(rc, myLocation);
+		
 		for (int i = 0; i < enemies.length; i++) {
+
+			if(enemies[i].getType() == RobotType.GARDENER /*|| enemies[i].getType() == RobotType.ARCHON*/) {
+				Comms.writeAttackEnemy(rc, enemies[i].getLocation(), enemies[i].getID());
+			}
+			
+			if(enemies[i].getID() == Comms.readAttackID(rc)) {
+				if(enemies[i].getHealth() < 20f) {
+					Comms.clearAttackEnemy(rc);
+				}
+			}
+			
 			if (enemies[i].getType() == RobotType.GARDENER 
 				|| enemies[i].getType() == RobotType.LUMBERJACK 
 				|| enemies[i].getType() == RobotType.SCOUT
@@ -41,7 +55,6 @@ public class BotScout {
 			}
 			startupFlag = false;
 		}
-
 		if (moveTarget == null) {
 			moveTarget = Comms.unpackLocation(rc, Comms.popStack(rc, Comms.ARCHON_SCOUT_DELEGATION_START, Comms.ARCHON_SCOUT_DELEGATION_END));
 		}
@@ -52,7 +65,8 @@ public class BotScout {
 			enemyTarget = null;
 			returning = false;
 		}
-		if (enemyTarget == null) {
+		if (enemyTarget == null && !rc.hasMoved()) {
+			moveTarget = Comms.readAttackLocation(rc);
 			if (moveTarget == null && returning == false) {
 				Nav.explore(rc);
 			} else {
@@ -76,10 +90,10 @@ public class BotScout {
 					}
 				}
 			}
-		} else {
+		} else if(enemyTarget != null ){
 			Direction dir = rc.getLocation().directionTo(enemyTarget.location);
 			float dist = enemyTarget.location.distanceTo(rc.getLocation());
-			if (/*!Nav.avoidBullets(rc, myLocation) &&*/ !Nav.avoidLumberjacks(rc, myLocation)) {
+			if (!rc.hasMoved() && !Nav.avoidLumberjacks(rc, myLocation)) {
 				if ((dist >= 0f && enemyTarget.type != RobotType.LUMBERJACK) || dist >= 2f) {
 					Nav.tryPrecisionMove(rc, dir, 1.49f);
 				}

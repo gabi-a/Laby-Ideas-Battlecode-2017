@@ -21,6 +21,7 @@ public class BotSoldier {
 			}
 		}
 
+		boolean moved = false;
 		float dist = 0;
 		Direction dir = new Direction(0);
 		if (target != null) {
@@ -31,10 +32,10 @@ public class BotSoldier {
 	        if(!Nav.avoidBullets(rc, myLocation)) {
 			if (target != null) {
 				if (dist >= 6) {
-					Nav.tryMove(rc, dir);
+					moved = Nav.tryMove(rc, dir);
 				}
 				else if (dist < 4 && rc.canMove(dir.opposite())) {
-					Nav.tryMove(rc, dir.opposite());
+					moved = Nav.tryMove(rc, dir.opposite());
 				}
 			}
 			else if(!rc.hasMoved()) {
@@ -45,13 +46,20 @@ public class BotSoldier {
 					if(allyBot.getType() == RobotType.GARDENER) {
 						float distance = myLocation.distanceTo(allyBot.getLocation());
 						if (distance > 6) {
-							Nav.tryMove(rc, myLocation.directionTo(allyBot.getLocation()));
+							moved = Nav.tryMove(rc, myLocation.directionTo(allyBot.getLocation()));
 							break;
 						}
 					}
 				}
-				if(!rc.hasMoved())
-					Nav.tryMove(rc, Nav.randomDirection());
+				if(!moved) {
+					MapLocation attackLocation = Comms.readAttackLocation(rc);
+					if(attackLocation != null) {
+						moved = Nav.tryMove(rc, myLocation.directionTo(attackLocation));
+					}
+					if(!moved) {
+						Nav.explore(rc);
+					}
+				}
 			}
 		}
 

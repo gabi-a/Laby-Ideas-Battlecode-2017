@@ -199,4 +199,265 @@ public class Nav {
 
         return (perpendicularDist <= rc.getType().bodyRadius);
     }
+	
+	static MapLocation dontGetHit(RobotController rc, MapLocation myLocation, BulletInfo[] bullets, MapLocation closestEnemyLocation) {
+
+		int innerCircleLocs = 8;
+		int outerCircleLocs = 16;
+		
+		// Assumption: There is always a move where no bullets will hit
+		
+		MapLocation[] safeMoves = new MapLocation[innerCircleLocs + outerCircleLocs + 1];
+		
+		// First check if staying still is the best option (unlikely!)
+		boolean hit = false;
+		for(int i = bullets.length; i-->0;) {
+			hit = calcHit(bullets[i], myLocation, rc.getType().bodyRadius);
+			if(hit) break;
+		}
+		if(!hit) safeMoves[innerCircleLocs + outerCircleLocs] = myLocation;
+		
+		
+		// Idea: Try an inner circle of possible moves, then an outer circle
+		int locationAttempt = 0;
+		
+		// Try moves in the inner circle
+		for(float rads = (float) (2*Math.PI); (rads -= 2*Math.PI / innerCircleLocs) > 0;) {
+			Direction dir = new Direction(rads);
+			MapLocation possibleMoveLocation = myLocation.add(dir, rc.getType().strideRadius);
+			
+			
+			int hits = 0;
+			for(int i = bullets.length; i-->0;) {
+				hit = calcHit(bullets[i], possibleMoveLocation, rc.getType().bodyRadius / 2f);
+				if(hit) hits++;
+			}
+			
+			if(hits != 0) rc.setIndicatorDot(possibleMoveLocation, 255, 0, 0);
+			if(hits == 0) rc.setIndicatorDot(possibleMoveLocation, 137, 172, 229);
+			//rc.setIndicatorDot(possibleMoveLocation, 50 * hits, 172, 229);
+			
+			if(hits == 0) safeMoves[locationAttempt] = possibleMoveLocation;
+			locationAttempt++;
+		}
+		
+		// Now try moves in the outer circle
+		for(float rads = (float) (2*Math.PI); (rads -= 2*Math.PI / outerCircleLocs) > 0;) {
+			Direction dir = new Direction(rads);
+			MapLocation possibleMoveLocation = myLocation.add(dir, rc.getType().strideRadius);
+			
+			int hits = 0;
+			for(int i = bullets.length; i-->0;) {
+				hit = calcHit(bullets[i], possibleMoveLocation, rc.getType().bodyRadius);
+				if(hit) hits++; 
+			}
+			
+			if(hits != 0) rc.setIndicatorDot(possibleMoveLocation, 255, 0, 0);
+			if(hits == 0) rc.setIndicatorDot(possibleMoveLocation, 137, 172, 229);
+			//rc.setIndicatorDot(possibleMoveLocation, 150, 172, 50 * hits);
+			//System.out.println("Loc:"+possibleMoveLocation+" Hits:"+hits);
+			
+			if(hits == 0) safeMoves[locationAttempt] = possibleMoveLocation;
+			locationAttempt++;
+		}
+		
+		// Now find the best of the safe moves
+		// If no enemy, just pick the first valid one
+		if(closestEnemyLocation == null) {
+			for(int i = safeMoves.length; i --> 0;) {
+				if(safeMoves[i] != null && rc.canMove(safeMoves[i])) {
+					//System.out.println("Returning safe location:"+safeMoves[i]);
+					return safeMoves[i];
+				}
+			}
+		}
+		
+		// Otherwise find the furthest from the enemy
+		MapLocation bestLocation = myLocation;
+		float maxDist = 0;
+		for(int i = safeMoves.length; i --> 0;) {
+			if(safeMoves[i] != null && rc.canMove(safeMoves[i])) {
+				//rc.setIndicatorDot(safeMoves[i], 137, 172, 229);
+				float dist = safeMoves[i].distanceTo(closestEnemyLocation);
+				if(dist > maxDist) {
+					maxDist = dist;
+					bestLocation = safeMoves[i];
+				}
+			}
+		}
+		//System.out.println("Returning best location:"+bestLocation);
+		return bestLocation;
+		
+	}
+	
+	static boolean calcHit(BulletInfo bullet, MapLocation targetCenter, float targetRadius) {
+		//System.out.println(bulletCenter.distanceTo(targetCenter));
+		//return bulletCenter.distanceTo(targetCenter) < targetRadius;
+		MapLocation bulletFutureLocation = bullet.location.add(bullet.dir,bullet.speed);
+		float hitDist = calcHitDist(bullet.location, bulletFutureLocation, targetCenter, targetRadius);
+		return(hitDist >= 0);
+	}
+	
+	static float calcHitDist(MapLocation bulletStart, MapLocation bulletFinish,
+            MapLocation targetCenter, float targetRadius) {
+		RobotPlayer.rc.setIndicatorLine(bulletStart, bulletFinish, 255, 0, 255);
+		final float minDist = 0;
+        final float maxDist = bulletStart.distanceTo(bulletFinish);
+        final float distToTarget = bulletStart.distanceTo(targetCenter);
+        final Direction toFinish = bulletStart.directionTo(bulletFinish);
+        final Direction toTarget = bulletStart.directionTo(targetCenter);
+
+        // If toTarget is null, then bullet is on top of center of unit, distance is zero
+        if(toTarget == null) {
+            return 0;
+        }
+
+        if(toFinish == null) {
+            // This should never happen
+            throw new RuntimeException("bulletStart and bulletFinish are the same.");
+        }
+
+        float radiansBetween = toFinish.radiansBetween(toTarget);
+
+        //Check if the target intersects with the line made between the bullet points
+        float perpDist = (float)Math.abs(distToTarget * Math.sin(radiansBetween));
+        if(perpDist > targetRadius){
+            return -1;
+        }
+
+        //Calculate hitDist
+        float halfChordDist = (float)Math.sqrt(targetRadius * targetRadius - perpDist * perpDist);
+        float hitDist = distToTarget * (float)Math.cos(radiansBetween);
+        if(hitDist < 0){
+            hitDist += halfChordDist;
+            hitDist = hitDist >= 0 ? 0 : hitDist;
+        }else{
+            hitDist -= halfChordDist;
+            hitDist = hitDist < 0 ? 0 : hitDist;
+        }
+
+        //Check invalid hitDists
+        if(hitDist < minDist || hitDist > maxDist){
+            return -1;
+        }
+        return hitDist;
+	}
+	
+	static MapLocation reallyDontGetHit(RobotController rc, MapLocation myLocation, BulletInfo[] bullets) {
+
+		final int innerCircleLocs = 8;
+		final int outerCircleLocs = 8;
+		
+		MapLocation maxHitDistLoc = myLocation;
+		float maxHitDist = 0;
+		
+		float minHitDist = 100;
+		for(int i = bullets.length; i-->0;) {
+			float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,2*bullets[i].speed), myLocation, rc.getType().bodyRadius);
+			if(hitDist != -1) {
+				if(hitDist < minHitDist) {
+					minHitDist = hitDist;
+				}
+			}
+		}
+		maxHitDist = minHitDist;
+		System.out.println("\nMax: "+maxHitDist+" Min: "+minHitDist);
+		
+		for(float rads = (float) (2*Math.PI); (rads -= 2*Math.PI / innerCircleLocs) >= 0;) {
+			Direction dir = new Direction(rads);
+			MapLocation possibleMoveLoc = myLocation.add(dir, rc.getType().strideRadius / 2f);
+			
+			minHitDist = 100;
+			for(int i = bullets.length; i-->0;) {
+				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
+				if(hitDist != -1) {
+					rc.setIndicatorDot(possibleMoveLoc, (int)(100 * hitDist), (int)(100 * hitDist), (int)(100 * hitDist));
+					if(hitDist < minHitDist) {
+						minHitDist = hitDist;
+					}
+				}
+			}
+			if(minHitDist > maxHitDist) {
+				maxHitDist = minHitDist;
+				maxHitDistLoc = possibleMoveLoc;
+			}
+		}
+		System.out.println("Max: "+maxHitDist+" Min: "+minHitDist);
+		for(float rads = (float) (2*Math.PI); (rads -= 2*Math.PI / outerCircleLocs) >= 0;) {
+			Direction dir = new Direction(rads);
+			MapLocation possibleMoveLoc = myLocation.add(dir, rc.getType().strideRadius);
+			
+			minHitDist = 100;
+			for(int i = bullets.length; i-->0;) {
+				float hitDist = calcHitDist(bullets[i].location,bullets[i].location.add(bullets[i].dir,bullets[i].speed), possibleMoveLoc, rc.getType().bodyRadius);
+				if(hitDist != -1) {
+					rc.setIndicatorDot(possibleMoveLoc, (int)(100 * hitDist), (int)(100 * hitDist), (int)(100 * hitDist));
+					if(hitDist < minHitDist) {
+						minHitDist = hitDist;
+					}
+				}
+			}
+			if(minHitDist > maxHitDist) {
+				maxHitDist = minHitDist;
+				maxHitDistLoc = possibleMoveLoc;
+			}
+		}
+		System.out.println(maxHitDist);
+		return maxHitDistLoc;
+	}
+	
+	static MapLocation dodgeBulletsAndStuff(RobotController rc, MapLocation myLocation, BulletInfo[] bullets) {
+		
+		final int innerCircleLocs = 3;
+		final int outerCircleLocs = 8;
+		
+		
+		int hits = 0;
+		for(int i = bullets.length; i-->0;) {
+			boolean hit = calcHit(bullets[i], myLocation, rc.getType().bodyRadius);
+			if(hit) hits++;
+		}
+		if(hits == 0) return myLocation;
+		
+		MapLocation minHitsLoc = myLocation;
+		int minHits = hits;
+		
+		for(float rads = (float) (2*Math.PI); (rads -= 2*Math.PI / innerCircleLocs) >= 0;) {
+			Direction dir = new Direction(rads);
+			MapLocation possibleMoveLoc = myLocation.add(dir, rc.getType().strideRadius / 2f);
+			hits = 0;
+			for(int i = bullets.length; i-->0;) {
+				boolean hit = calcHit(bullets[i], possibleMoveLoc, rc.getType().bodyRadius);
+				if(hit) RobotPlayer.rc.setIndicatorDot(possibleMoveLoc,0,0,128);
+				if(hit) hits++;
+			}
+			if(hits == 0) return possibleMoveLoc;
+			if(hits < minHits) {minHits = hits; minHitsLoc = possibleMoveLoc;}
+		}
+		
+		for(float rads = (float) (2*Math.PI); (rads -= 2*Math.PI / outerCircleLocs) >= 0;) {
+			Direction dir = new Direction(rads);
+			MapLocation possibleMoveLoc = myLocation.add(dir, rc.getType().strideRadius);
+			hits = 0;
+			for(int i = bullets.length; i-->0;) {
+				boolean hit = calcHit(bullets[i], possibleMoveLoc, rc.getType().bodyRadius);
+				if(hit) RobotPlayer.rc.setIndicatorDot(possibleMoveLoc,0,0,128);
+				if(hit) hits++;
+			}
+			if(hits == 0) return possibleMoveLoc;
+			if(hits < minHits) {minHits = hits; minHitsLoc = possibleMoveLoc;}
+		}
+		
+		if(minHitsLoc == myLocation) {
+			MapLocation goalLoc = myLocation;
+			for(int i = bullets.length; i-->0;) {
+				goalLoc = goalLoc.add(bullets[i].location.directionTo(myLocation));
+			}
+			System.out.println("Can't dodge bullets properly");
+			return goalLoc;
+		}
+		System.out.println("Min hits: "+minHits);
+		return minHitsLoc;
+		
+	}
 }

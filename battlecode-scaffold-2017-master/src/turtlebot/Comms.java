@@ -17,10 +17,16 @@ public class Comms {
 	public static final int ENEMY_END = 699;
 	public static final int ENEMY_ARCHON_START = 700;
 	public static final int ENEMY_ARCHON_END = 702;
+
 	public static final int HIGH_PRIORITY_TREE_START = 7;
 	public static final int HIGH_PRIORITY_TREE_END = 16;
 	public static final int LOW_PRIORITY_TREE_START = 17;
 	public static final int LOW_PRIORITY_TREE_END = 26;
+
+	public static final int ROBOT_NUMS_START = 703; // End is 709
+	public static final int ATTACK_LOCATION = 710;
+	public static final int ATTACK_ID = 711;
+
 	
     private static final int POINTER_OFFSET = 1;
     
@@ -59,9 +65,11 @@ public class Comms {
         int stackPointer = rc.readBroadcast(stackStart);
         
         if (stackStart + stackPointer + 1 > stackEnd) {
-            System.out.println("Oops! Exceeded stack limit.");
+            //System.out.println("Oops! Exceeded stack limit.");
             return;
         }
+
+
 
         rc.broadcast(stackStart + POINTER_OFFSET + stackPointer, data);
         rc.broadcast(stackStart, stackPointer + 1);
@@ -219,4 +227,34 @@ public class Comms {
 	public static int readGardenerUniversalHoldRound(RobotController rc) throws GameActionException {
 		return rc.readBroadcast(GARDENER_UNIVERSAL_HOLD_ROUND);
 	}
+	
+	public static void writeNumRobots(RobotController rc, RobotType type, int num) throws GameActionException {
+		rc.broadcast(ROBOT_NUMS_START-1+type.ordinal(), num);
+	}
+	
+	public static int readNumRobots(RobotController rc, RobotType type) throws GameActionException {
+		return rc.readBroadcast(ROBOT_NUMS_START-1+type.ordinal());
+	}
+	
+	public static void writeAttackEnemy(RobotController rc, MapLocation loc, int id) throws GameActionException {
+		rc.broadcast(ATTACK_LOCATION, Comms.packLocation(rc,loc));
+		rc.broadcast(ATTACK_ID, id);
+	}
+	
+	public static void clearAttackEnemy(RobotController rc) throws GameActionException {
+		rc.broadcast(ATTACK_LOCATION, 0);
+		rc.broadcast(ATTACK_ID, 0);
+	}
+	
+	public static MapLocation readAttackLocation(RobotController rc) throws GameActionException {
+		int data = rc.readBroadcast(ATTACK_LOCATION);
+		if(data == 0)
+			return null;
+		return Comms.unpackLocation(rc,data);
+	}
+	
+	public static int readAttackID(RobotController rc) throws GameActionException {
+		return rc.readBroadcast(ATTACK_ID);
+	}
+	
 }
